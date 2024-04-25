@@ -1,0 +1,81 @@
+# Роль
+
+ROLE_YA_MARKET_PRODUCTS_SETTING:
+  name: 'Соотношения свойств Wildberries'
+  desc: 'Настройки соотношений данных Wildberries'
+
+# Правила
+
+ROLE_YA_MARKET_PRODUCTS_SETTING_INDEX:
+  name: 'Просмотр'
+  desc: ''
+
+ROLE_YA_MARKET_PRODUCTS_SETTING_NEW:
+  name: 'Добавить'
+  desc: ''
+
+ROLE_YA_MARKET_PRODUCTS_SETTING_EDIT:
+  name: 'Редактировать'
+  desc: ''
+
+ROLE_YA_MARKET_PRODUCTS_SETTING_DELETE:
+  name: 'Удалить'
+  desc: ''
+
+
+
+
+ROLE_WB_CARDS:
+  name: 'Карточки товаров'
+  desc: 'Карточки товаров Wildberries'
+
+ROLE_WB_CARDS_INDEX:
+  name: 'Просмотр'
+  desc: ''
+
+ROLE_WB_CARDS_NEW:
+  name: 'Добавить'
+  desc: ''
+
+ROLE_WB_CARDS_EDIT:
+  name: 'Редактировать'
+  desc: ''
+
+ROLE_WB_CARDS_DELETE:
+  name: 'Удалить'
+  desc: ''
+
+ROLE_WB_CARDS_UPDATE:
+  name: 'Обновление'
+  desc: ''
+
+
+ROLE_WB_CARDS_GET:
+  name: 'Получить новые'
+  desc: ''
+
+
+
+ROLE_WB_BARCODE:
+  name: 'Штрихкоды Wildberries'
+  desc: 'Настройки стикеров штрихкодов Wildberries'
+
+ROLE_WB_BARCODE_INDEX:
+  name: 'Просмотр'
+  desc: ''
+
+ROLE_WB_BARCODE_PRINT:
+  name: 'Печать'
+  desc: ''
+
+ROLE_WB_BARCODE_NEW:
+  name: 'Добавить'
+  desc: ''
+
+ROLE_WB_BARCODE_EDIT:
+  name: 'Редактировать'
+  desc: ''
+
+ROLE_WB_BARCODE_DELETE:
+  name: 'Удалить'
+  desc: ''

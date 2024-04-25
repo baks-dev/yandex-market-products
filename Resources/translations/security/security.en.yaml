@@ -1,0 +1,74 @@
+# Role
+
+ROLE_YA_MARKET_PRODUCTS_SETTING:
+  name: 'Ratio settings'
+  desc: 'Wildberries data ratio settings'
+
+# Rules
+ROLE_YA_MARKET_PRODUCTS_SETTING_INDEX:
+  name: 'View'
+  desc: ''
+
+ROLE_YA_MARKET_PRODUCTS_SETTING_NEW:
+  name: 'Add'
+  desc: ''
+
+ROLE_YA_MARKET_PRODUCTS_SETTING_EDIT:
+  name: 'Edit'
+  desc: ''
+
+ROLE_YA_MARKET_PRODUCTS_SETTING_DELETE:
+  name: 'Delete'
+  desc: ''
+
+ROLE_WB_CARDS_UPDATE:
+  name: 'Update'
+  desc: ''
+
+ROLE_WB_CARDS_GET:
+  name: 'Get new ones'
+  desc: ''
+
+
+
+ROLE_WB_CARDS:
+  name: 'Product cards'
+  desc: 'Wildberries Product Cards'
+
+ROLE_WB_CARDS_INDEX:
+  name: 'View'
+  desc: ''
+
+ROLE_WB_CARDS_NEW:
+  name: 'Add'
+  desc: ''
+
+ROLE_WB_CARDS_EDIT:
+  name: 'Edit'
+  desc: ''
+
+ROLE_WB_CARDS_DELETE:
+  name: 'Delete'
+  desc: ''
+
+
+
+ROLE_WB_BARCODE:
+  name: 'Wildberries barcodes'
+  desc: 'Wildberries barcode sticker settings'
+
+ROLE_WB_BARCODE_PRINT:
+  name: 'Print'
+  desc: ''
+
+ROLE_WB_BARCODE_NEW:
+  name: 'Add'
+  desc: ''
+
+ROLE_WB_BARCODE_EDIT:
+  name: 'Edit'
+  desc: ''
+
+ROLE_WB_BARCODE_DELETE:
+  name: 'Delete'
+  desc: ''

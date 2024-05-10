@@ -92,12 +92,10 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
         $dbal
             ->select('card.*')
             ->leftJoin(
-                'product',
+                'product_event',
                 YaMarketProductsCardMarket::class,
                 'card',
-                '
-                    card.product = product_event.main
-                '
+                'card.product = product_event.main'
             );
 
 

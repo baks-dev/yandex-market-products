@@ -154,6 +154,10 @@ final class YaMarketProductsSettingsForm extends AbstractType
 
                 foreach($marketParameters as $param)
                 {
+                    if($param->getName() === 'Номер карточки')
+                    {
+                        continue;
+                    }
 
                     $YaMarketProductsSettingsParametersDTO = new YaMarketProductsSettingsParametersDTO();
                     $YaMarketProductsSettingsParametersDTO->setName($param->getName());

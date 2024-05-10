@@ -72,12 +72,12 @@ final class EditController extends AbstractController
 
             if($handle)
             {
-                $this->addFlash('admin.page.edit', 'admin.success.edit', 'admin.wb.products.settings');
+                $this->addFlash('page.edit', 'success.edit', 'yandex-market-products.admin.settings');
 
                 return $this->redirectToRoute('yandex-market-products:admin.settings.index');
             }
 
-            $this->addFlash('admin.page.edit', 'admin.danger.update', 'admin.wb.products.settings', $handle);
+            $this->addFlash('page.edit', 'danger.update', 'yandex-market-products.admin.settings', $handle);
 
             return $this->redirectToReferer();
 

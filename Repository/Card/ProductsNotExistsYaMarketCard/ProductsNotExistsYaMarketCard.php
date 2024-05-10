@@ -53,7 +53,6 @@ final class ProductsNotExistsYaMarketCard implements ProductsNotExistsYaMarketCa
      */
     public function findAll(UserProfileUid|string $profile): \Generator
     {
-
         if(is_string($profile))
         {
             $profile = new UserProfileUid($profile);

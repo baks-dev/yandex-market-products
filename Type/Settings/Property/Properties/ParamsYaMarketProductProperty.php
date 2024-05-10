@@ -113,8 +113,12 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
 
                 /** Tansform data */
 
-                foreach($product_params as $key => $param)
+                foreach($product_params as $param)
                 {
+                    if($param->value === 'false')
+                    {
+                        continue;
+                    }
 
                     /** Категория ШИНЫ */
                     if($data["market_category"] === 90490)
@@ -131,7 +135,6 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
 
                         }
 
-
                         if($param->name === 'Класс топливной эффективности')
                         {
                             if(!$param->value)
@@ -140,8 +143,13 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
                             }
 
                             $arr = json_decode($param->value);
-                            $param->value = $arr[0];
 
+                            if(!isset($arr[0]))
+                            {
+                                continue;
+                            }
+
+                            $param->value = $arr[0];
                         }
 
                         if($param->name === 'Сцепление на мокрой дороге')
@@ -152,8 +160,13 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
                             }
 
                             $arr = json_decode($param->value);
-                            $param->value = $arr[1];
 
+                            if(!isset($arr[1]))
+                            {
+                                continue;
+                            }
+
+                            $param->value = $arr[1];
                         }
 
                         if($param->name === 'Уровень внешнего шума')
@@ -164,6 +177,12 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
                             }
 
                             $arr = json_decode($param->value);
+
+                            if(!isset($arr[2]))
+                            {
+                                continue;
+                            }
+
                             $param->value = $arr[2];
 
                         }
@@ -173,21 +192,15 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
                             $param->value = $this->translator->trans($param->value.'_desc', domain: 'field.tire.cartype');
                         }
 
-
-                        //                    if($param->name === 'Индекс максимальной скорости')
-                        //                    {
-                        //                        $param->value = $this->translator->trans($param->value.'_desc', domain: 'field.tire.cartype');
-                        //                    }
-
-                        //                    if($param->name === 'Максимальная скорость - индекс')
-                        //                    {
-                        //                        $param->value = $this->translator->trans($param->value.'_desc', domain: 'field.tire.cartype');
-                        //                    }
                     }
 
-                    $params[$key]['name'] = $param->name;
-                    $params[$key]['value'] = $param->value;
+                    $params[] = [
+                        'name' => $param->name,
+                        'value' => $param->value
+                    ];
                 }
+
+
 
                 if($data['product_modification_postfix'])
                 {
@@ -196,13 +209,13 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
 
                     if(!empty($cleaned_str))
                     {
+                        $params[] = [
+                            'name' => 'Максимальная скорость - индекс',
+                            'value' => $cleaned_str
+                        ];
 
-                        // Не отображаются в карточке на YaMarket (видимо устаревший)
-                        // $key++;
-                        // $params[$key]['name'] = 'Максимальная скорость - индекс';
-                        // $params[$key]['value'] = $cleaned_str;
 
-                        $key++;
+                        /** Индекс максимальной скорости */
 
                         $return_index = match ($cleaned_str)
                         {
@@ -223,8 +236,11 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
                             'Z/ZR' => 'Z/ZR (свыше 240 км/ч)'
                         };
 
-                        $params[$key]['name'] = 'Индекс максимальной скорости';
-                        $params[$key]['value'] = $return_index;
+                        $params[] = [
+                            'name' => 'Индекс максимальной скорости',
+                            'value' => $return_index
+                        ];
+
                     }
                 }
 
@@ -245,16 +261,13 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
 
                         (int) $identifier = substr($return_value->getDateTime()->getTimestamp().$numbers, 0, 64);
 
-                        $key++;
-                        $params[$key]['name'] = 'Номер карточки';
-                        $params[$key]['value'] = $identifier;
+                        $params[] = [
+                            'name' => 'Номер карточки',
+                            'value' => $identifier
+                        ];
 
                     }
                 }
-
-
-                //$param->value = $this->translator->trans($param->value, domain: 'field.tire.radius');
-
 
             }
         }

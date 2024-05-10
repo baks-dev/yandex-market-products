@@ -55,7 +55,6 @@ class YaMarketPostNewCardCommand extends Command
         $this->addArgument('profile', InputArgument::OPTIONAL, 'Идентификатор профиля');
     }
 
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -64,7 +63,9 @@ class YaMarketPostNewCardCommand extends Command
 
         if(!$profile)
         {
-            $io->error('Профиль пользователя не указан');
+            $io->error("Не указан идентификатор профиля пользователя. Пример:".PHP_EOL
+                ." php bin/console baks:yandex-market-products:post:new <UID>");
+            return Command::INVALID;
         }
 
         $profile = new UserProfileUid($profile);
@@ -76,10 +77,10 @@ class YaMarketPostNewCardCommand extends Command
         /** @var YaMarketProductsCardMarketDTO $YaMarketProductsCardMarketDTO */
         foreach($YaMarketProductsCardMarket as $i => $YaMarketProductsCardMarketDTO)
         {
-//            if ($i % 600 === 0) {
-//                $io->info($i.': Исключаем блокировку (ОГРАНИЧЕНИЕ! 600 запросов в минуту)');
-//                sleep(60);
-//            }
+            //            if ($i % 600 === 0) {
+            //                $io->info($i.': Исключаем блокировку (ОГРАНИЧЕНИЕ! 600 запросов в минуту)');
+            //                sleep(60);
+            //            }
 
             // Исключаем блокировку (ОГРАНИЧЕНИЕ! 600 запросов в минуту)'
             usleep(200);
@@ -102,8 +103,6 @@ class YaMarketPostNewCardCommand extends Command
 
 
         return Command::SUCCESS;
-
-
 
 
         if($profile)

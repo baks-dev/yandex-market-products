@@ -73,6 +73,23 @@ final class YaMarketProductsPriceUpdate
             return;
         }
 
+        /** Не обновляем базовую стоимость карточки без цены */
+        if(empty($Card['product_price']))
+        {
+            return;
+        }
+
+        /** Карточка товара YaMarket */
+        $MarketProduct = $this->yandexMarketProductRequest
+            ->profile($Card['profile'])
+            ->article($Card['article'])
+            ->find();
+
+        if(false === $MarketProduct->valid()) // карточка не найдена
+        {
+            return;
+        }
+
         $Money = new Money($Card['product_price'] / 100);
         $Currency = new Currency($Card['product_currency']);
 
@@ -89,16 +106,6 @@ final class YaMarketProductsPriceUpdate
 
         $Price = new Money($marketCalculator);
 
-        /** Карточка товара YaMarket */
-        $MarketProduct = $this->yandexMarketProductRequest
-            ->profile($Card['profile'])
-            ->article($Card['article'])
-            ->find();
-
-        if(false === $MarketProduct->valid()) // карточка не найдена
-        {
-            return;
-        }
 
         /** @var YandexMarketProductDTO $YandexMarketProductDTO */
         $YandexMarketProductDTO = $MarketProduct->current();

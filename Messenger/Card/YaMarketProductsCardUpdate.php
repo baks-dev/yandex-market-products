@@ -76,6 +76,13 @@ final class YaMarketProductsCardUpdate
             return;
         }
 
+        /** Не добавляем карточку без цены */
+        if(empty($Card['product_price']))
+        {
+            $this->logger->warning(sprintf('Не добавляем карточку %s без цены', $Card['article']));
+            return;
+        }
+
         $request = null;
 
         /** @var YaMarketProductPropertyInterface $item */

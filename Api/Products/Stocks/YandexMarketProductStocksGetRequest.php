@@ -82,7 +82,14 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
             );
         }
 
-        $stocks = current(current($content['result']['warehouses'])['offers'])['stocks'];
+        $warehouses = current($content['result']['warehouses']);
+
+        if(empty($warehouses))
+        {
+            return 0;
+        }
+
+        $stocks = current($warehouses['offers'])['stocks'];
 
         return empty($stocks) ? 0 : $stocks;
 

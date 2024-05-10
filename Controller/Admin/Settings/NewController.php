@@ -66,12 +66,12 @@ final class NewController extends AbstractController
 
             if($handle instanceof YaMarketProductsSettings)
             {
-                $this->addFlash('admin.page.new', 'admin.success.new', 'admin.wb.products.settings');
+                $this->addFlash('page.new', 'success.new', 'yandex-market-products.admin.settings');
 
                 return $this->redirectToRoute('yandex-market-products:admin.settings.index');
             }
 
-            $this->addFlash('admin.page.new', 'admin.danger.new', 'admin.wb.products.settings');
+            $this->addFlash('page.new', 'danger.new', 'yandex-market-products.admin.settings');
 
             return $this->redirectToReferer();
         }

@@ -71,6 +71,11 @@ final class YaMarketProductsCardUpdate
     {
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
+        if(!$Card)
+        {
+            return;
+        }
+
         $request = null;
 
         /** @var YaMarketProductPropertyInterface $item */
@@ -103,14 +108,14 @@ final class YaMarketProductsCardUpdate
         {
             /** @var YandexMarketProductDTO $YandexMarketProductDTO */
 
-            $YandexMarketProductDTO =  $MarketProduct->current();
+            $YandexMarketProductDTO = $MarketProduct->current();
 
             /** Не обновляем карточку если нет изменений (фото параметров) */
-           if($YandexMarketProductDTO->equals($request))
-           {
-               $this->logger->info(sprintf('Изменения в карточке %s отсутствуют', $request['offerId']));
-               return;
-           }
+            if($YandexMarketProductDTO->equals($request))
+            {
+                $this->logger->info(sprintf('Изменения в карточке %s отсутствуют', $request['offerId']));
+                return;
+            }
         }
 
         $this->marketProductUpdate

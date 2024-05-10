@@ -68,6 +68,11 @@ final class YaMarketProductsPriceUpdate
     {
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
+        if(!$Card)
+        {
+            return;
+        }
+
         $Money = new Money($Card['product_price'] / 100);
         $Currency = new Currency($Card['product_currency']);
 

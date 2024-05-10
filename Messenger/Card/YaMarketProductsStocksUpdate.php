@@ -70,6 +70,11 @@ final class YaMarketProductsStocksUpdate
     {
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
+        if(!$Card)
+        {
+            return;
+        }
+
         $ProductStocks = $this->marketProductStocksGetRequest
             ->profile($Card['profile'])
             ->article($Card['article'])

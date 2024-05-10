@@ -28,6 +28,8 @@ use BaksDev\Core\Services\Paginator\PaginatorInterface;
 
 interface AllProductsSettingsInterface
 {
+    public function search(SearchDTO $search): self;
+
     /** Метод возвращает пагинатор WbProductsSettings */
-    public function fetchAllProductsSettingsAssociative(SearchDTO $search): PaginatorInterface;
+    public function fetchAllProductsSettingsAssociative(): PaginatorInterface;
 }

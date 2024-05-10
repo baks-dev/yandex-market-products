@@ -37,7 +37,7 @@ final class DeleteYaMarketProductsSettingsForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
-            'delete_product_settings',
+            'delete_market_products_settings',
             SubmitType::class,
             ['label' => 'Delete', 'label_html' => true, 'attr' => ['class' => 'btn-danger']]
         );

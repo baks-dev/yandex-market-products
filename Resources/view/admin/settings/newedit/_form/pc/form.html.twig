@@ -1,35 +1,134 @@
-{% trans_default_domain 'admin.wb.products.settings' %}
-
-<div class="d-flex gap-2">
-
-    <div class="d-flex flex-column gap-2 w-100 mb-2">
-        {# Настройки локали #}
+{% trans_default_domain 'yandex-market-products.admin.settings' %}
 
 
+<ul class="nav nav-pills gap-3 mb-3" id="nav-market">
 
-        {# {{ form_row(form.country, { label: 'Страна-изготовитель', placeholder: 'Выберите поле из списка...'}) }} #}
+    <li class="nav-item" role="presentation">
+        <button class="btn fw-bolder nav-link active"
+                data-bs-toggle="tab"
+                type="button"
+                role="tab"
+                aria-selected="true"
+
+                id="tab_parameter-tab"
+                data-bs-target="#tab_parameter"
+                aria-controls="nav-market"
+        >
+            <small class="text-uppercase px-3">
+                {# Основные настройки #}
+                Основные настройки
+            </small>
+        </button>
+    </li>
 
 
+    <li class="nav-item">
+        <button class="btn fw-bolder nav-link"
+                data-bs-toggle="tab"
+                type="button"
+                role="tab"
+                aria-selected="true"
 
-        {# НАСТРОЙКИ ЛОКАЛИ ПОСАДОЧНЫХ БЛОКОВ #}
+                id="tab_property-tab"
+                data-bs-target="#tab_property"
+                aria-controls="nav-market"
+        >
+            <small class="text-uppercase px-3">
+                {# Пользовательские поля #}
+                Свойства товара
+            </small>
+        </button>
+    </li>
+
+
+</ul>
+
+<div class="tab-content">
+
+    {# ОСНОВНЫЕ НАСТРОЙКИ #}
+    <div class="tab-pane fade show active" id="tab_parameter" role="tabpanel">
         {% for property in form.property %}
 
-
-
-            <div class="d-flex mb-1 gap-2 align-items-end rounded-3"
-                 style='background-color: {{ property.vars.data.required ? '#fff2f2' : property.vars.data.field is null ? '#fffaef' : '#f8f8f8' }}'
+            <div class="d-flex p-3 mb-1 gap-2 align-items-end rounded-3 border"
+                    {#style='background-color: {{ property.vars.data.required ? '#fff2f2' : property.vars.data.field is null ? '#fffaef' : '#f8f8f8' }}'#}
             >
+                <div class="w-50">
+                    {{ form_label(property.field) }}
+                    {{ form_help(property.field) }}
+                </div>
 
-                {% set unit = property.vars.data.unit ? ' ('~property.vars.data.unit~').' : '' %}
-                {% set popular = property.vars.data.popular ? '<span class="badge text-bg-primary me-1">Популярное</span> ' : '' %}
 
-
-                <div class="p-3 w-100 opacity-100">
-                    {{ popular|raw }}
-
-                    {{ form_label(property.field, property.vars.data.type ~ unit) }}
-
+                <div class="w-50 d-flex mb-1 gap-2 align-items-end rounded-3">
                     {{ form_widget(property.field, {
+                        placeholder: 'Выберите поле из списка...',
+                        attr: { 'data-select' : 'select2', class:  'mb-0'  }
+                    }) }}
+
+                    {% if property.def is defined %}
+                        {{ form_widget(property.def, {
+                            placeholder: 'Выберите поле из списка...',
+                            attr: { 'placeholder' : 'по умолчанию' }
+                        }) }}
+                    {% endif %}
+
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+    </div>
+
+    <div class="tab-pane fade" id="tab_property" role="tabpanel">
+        {% for parameters in form.parameters %}
+
+            <div class="d-flex gap-2">
+
+            <div class=" w-100 d-flex p-3 mb-1 gap-2 align-items-end rounded-3 border" >
+
+
+
+                <div class="w-50">
+                    {{ form_label(parameters.field) }}
+                    {#{{ form_help(parameters.field) }}#}
+
+                    {% if parameters.vars.data.help %}
+
+
+                        {% set rand = random() %}
+
+                        <div>
+                            <a tabindex="0"
+                               id="{{ rand }}"
+                               class="small text-decoration-none"
+                               role="button"
+                               data-bs-container="body"
+                               data-bs-toggle="popover"
+                               data-bs-trigger="click"
+                               data-bs-placement="bottom"
+                            >
+                                Список ркеомендуемых значений
+                            </a>
+
+                            <div id="{{ rand }}-content" class="d-none mt-5">
+                                <div class="d-flex gap-3 align-items-center mb-1">
+                                <span>
+                                    {% for help in parameters.vars.data.help %}
+                                        {{ help }}<br>
+                                    {% endfor %}
+                                </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endif %}
+
+
+
+                </div>
+
+                <div class="w-50 d-flex mb-1 gap-2 align-items-end rounded-3">
+                    {{ form_widget(parameters.field, {
                         placeholder: 'Выберите поле из списка...',
                         attr: { 'data-select' : 'select2', class:  'mb-0'  }
                     }) }}
@@ -38,10 +137,21 @@
 
             </div>
 
+
+            {#{% if parameters.default is defined %}
+                <div class="w-50 p-3 mb-1 rounded-3 border" >
+                {{ form_widget(parameters.default, {
+                    placeholder: 'Рекомендуемые значения',
+                    attr: { 'placeholder' : 'по умолчанию' }
+                }) }}
+                </div>
+            {% endif %}
+#}
+
+            </div>
         {% endfor %}
     </div>
 
 </div>
-
 
 

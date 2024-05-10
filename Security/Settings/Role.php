@@ -30,6 +30,7 @@ use BaksDev\Menu\Admin\Type\SectionGroup\Group\Collection\MenuAdminSectionGroupC
 use BaksDev\Menu\Admin\Type\SectionGroup\Group\MenuGroupSettings;
 use BaksDev\Users\Profile\Group\Security\RoleInterface;
 use BaksDev\Yandex\Market\Security\MenuGroupWildberries;
+use BaksDev\Yandex\Market\Security\MenuGroupYandex;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.security.role')]
@@ -59,7 +60,7 @@ final class Role implements RoleInterface, MenuAdminInterface
      */
     public function getGroupMenu(): MenuAdminSectionGroupCollectionInterface|bool
     {
-        return new MenuGroupWildberries();
+        return new MenuGroupYandex();
     }
 
     /**

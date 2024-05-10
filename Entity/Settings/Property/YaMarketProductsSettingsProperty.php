@@ -22,6 +22,7 @@ namespace BaksDev\Yandex\Market\Products\Entity\Settings\Property;
 use BaksDev\Core\Entity\EntityEvent;
 use BaksDev\Products\Category\Type\Section\Field\Id\CategoryProductSectionFieldUid;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
+use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductProperty;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
@@ -33,7 +34,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'ya_market_products_settings_property')]
 class YaMarketProductsSettingsProperty extends EntityEvent
 {
-
     /**
      * Идентификатор события
      */
@@ -49,17 +49,22 @@ class YaMarketProductsSettingsProperty extends EntityEvent
      */
     #[Assert\NotBlank]
     #[ORM\Id]
-    #[ORM\Column(type: Types::STRING)]
-    private string $type;
+    #[ORM\Column(type: YaMarketProductProperty::TYPE)]
+    private YaMarketProductProperty $type;
     
     /**
      * Связь на свойство продукта в категории
      */
-    #[Assert\NotBlank]
     #[Assert\Uuid]
-    #[ORM\Column(type: CategoryProductSectionFieldUid::TYPE)]
-    private CategoryProductSectionFieldUid $field;
-    
+    #[ORM\Column(type: CategoryProductSectionFieldUid::TYPE, nullable: true)]
+    private ?CategoryProductSectionFieldUid $field = null;
+
+    /**
+     * Значение по умолчанию
+     */
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    private ?string $def = null;
+
 
     public function __construct(YaMarketProductsSettingsEvent $event) {
         $this->event = $event;
@@ -87,11 +92,11 @@ class YaMarketProductsSettingsProperty extends EntityEvent
     {
         if($dto instanceof YaMarketProductsSettingsPropertyInterface || $dto instanceof self)
         {
-            if(empty($dto->getField())) { return false; }
+            if(empty($dto->getField()) && empty($dto->getDef())) { return false; }
             
             return parent::setEntity($dto);
         }
-        
+
         throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
 }

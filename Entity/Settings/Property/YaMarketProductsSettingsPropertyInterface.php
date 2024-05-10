@@ -23,4 +23,6 @@ use BaksDev\Products\Category\Type\Section\Field\Id\CategoryProductSectionFieldU
 interface YaMarketProductsSettingsPropertyInterface
 {
     public function getField(): ?CategoryProductSectionFieldUid;
+
+    public function getDef(): ?string;
 }

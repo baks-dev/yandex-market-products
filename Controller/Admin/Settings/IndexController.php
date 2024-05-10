@@ -37,8 +37,10 @@ use Symfony\Component\Routing\Annotation\Route;
 #[RoleSecurity('ROLE_YA_MARKET_PRODUCTS_SETTING')]
 final class IndexController extends AbstractController
 {
-    /** Настройки соотношений данных Wildberries  */
-    #[Route('/admin/wb/product/settings/{page<\d+>}', name: 'admin.settings.index', methods: ['GET', 'POST'])]
+    /**
+     * Настройки соотношений данных Yandex Market
+     */
+    #[Route('/admin/ya/market/product/settings/{page<\d+>}', name: 'admin.settings.index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
         AllProductsSettingsInterface $allProductsSettings,

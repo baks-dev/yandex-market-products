@@ -20,46 +20,38 @@ namespace BaksDev\Yandex\Market\Products\Forms\Preform;
 
 use BaksDev\Products\Category\Repository\CategoryChoice\CategoryChoiceInterface;
 use BaksDev\Products\Category\Type\Id\CategoryProductUid;
-use BaksDev\Yandex\Market\Api\Token\Reference\Object\WbObject;
-use BaksDev\Yandex\Market\Api\Token\Reference\Object\WbObjectDTO;
-use BaksDev\Yandex\Market\Repository\AnyWbTokenActive\AnyWbTokenActiveInterface;
-use DomainException;
+use BaksDev\Yandex\Market\Products\Api\Reference\Category\YandexMarketCategoryDTO;
+use BaksDev\Yandex\Market\Products\Api\Reference\Category\YandexMarketCategoryRequest;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 final class PreformForm extends AbstractType
 {
     private CategoryChoiceInterface $categoryChoice;
-
-    private WbObject $objectReference;
-
-    private AnyWbTokenActiveInterface $anyWbTokenActive;
+    private TokenStorageInterface $tokenStorage;
+    private YandexMarketCategoryRequest $yandexMarketCategoryRequest;
 
     public function __construct(
+        TokenStorageInterface $tokenStorage,
+        YandexMarketCategoryRequest $yandexMarketCategoryRequest,
         CategoryChoiceInterface $categoryChoice,
-        WbObject $objectReference,
-        AnyWbTokenActiveInterface $anyWbTokenActive
     )
     {
         $this->categoryChoice = $categoryChoice;
-        $this->objectReference = $objectReference;
-        $this->anyWbTokenActive = $anyWbTokenActive;
+        $this->tokenStorage = $tokenStorage;
+        $this->yandexMarketCategoryRequest = $yandexMarketCategoryRequest;
     }
 
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $currentProfile = $this->anyWbTokenActive->findProfile();
-
         $builder
             ->add('category', ChoiceType::class, [
-                'choices' => $this->categoryChoice->getCategoryCollection(),
+                'choices' => $this->categoryChoice->findAll(),
                 'choice_value' => function(?CategoryProductUid $type) {
                     return $type?->getValue();
                 },
@@ -73,116 +65,44 @@ final class PreformForm extends AbstractType
                 'required' => true,
             ]);
 
-        $section = [];
 
-        if($currentProfile)
+        /** Получаем список параметров категории маркет по токену профиля */
+
+        $TokenInterface = $this->tokenStorage->getToken();
+        $UserProfileUid = $TokenInterface?->getUser()?->getProfile();
+
+        if($UserProfileUid)
         {
-            try
-            {
-                $section =
-                    iterator_to_array($this->objectReference
-                    ->profile($currentProfile)
-                    ->findObject());
 
-            }
-            catch(DomainException $e)
-            {
-                /** Если токен авторизации не найден */
-                $section = [];
-            }
+            $market = $this->yandexMarketCategoryRequest
+                ->profile($UserProfileUid)
+                ->findAll();
+
+            /** @var YandexMarketCategoryDTO $YandexMarketCategoryDTO */
+
+            $builder
+                ->add('market', ChoiceType::class, [
+                    'choices' => $market,  // array_flip(Main::LANG),
+                    'choice_value' => function(?YandexMarketCategoryDTO $type) {
+                        return $type?->getId();
+                    },
+                    'choice_label' => function(YandexMarketCategoryDTO $type) {
+                        return $type?->getName();
+                    },
+
+                    'expanded' => false,
+                    'multiple' => false,
+                    //'required' => $data->isRequired(),
+                    //'disabled' => !$data->isIsset()
+                ]);
+
         }
 
-        $builder
-            ->add('name', ChoiceType::class, [
-                'choices' => $section,
-                'choice_value' => function(?WbObjectDTO $type) {
-                    return $type?->getCategory();
-                },
-                'choice_label' => function(WbObjectDTO $type) {
-                    return $type->getCategory();
-                },
-                'label' => false,
-                'expanded' => false,
-                'multiple' => false,
-                'required' => true,
-            ]);
-
-
-        $builder->add(
-            'parent',
-            ChoiceType::class,
-            ['disabled' => true, 'placeholder' => 'Выберите раздел для списка категорий'],
-        );
-
-        $formModifier = function(FormInterface $form, WbObjectDTO $name = null) use ($section) {
-
-            if($name)
-            {
-                $parent = [];
-
-                //$section->rewind();
-
-                if($section)
-                {
-                    $parent = $section;
-
-                    $parent = array_filter($parent, function($k) use ($name) {
-                        return $k->getCategory() === $name->getCategory();
-                    });
-                }
-
-                if(!empty($parent))
-                {
-
-                    //$parentChoice = array_column($parent, 'objectName', 'objectName');
-
-                    $form
-                        ->add('parent', ChoiceType::class, [
-                            'choices' => $parent,
-                            'choice_value' => function(?WbObjectDTO $type) {
-                                return $type?->getName();
-                            },
-                            'choice_label' => function(WbObjectDTO $type) {
-                                return $type->getName();
-                            },
-                            'label' => false,
-                            'expanded' => false,
-                            'multiple' => false,
-                            'required' => true,
-                            'placeholder' => 'Выберите категорию из списка...',
-                        ]);
-                }
-            }
-        };
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) use ($formModifier) {
-
-
-            if(null === $event->getData()->name)
-            {
-                return;
-            }
-
-            $formModifier($event->getForm(), $event->getData()->name);
-        });
-
-        $builder->get('name')
-            ->addEventListener(
-                FormEvents::POST_SUBMIT,
-                function(FormEvent $event) use ($formModifier) {
-                    $data = $event->getForm()
-                        ->getData();
-                    $formModifier(
-                        $event->getForm()->getParent(),
-                        $data,
-                    );
-                },
-            );
 
         /* Сохранить ******************************************************/
         $builder->add
         (
-            'preform',
+            'ya_market_preform',
             SubmitType::class,
             ['label_html' => true, 'attr' => ['class' => 'btn-primary']],
         );

@@ -1,8 +1,8 @@
 # Роль
 
 ROLE_YA_MARKET_PRODUCTS_SETTING:
-  name: 'Соотношения свойств Wildberries'
-  desc: 'Настройки соотношений данных Wildberries'
+  name: 'Соотношения свойств Yandex Market'
+  desc: 'Настройки соотношений данных Yandex Market'
 
 # Правила
 
@@ -24,58 +24,31 @@ ROLE_YA_MARKET_PRODUCTS_SETTING_DELETE:
 
 
 
-
-ROLE_WB_CARDS:
+ROLE_YA_MARKET_PRODUCTS_CARD:
   name: 'Карточки товаров'
-  desc: 'Карточки товаров Wildberries'
+  desc: 'Карточки товаров Yandex Market'
 
-ROLE_WB_CARDS_INDEX:
+ROLE_YA_MARKET_PRODUCTS_CARD_INDEX:
   name: 'Просмотр'
   desc: ''
 
-ROLE_WB_CARDS_NEW:
+ROLE_YA_MARKET_PRODUCTS_CARD_NEW:
   name: 'Добавить'
   desc: ''
 
-ROLE_WB_CARDS_EDIT:
+ROLE_YA_MARKET_PRODUCTS_CARD_EDIT:
   name: 'Редактировать'
   desc: ''
 
-ROLE_WB_CARDS_DELETE:
+ROLE_YA_MARKET_PRODUCTS_CARD_DELETE:
   name: 'Удалить'
   desc: ''
 
-ROLE_WB_CARDS_UPDATE:
-  name: 'Обновление'
-  desc: ''
 
-
-ROLE_WB_CARDS_GET:
+ROLE_YA_MARKET_PRODUCTS_CARD_GET:
   name: 'Получить новые'
-  desc: ''
+  desc: 'Получить новые карточки с Market'
 
-
-
-ROLE_WB_BARCODE:
-  name: 'Штрихкоды Wildberries'
-  desc: 'Настройки стикеров штрихкодов Wildberries'
-
-ROLE_WB_BARCODE_INDEX:
-  name: 'Просмотр'
-  desc: ''
-
-ROLE_WB_BARCODE_PRINT:
-  name: 'Печать'
-  desc: ''
-
-ROLE_WB_BARCODE_NEW:
-  name: 'Добавить'
-  desc: ''
-
-ROLE_WB_BARCODE_EDIT:
-  name: 'Редактировать'
-  desc: ''
-
-ROLE_WB_BARCODE_DELETE:
-  name: 'Удалить'
-  desc: ''
+ROLE_YA_MARKET_PRODUCTS_CARD_POST:
+  name: 'Обновить новые'
+  desc: 'Обновить новые карточки на Market'

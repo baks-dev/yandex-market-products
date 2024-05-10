@@ -20,18 +20,18 @@ namespace BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit\Property;
 
 use BaksDev\Products\Category\Type\Section\Field\Id\CategoryProductSectionFieldUid;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Property\YaMarketProductsSettingsPropertyInterface;
+use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductProperty;
 use ReflectionProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see YaMarketProductsSettingsProperty */
 final class YaMarketProductsSettingsPropertyDTO implements YaMarketProductsSettingsPropertyInterface
 {
-
     /**
-     * Наименование характеристики
+     * Тип характеристики (Параметр в запросе на апи)
      */
     #[Assert\NotBlank]
-    private ?string $type = null;
+    private ?YaMarketProductProperty $type = null;
 
     /**
      * Связь на свойство продукта в категории
@@ -39,32 +39,19 @@ final class YaMarketProductsSettingsPropertyDTO implements YaMarketProductsSetti
     #[Assert\Uuid]
     private ?CategoryProductSectionFieldUid $field = null;
 
-
-    /* Вспомогательные свойства */
-
     /**
-     * Характеристика обязательна к заполнению
+     * По умолчанию
      */
-    private readonly bool $required;
-
-    /**
-     * Единица измерения (см, гр и т.д.)
-     */
-    private readonly string $unit;
-
-    /**
-     * Характеристика популярна у пользователей
-     */
-    private readonly bool $popular;
+    private ?string $def = null;
 
 
-    public function getType(): string
+    public function getType(): ?YaMarketProductProperty
     {
         return $this->type;
     }
 
 
-    public function setType(string $type): void
+    public function setType(YaMarketProductProperty $type): void
     {
         $this->type = $type;
     }
@@ -81,67 +68,18 @@ final class YaMarketProductsSettingsPropertyDTO implements YaMarketProductsSetti
         $this->field = $field;
     }
 
-
     /**
-     * Характеристика обязательна к заполнению
+     * Default
      */
-    public function isRequired(): bool
+    public function getDef(): ?string
     {
-
-        if(!(new ReflectionProperty(self::class, 'required'))->isInitialized($this))
-        {
-            $this->required = true;
-        }
-
-        return $this->required;
+        return $this->def;
     }
 
-
-    public function setRequired(bool $required): void
+    public function setDef(?string $default): self
     {
-        $this->required = $required;
-    }
-
-
-    /**
-     * Единица измерения (см, гр и т.д.)
-     */
-    public function getUnit(): ?string
-    {
-
-        if(!(new ReflectionProperty(self::class, 'unit'))->isInitialized($this))
-        {
-            $this->unit = '';
-        }
-
-        return $this->unit;
-    }
-
-
-    public function setUnit(?string $unit): void
-    {
-        $this->unit = $unit;
-    }
-
-
-    /**
-     * Popular
-     */
-    public function isPopular(): bool
-    {
-
-        if(!(new ReflectionProperty(self::class, 'popular'))->isInitialized($this))
-        {
-            $this->popular = false;
-        }
-
-        return $this->popular;
-    }
-
-
-    public function setPopular(bool $popular): void
-    {
-        $this->popular = $popular;
+        $this->def = $default;
+        return $this;
     }
 
 }

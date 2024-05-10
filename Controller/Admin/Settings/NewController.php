@@ -40,19 +40,21 @@ use Symfony\Component\Routing\Annotation\Route;
 #[RoleSecurity('ROLE_YA_MARKET_PRODUCTS_SETTING_NEW')]
 final class NewController extends AbstractController
 {
-    #[Route('/admin/wb/product/setting/new/{id}/{parent}', name: 'admin.settings.newedit.new',
+    #[Route('/admin/ya/market/product/setting/new/{id}/{market<\d+>}',
+        name: 'admin.settings.newedit.new',
+        requirements: [ 'id' => '^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$'],
         methods: ['GET', 'POST',])]
     public function new(
         Request $request,
         YaMarketProductsSettingsHandler $productsSettingsHandler,
         #[MapEntity] CategoryProduct $Category,
-        string $parent,
+        int $market,
     ): Response
     {
 
         $SettingsDTO = new YaMarketProductsSettingsDTO();
         $SettingsDTO->setSettings($Category);
-        $SettingsDTO->setName($parent);
+        $SettingsDTO->setMarket($market);
 
         /* Форма добавления */
         $form = $this->createForm(YaMarketProductsSettingsForm::class, $SettingsDTO);
@@ -75,8 +77,7 @@ final class NewController extends AbstractController
         }
 
         return $this->render([
-            'form' => $form->createView(),
-            'name' => $parent,
+            'form' => $form->createView()
         ]);
 
     }

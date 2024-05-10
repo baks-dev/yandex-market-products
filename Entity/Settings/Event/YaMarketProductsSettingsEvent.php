@@ -22,6 +22,7 @@ namespace BaksDev\Yandex\Market\Products\Entity\Settings\Event;
 use BaksDev\Core\Entity\EntityEvent;
 use BaksDev\Products\Category\Type\Id\CategoryProductUid;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Modify\YaMarketProductsSettingsModify;
+use BaksDev\Yandex\Market\Products\Entity\Settings\Parameters\YaMarketProductsSettingsParameters;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Property\YaMarketProductsSettingsProperty;
 use BaksDev\Yandex\Market\Products\Entity\Settings\YaMarketProductsSettings;
 use BaksDev\Yandex\Market\Products\Type\Settings\Event\YaMarketProductsSettingsEventUid;
@@ -35,8 +36,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'ya_market_products_settings_event')]
-#[ORM\Index(columns: ['settings'])]
-#[ORM\Index(columns: ['name'])]
+//#[ORM\Index(columns: ['settings'])]
+//#[ORM\Index(columns: ['market'])]
 class YaMarketProductsSettingsEvent extends EntityEvent
 {
     /**
@@ -49,7 +50,7 @@ class YaMarketProductsSettingsEvent extends EntityEvent
     private YaMarketProductsSettingsEventUid $id;
 
     /**
-     * Идентификатор настройки
+     * Идентификатор категории в системе
      */
     #[Assert\NotBlank]
     #[Assert\Uuid]
@@ -57,11 +58,12 @@ class YaMarketProductsSettingsEvent extends EntityEvent
     private CategoryProductUid $settings;
 
     /**
-     * Категория Wildberries
+     * Идентификатор категории на Маркете
      */
     #[Assert\NotBlank]
-    #[ORM\Column(type: Types::STRING)]
-    private string $name;
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $market;
+
 
     /**
      * Модификатор
@@ -71,11 +73,20 @@ class YaMarketProductsSettingsEvent extends EntityEvent
     private YaMarketProductsSettingsModify $modify;
 
     /**
-     * Свойства карточки
+     * Свойства карточки Маркет
      */
     #[Assert\Valid]
     #[ORM\OneToMany(targetEntity: YaMarketProductsSettingsProperty::class, mappedBy: 'event', cascade: ['all'])]
     private Collection $property;
+
+
+    /**
+     * Параметры продукции категории Маркет
+     */
+    #[Assert\Valid]
+    #[ORM\OneToMany(targetEntity: YaMarketProductsSettingsParameters::class, mappedBy: 'event', cascade: ['all'])]
+    private Collection $parameters;
+
 
     public function __construct()
     {
@@ -129,12 +140,6 @@ class YaMarketProductsSettingsEvent extends EntityEvent
     public function getSettings(): CategoryProductUid
     {
         return $this->settings;
-    }
-
-
-    public function getName(): string
-    {
-        return $this->name;
     }
 
 }

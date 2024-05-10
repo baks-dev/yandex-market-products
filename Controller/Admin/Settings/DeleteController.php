@@ -42,7 +42,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class DeleteController extends AbstractController
 {
 
-    #[Route('/admin/wb/product/setting/delete/{id}', name: 'admin.settings.delete', methods: ['POST', 'GET'])]
+    #[Route('/admin/ya/market/product/setting/delete/{id}', name: 'admin.settings.delete', methods: ['POST', 'GET'])]
     public function delete(
         Request $request,
         DeleteYaMarketProductsSettingsHandler $ProductSettingsHandler,
@@ -58,21 +58,21 @@ final class DeleteController extends AbstractController
 
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid() && $form->has('delete_product_settings'))
+        if($form->isSubmitted() && $form->isValid() && $form->has('delete_market_products_settings'))
         {
             $WbProductSettings = $ProductSettingsHandler->handle($DeleteWbProductSettingsDTO);
 
             if($WbProductSettings instanceof YaMarketProductsSettings)
             {
-                $this->addFlash('admin.page.delete', 'admin.success.delete', 'admin.wb.products.settings');
+                $this->addFlash('page.delete', 'success.delete', 'yandex-market-products.admin.settings');
 
                 return $this->redirectToRoute('yandex-market-products:admin.settings.index');
             }
 
             $this->addFlash(
-                'admin.page.delete',
-                'admin.danger.delete',
-                'admin.wb.products.settings',
+                'page.delete',
+                'danger.delete',
+                'yandex-market-products.admin.settings',
                 $WbProductSettings,
             );
 
@@ -82,7 +82,7 @@ final class DeleteController extends AbstractController
 
         return $this->render([
             'form' => $form->createView(),
-            'name' => $Event->getName(),
+            //'name' => $Event->getName(),
         ],);
     }
 

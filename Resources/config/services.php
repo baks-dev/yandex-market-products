@@ -43,4 +43,6 @@ return static function(ContainerConfigurator $configurator) {
         ])
     ;
 
+    $services->load($NAMESPACE.'Type\Settings\Property\Properties\\', $MODULE.'Type/Settings/Property/Properties');
+
 };

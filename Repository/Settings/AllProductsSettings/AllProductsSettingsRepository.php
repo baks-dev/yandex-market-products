@@ -40,83 +40,84 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AllProductsSettingsRepository implements AllProductsSettingsInterface
 {
-
     private PaginatorInterface $paginator;
 
-    private SwitcherInterface $switcher;
-
-    private TranslatorInterface $translator;
     private DBALQueryBuilder $DBALQueryBuilder;
-
 
     public function __construct(
         DBALQueryBuilder $DBALQueryBuilder,
-        PaginatorInterface $paginator,
-        SwitcherInterface $switcher,
-        TranslatorInterface $translator,
+        PaginatorInterface $paginator
     )
     {
-
         $this->paginator = $paginator;
-        $this->switcher = $switcher;
-        $this->translator = $translator;
         $this->DBALQueryBuilder = $DBALQueryBuilder;
+    }
+
+    private ?SearchDTO $search = null;
+
+
+    public function search(SearchDTO $search): self
+    {
+        $this->search = $search;
+        return $this;
     }
 
 
     /** Метод возвращает пагинатор WbProductsSettings */
-    public function fetchAllProductsSettingsAssociative(SearchDTO $search): PaginatorInterface
+    public function fetchAllProductsSettingsAssociative(): PaginatorInterface
     {
-        $local = new Locale($this->translator->getLocale());
 
-        $qb = $this->DBALQueryBuilder->createQueryBuilder(self::class);
+        $dbal = $this->DBALQueryBuilder
+            ->createQueryBuilder(self::class)
+            ->bindLocal()
+        ;
 
-        $qb->select('settings.id');
-        $qb->addSelect('settings.event');
+        $dbal->select('settings.id');
+        $dbal->addSelect('settings.event');
 
-        $qb->addSelect('event.name');
-        //$qb->addSelect('event.parent');
+        //$dbal->addSelect('event.name');
+        //$dbal->addSelect('event.parent');
 
-        $qb->from(YaMarketProductsSettings::TABLE, 'settings');
+        $dbal->from(YaMarketProductsSettings::class, 'settings');
 
-        $qb->join(
+        $dbal->join(
             'settings',
-            YaMarketProductsSettingsEvent::TABLE,
+            YaMarketProductsSettingsEvent::class,
             'event',
             'event.id = settings.event AND event.settings = settings.id',
         );
 
         /** Категория */
-        $qb->addSelect('category.id as category_id');
-        $qb->addSelect('category.event as category_event'); /* ID события */
-        $qb->join('settings', CategoryProduct::TABLE, 'category', 'category.id = settings.id');
+        $dbal->addSelect('category.id as category_id');
+        $dbal->addSelect('category.event as category_event'); /* ID события */
+        $dbal->join('settings', CategoryProduct::class, 'category', 'category.id = settings.id');
 
         /** События категории */
-        $qb->addSelect('category_event.sort');
+        $dbal->addSelect('category_event.sort');
 
-        $qb->join
+        $dbal->join
         (
             'category',
-            CategoryProductEvent::TABLE,
+            CategoryProductEvent::class,
             'category_event',
             'category_event.id = category.event',
         );
 
         /** Обложка */
-        $qb->addSelect('category_cover.ext');
-        $qb->addSelect('category_cover.cdn');
-        $qb->leftJoin(
+        $dbal->addSelect('category_cover.ext');
+        $dbal->addSelect('category_cover.cdn');
+        $dbal->leftJoin(
             'category_event',
-            CategoryProductCover::TABLE,
+            CategoryProductCover::class,
             'category_cover',
             'category_cover.event = category_event.id',
         );
 
 
-        $qb->addSelect("
+        $dbal->addSelect("
 			CASE
 			   WHEN category_cover.name IS NOT NULL THEN
-					CONCAT ( '/upload/".CategoryProductCover::TABLE."' , '/', category_cover.name)
+					CONCAT ( '/upload/".$dbal->table(CategoryProductCover::class)."' , '/', category_cover.name)
 			   ELSE NULL
 			END AS cover
 		"
@@ -124,19 +125,18 @@ final class AllProductsSettingsRepository implements AllProductsSettingsInterfac
 
 
         /** Перевод категории */
-        $qb->addSelect('category_trans.name as category_name');
-        $qb->addSelect('category_trans.description as category_description');
+        $dbal->addSelect('category_trans.name as category_name');
+        $dbal->addSelect('category_trans.description as category_description');
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
             'category_event',
-            CategoryProductTrans::TABLE,
+            CategoryProductTrans::class,
             'category_trans',
             'category_trans.event = category_event.id AND category_trans.local = :local',
         );
 
-        $qb->setParameter('local', $local, Locale::TYPE);
 
-        return $this->paginator->fetchAllAssociative($qb);
+        return $this->paginator->fetchAllAssociative($dbal);
 
     }
 }

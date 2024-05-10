@@ -37,28 +37,23 @@ use Symfony\Component\Routing\Annotation\Route;
 final class PreFormController extends AbstractController
 {
 
-    #[Route('/admin/wb/product/setting/preforms', name: 'admin.settings.preform', methods: ['POST', 'GET'])]
+    #[Route('/admin/ya/market/product/setting/preforms', name: 'admin.settings.preform', methods: ['POST', 'GET'])]
     public function delete(
         Request $request,
     ): Response
     {
-        $category = new PreformDTO();
+        $PreformDTO = new PreformDTO();
 
-        $form = $this->createForm(PreformForm::class, $category, [
+        $form = $this->createForm(PreformForm::class, $PreformDTO, [
             'action' => $this->generateUrl('yandex-market-products:admin.settings.preform'),
         ]);
 
         $form->handleRequest($request);
 
-
-
-        if($form->isSubmitted() && $form->isValid() && $form->has('preform'))
+        if($form->isSubmitted() && $form->isValid() && $form->has('ya_market_preform'))
         {
-            $data = $form->getData();
-
             return $this->redirectToRoute(
-                'yandex-market-products:admin.settings.newedit.new',
-                ['id' => $data->category, 'parent' => $data->parent->getName()]
+                'yandex-market-products:admin.settings.newedit.new', ['id' => $PreformDTO->category, 'market' => $PreformDTO->market->getId()]
             );
         }
 

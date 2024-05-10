@@ -19,14 +19,34 @@
 namespace BaksDev\Yandex\Market\Products\Forms\Preform;
 
 use BaksDev\Products\Category\Type\Id\CategoryProductUid;
-use BaksDev\Yandex\Market\Api\Token\Reference\Object\WbObjectDTO;
+use BaksDev\Yandex\Market\Products\Api\Reference\Category\YandexMarketCategoryDTO;
+use Symfony\Component\Validator\Constraints as Assert;
 
 final class PreformDTO
 {
+    #[Assert\NotBlank]
+    #[Assert\Uuid]
     public ?CategoryProductUid $category = null;
 
-    public ?WbObjectDTO $name = null;
+    #[Assert\NotBlank]
+    public ?YandexMarketCategoryDTO $market = null;
 
-    public ?WbObjectDTO $parent = null;
+//    /**
+//     * Category
+//     */
+//    public function getParameters(): array
+//    {
+//        return (string) ['id' => $this->category?->getValue()];
+//    }
+//
+//    /**
+//     * Market
+//     */
+//    public function getMarket(): ?int
+//    {
+//        return $this->market?->getId();
+//    }
+
+
 
 }

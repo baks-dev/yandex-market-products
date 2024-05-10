@@ -35,6 +35,7 @@ final class YaMarketProductsSettingsDTO implements YaMarketProductsSettingsEvent
     #[Assert\Uuid]
     private ?YaMarketProductsSettingsEventUid $id = null;
 
+
     /**
      * ID настройки
      */
@@ -42,10 +43,19 @@ final class YaMarketProductsSettingsDTO implements YaMarketProductsSettingsEvent
     #[Assert\Uuid]
     private readonly CategoryProductUid $settings;
 
-    /** Категория Wildberries */
-    #[Assert\NotBlank]
-    private string $name;
 
+    /**
+     * Идентификатор категории на Маркете
+     */
+    #[Assert\NotBlank]
+    private int $market;
+
+
+    /**
+     * Параметры карточки
+     */
+    #[Assert\Valid]
+    private ArrayCollection $parameters;
 
     /**
      * Коллекция Свойств
@@ -66,7 +76,8 @@ final class YaMarketProductsSettingsDTO implements YaMarketProductsSettingsEvent
 
     public function __construct()
     {
-        $this->property = new ArrayCollection();
+        $this->property = new ArrayCollection;
+        $this->parameters = new ArrayCollection;
         //        $this->offer = new ArrayCollection();
         //        $this->variation = new ArrayCollection();
     }
@@ -101,21 +112,34 @@ final class YaMarketProductsSettingsDTO implements YaMarketProductsSettingsEvent
     }
 
 
+    //    /**
+    //     * Категория Wildberries
+    //     */
+    //    public function getName(): string
+    //    {
+    //        return $this->name;
+    //    }
+    //
+    //
+    //    public function setName(string $name): void
+    //    {
+    //        $this->name = $name;
+    //    }
+
+
     /**
-     * Категория Wildberries
+     * Market
      */
-    public function getName(): string
+    public function getMarket(): int
     {
-        return $this->name;
+        return $this->market;
     }
 
-
-    public function setName(string $name): void
+    public function setMarket(int $market): self
     {
-        $this->name = $name;
+        $this->market = $market;
+        return $this;
     }
-
-
 
 
 
@@ -169,6 +193,43 @@ final class YaMarketProductsSettingsDTO implements YaMarketProductsSettingsEvent
     //   }
 
 
+    /* PARAMS */
+
+    public function getParameters(): ArrayCollection
+    {
+        return $this->parameters;
+    }
+
+
+    public function addParameter(Parameters\YaMarketProductsSettingsParametersDTO $parameters): void
+    {
+        $filter = $this->parameters->filter(
+            function(Parameters\YaMarketProductsSettingsParametersDTO $element) use ($parameters) {
+                return $parameters->getType() === $element->getType();
+            });
+
+        if($filter->isEmpty())
+        {
+
+            $this->parameters->add($parameters);
+        }
+
+        else
+        {
+            $filter->current()
+                ->setName($parameters->getName())
+                ->setHelp($parameters->getHelp())
+            ;
+        }
+    }
+
+
+    public function removeParameter(Parameters\YaMarketProductsSettingsParametersDTO $parameters): void
+    {
+        $this->parameters->removeElement($parameters);
+    }
+
+
     /* PROPERTY */
 
     public function getProperty(): ArrayCollection
@@ -179,7 +240,16 @@ final class YaMarketProductsSettingsDTO implements YaMarketProductsSettingsEvent
 
     public function addProperty(Property\YaMarketProductsSettingsPropertyDTO $property): void
     {
-        $this->property->add($property);
+        $filter = $this->property->filter(function(Property\YaMarketProductsSettingsPropertyDTO $element) use ($property
+        ) {
+            return $property->getType()?->equals($element->getType());
+        });
+
+        if($filter->isEmpty())
+        {
+            $this->property->add($property);
+        }
+
     }
 
 

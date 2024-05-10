@@ -1,10 +1,11 @@
 # Role
 
 ROLE_YA_MARKET_PRODUCTS_SETTING:
-  name: 'Ratio settings'
-  desc: 'Wildberries data ratio settings'
+  name: 'Yandex Market property relationships'
+  desc: 'Yandex Market data correlation settings'
 
 # Rules
+
 ROLE_YA_MARKET_PRODUCTS_SETTING_INDEX:
   name: 'View'
   desc: ''
@@ -21,54 +22,33 @@ ROLE_YA_MARKET_PRODUCTS_SETTING_DELETE:
   name: 'Delete'
   desc: ''
 
-ROLE_WB_CARDS_UPDATE:
-  name: 'Update'
-  desc: ''
-
-ROLE_WB_CARDS_GET:
-  name: 'Get new ones'
-  desc: ''
 
 
-
-ROLE_WB_CARDS:
+ROLE_YA_MARKET_PRODUCTS_CARD:
   name: 'Product cards'
-  desc: 'Wildberries Product Cards'
+  desc: 'Yandex Market product cards'
 
-ROLE_WB_CARDS_INDEX:
+ROLE_YA_MARKET_PRODUCTS_CARD_INDEX:
   name: 'View'
   desc: ''
 
-ROLE_WB_CARDS_NEW:
+ROLE_YA_MARKET_PRODUCTS_CARD_NEW:
   name: 'Add'
   desc: ''
 
-ROLE_WB_CARDS_EDIT:
+ROLE_YA_MARKET_PRODUCTS_CARD_EDIT:
   name: 'Edit'
   desc: ''
 
-ROLE_WB_CARDS_DELETE:
+ROLE_YA_MARKET_PRODUCTS_CARD_DELETE:
   name: 'Delete'
   desc: ''
 
 
+ROLE_YA_MARKET_PRODUCTS_CARD_GET:
+  name: 'Get new'
+  desc: 'Get new cards from the Market'
 
-ROLE_WB_BARCODE:
-  name: 'Wildberries barcodes'
-  desc: 'Wildberries barcode sticker settings'
-
-ROLE_WB_BARCODE_PRINT:
-  name: 'Print'
-  desc: ''
-
-ROLE_WB_BARCODE_NEW:
-  name: 'Add'
-  desc: ''
-
-ROLE_WB_BARCODE_EDIT:
-  name: 'Edit'
-  desc: ''
-
-ROLE_WB_BARCODE_DELETE:
-  name: 'Delete'
-  desc: ''
+ROLE_YA_MARKET_PRODUCTS_CARD_POST:
+  name: 'Update new'
+  desc: 'Update new cards on Market'

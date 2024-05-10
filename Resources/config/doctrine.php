@@ -25,19 +25,31 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BaksDev\Yandex\Market\Products\Type\Barcode\Event\WbBarcodeEventUid;
 use BaksDev\Yandex\Market\Products\Type\Barcode\Event\WbBarcodeEventUidType;
+use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventType;
+use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventUid;
+use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardType;
+use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use BaksDev\Yandex\Market\Products\Type\Cards\Id\WbCardUid;
 use BaksDev\Yandex\Market\Products\Type\Cards\Id\WbCardUidType;
 use BaksDev\Yandex\Market\Products\Type\Settings\Event\YaMarketProductsSettingsEventType;
 use BaksDev\Yandex\Market\Products\Type\Settings\Event\YaMarketProductsSettingsEventUid;
+use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductProperty;
+use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductPropertyType;
 use Symfony\Config\DoctrineConfig;
 
 return static function(DoctrineConfig $doctrine): void {
 
     $doctrine->dbal()->type(YaMarketProductsSettingsEventUid::TYPE)->class(YaMarketProductsSettingsEventType::class);
+    $doctrine->dbal()->type(YaMarketProductProperty::TYPE)->class(YaMarketProductPropertyType::class);
 
-    $doctrine->dbal()->type(WbCardUid::TYPE)->class(WbCardUidType::class);
 
-    $doctrine->dbal()->type(WbBarcodeEventUid::TYPE)->class(WbBarcodeEventUidType::class);
+
+    $doctrine->dbal()->type(YaMarketProductsCardUid::TYPE)->class(YaMarketProductsCardType::class);
+    $doctrine->dbal()->type(YaMarketProductsCardEventUid::TYPE)->class(YaMarketProductsCardEventType::class);
+
+//    $doctrine->dbal()->type(WbCardUid::TYPE)->class(WbCardUidType::class);
+//
+//    $doctrine->dbal()->type(WbBarcodeEventUid::TYPE)->class(WbBarcodeEventUidType::class);
 
 
 

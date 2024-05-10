@@ -43,7 +43,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[RoleSecurity('ROLE_YA_MARKET_PRODUCTS_SETTING_EDIT')]
 final class EditController extends AbstractController
 {
-    #[Route('/admin/wb/product/setting/edit/{id}', name: 'admin.settings.newedit.edit', methods: ['GET', 'POST'])]
+    #[Route('/admin/ya/market/product/setting/edit/{id}', name: 'admin.settings.newedit.edit', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
         #[MapEntity] YaMarketProductsSettingsEvent $Event,
@@ -59,6 +59,12 @@ final class EditController extends AbstractController
         /* Форма добавления */
         $form = $this->createForm(YaMarketProductsSettingsForm::class, $SettingsDTO);
         $form->handleRequest($request);
+
+        if($form->isSubmitted())
+        {
+            dump($form->getErrors());
+            dump($form->isValid());
+        }
 
         if($form->isSubmitted() && $form->isValid() && $form->has('product_settings'))
         {
@@ -79,7 +85,7 @@ final class EditController extends AbstractController
 
         return $this->render([
             'form' => $form->createView(),
-            'name' => $Event->getName()
+            //'name' => $Event->getName()
         ]);
 
     }

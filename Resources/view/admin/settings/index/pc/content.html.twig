@@ -1,4 +1,4 @@
-{% trans_default_domain("admin.wb.products.settings") %}
+{% trans_default_domain('yandex-market-products.admin.settings') %}
 
 <main class="main d-print-none ">
 
@@ -12,24 +12,23 @@
 
             <div class="w-100">
                 <h1 class="h4 text-uppercase fw-bolder mb-0">
-                    {{ 'admin.page.index'|trans }}
+                    {{ 'page.index'|trans }}
                 </h1>
             </div>
 
-            <div class="w-100 d-flex align-items-center gap-3 justify-content-end">
-
+            <div class="w-50 d-flex align-items-center gap-3 justify-content-end">
 
 
                 {# Добавить #}
                 {% if is_granted(ROLE~'_NEW') or is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('yandex-market-products:admin.settings.preform') }}"
+                    <button data-href="{{ path('yandex-market-products:admin.settings.preform') }}"
                        class="btn btn-primary fw-bolder modal-link disabled"
                        data-bs-toggle="modal"
                        data-bs-target="#modal"
                        title='Добавить табель сотруднику'
                     >
                         {{ 'btn.new'|trans({}, 'core.btn') }}
-                    </a>
+                    </button>
                 {% endif %}
             </div>
 
@@ -49,7 +48,7 @@
                 <tr>
                     <th>#</th>
                     <th class='w-100'>Категория</th>
-                    <th class='text-nowrap'>Категория Wildberries</th>
+                    {#<th class='text-nowrap'>Категория Yandex Market</th>#}
                 </tr>
 
                 </thead>

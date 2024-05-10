@@ -1,6 +1,6 @@
 # BaksDev Products YandexMarket
 
-[![Version](https://img.shields.io/badge/version-7.0.4-blue)](https://github.com/baks-dev/yandex-market-products/releases)
+[![Version](https://img.shields.io/badge/version-7.0.3-blue)](https://github.com/baks-dev/yandex-market-products/releases)
 ![php 8.2+](https://img.shields.io/badge/php-min%208.1-red.svg)
 
 Модуль продукции Yandex Market

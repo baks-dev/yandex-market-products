@@ -1,0 +1,31 @@
+page:
+  index: 'Карточки товаров Yandex Market'
+  new: 'Добавить карточку '
+  edit: 'Редактировать карточку'
+  update: 'Обновить карточку Yandex Market'
+  delete: 'Удалить карточку '
+  get: 'Получить новые карточки Yandex Market'
+
+breadcrumb:
+  index: 'Карточки товаров Yandex Market'
+  new: 'Добавить карточку товара Yandex Market'
+  edit: 'Редактировать карточку товара Yandex Market'
+  update: 'Обновить карточку товара Yandex Market'
+  delete: 'Удалить карточку товара Yandex Market'
+  restore: 'Восстановить карточку товара Yandex Market'
+
+success:
+  new: 'Карточка товара Yandex Market успешно добавлена'
+  edit: 'Карточка товара Yandex Market успешно обновлена'
+  update: 'Карточка товара Yandex Market успешно добавлена в очередь для обновления'
+  delete: 'Карточка товара Yandex Market успешно удалена'
+  restore: 'Карточка товара Yandex Market восстановлена'
+  get: 'Обновление корточек Yandex Market добавлено в очередь'
+
+danger:
+  new: '%s: Ошибка при добавлении карточки товара Yandex Market'
+  edit: '%s: Ошибка при обновлении карточки товара Yandex Market'
+  update: '%s: Ошибка при обновлении карточки товара Yandex Market'
+  delete: '%s: Ошибка при удалении карточки товара Yandex Market'
+  restore: '%s: Ошибка при восстановлении карточки товара Yandex Market'
+  get: 'Уже было обновление! Повторите попытку через 5 минут!'

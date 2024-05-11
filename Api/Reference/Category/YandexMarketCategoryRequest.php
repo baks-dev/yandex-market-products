@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Reference\Category;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use DateInterval;
 use DomainException;
 use Generator;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -43,13 +44,13 @@ final class YandexMarketCategoryRequest extends YandexMarket
      */
     public function findAll() //: Generator
     {
-        $cache = new FilesystemAdapter('yandex-market');
+        $cache = new FilesystemAdapter('yandex-market-products');
 
         $content = $cache->get('ya-market-categories', function(
             ItemInterface $item
         ) {
 
-            $item->expiresAfter(\DateInterval::createFromDateString('1 day'));
+            $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
             $response = $this->TokenHttpClient()
                 ->request(

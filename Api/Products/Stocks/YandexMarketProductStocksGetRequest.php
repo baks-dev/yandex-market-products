@@ -26,6 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use DomainException;
+use InvalidArgumentException;
 
 /**
  * Информация об остатках и оборачиваемости
@@ -50,11 +52,11 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
      * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/stocks/getStocks
      *
      */
-    public function find(): int
+    public function find(): int|bool
     {
         if(empty($this->article))
         {
-            throw new \InvalidArgumentException('Invalid Argument article');
+            throw new InvalidArgumentException('Invalid Argument article');
         }
 
         $response = $this->TokenHttpClient()
@@ -76,7 +78,7 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
                 $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
             }
 
-            throw new \DomainException(
+            throw new DomainException(
                 message: 'Ошибка '.self::class,
                 code: $response->getStatusCode()
             );
@@ -84,9 +86,10 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
 
         $warehouses = current($content['result']['warehouses']);
 
+        /** Если не указан ранее остаток (остатки по артикулу не найдены) */
         if(empty($warehouses))
         {
-            return 0;
+            return false;
         }
 
         $stocks = current($warehouses['offers'])['stocks'];

@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Products\Update;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use DomainException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 final class YandexMarketProductUpdateRequest extends YandexMarket
@@ -63,14 +64,14 @@ final class YandexMarketProductUpdateRequest extends YandexMarket
                 $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
             }
 
-            throw new \DomainException(
+            throw new DomainException(
                 message: 'Ошибка '.self::class,
                 code: $response->getStatusCode()
             );
         }
 
         /** Удаляем файловый кеш карточки */
-        $cache = new FilesystemAdapter('yandex-market');
+        $cache = new FilesystemAdapter('yandex-market-products');
         $cache->clear();
 
         return $response->toArray(false);

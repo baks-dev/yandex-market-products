@@ -55,12 +55,11 @@ final class YaMarketProductsStocksUpdate
         LoggerInterface $yandexMarketProductsLogger
     )
     {
+        $this->marketProductStocksGetRequest = $marketProductStocksGetRequest;
         $this->marketProductStocksUpdateRequest = $marketProductStocksUpdateRequest;
         $this->marketProductsCard = $marketProductsCard;
         $this->logger = $yandexMarketProductsLogger;
 
-
-        $this->marketProductStocksGetRequest = $marketProductStocksGetRequest;
     }
 
     /**
@@ -71,6 +70,12 @@ final class YaMarketProductsStocksUpdate
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
         if(!$Card)
+        {
+            return;
+        }
+
+        /** Не обновляем остатки карточки без цены */
+        if(empty($Card['product_price']))
         {
             return;
         }

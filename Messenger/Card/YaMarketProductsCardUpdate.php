@@ -118,7 +118,7 @@ final class YaMarketProductsCardUpdate
             $YandexMarketProductDTO = $MarketProduct->current();
 
             /** Не обновляем карточку если нет изменений (фото параметров) */
-            if($YandexMarketProductDTO->equals($request))
+            if($YandexMarketProductDTO->equals($request) === true)
             {
                 $this->logger->info(sprintf('Изменения в карточке %s отсутствуют', $request['offerId']));
                 return;

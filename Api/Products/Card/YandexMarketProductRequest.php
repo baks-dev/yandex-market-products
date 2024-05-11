@@ -26,7 +26,10 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use DateInterval;
+use DomainException;
 use Generator;
+use InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -52,16 +55,16 @@ final class YandexMarketProductRequest extends YandexMarket
     {
         if(!$this->article)
         {
-            throw new \InvalidArgumentException('Invalid Argument article');
+            throw new InvalidArgumentException('Invalid Argument article');
         }
 
-        $cache = new FilesystemAdapter('yandex-market');
+        $cache = new FilesystemAdapter('yandex-market-products');
 
         $content = $cache->get('ya-market-product-'.$this->profile->getValue().'-'.$this->article,
 
             function(ItemInterface $item) {
 
-                $item->expiresAfter(\DateInterval::createFromDateString('1 minutes'));
+                $item->expiresAfter(DateInterval::createFromDateString('1 minutes'));
 
                 $data['offerIds'] = is_array($this->article) ? $this->article : [$this->article];
 
@@ -81,7 +84,7 @@ final class YandexMarketProductRequest extends YandexMarket
                         $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
                     }
 
-                    throw new \DomainException(
+                    throw new DomainException(
                         message: 'Ошибка YandexMarketShopRequest',
                         code: $response->getStatusCode()
                     );

@@ -27,8 +27,10 @@ namespace BaksDev\Yandex\Market\Products\Api\Reference\Parameters;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use BaksDev\Yandex\Market\Repository\YaMarketTokenByProfile\YaMarketTokenByProfileInterface;
+use DateInterval;
 use DomainException;
 use Generator;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -65,16 +67,16 @@ final class YandexMarketParametersRequest extends YandexMarket
     {
         if(!$this->category)
         {
-            throw new \InvalidArgumentException('Invalid Argument Category');
+            throw new InvalidArgumentException('Invalid Argument Category');
         }
 
-        $cache = new FilesystemAdapter('yandex-market');
+        $cache = new FilesystemAdapter('yandex-market-products');
 
         $content = $cache->get('ya-market-parameters-'.$this->category, function(
             ItemInterface $item
         ) {
 
-            $item->expiresAfter(\DateInterval::createFromDateString('1 day'));
+            $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
             $response = $this->TokenHttpClient()
                 ->request(

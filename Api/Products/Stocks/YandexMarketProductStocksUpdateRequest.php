@@ -26,6 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use DomainException;
+use InvalidArgumentException;
 
 final class YandexMarketProductStocksUpdateRequest extends YandexMarket
 {
@@ -46,7 +48,6 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
         return $this;
     }
 
-
     /**
      * Передает данные об остатках товаров на витрине.
      *
@@ -59,22 +60,21 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
     {
         if(empty($this->article))
         {
-            throw new \InvalidArgumentException('Invalid Argument article');
+            throw new InvalidArgumentException('Invalid Argument article');
         }
-
-        // campaignId
-
 
         $response = $this->TokenHttpClient()
             ->request(
-                'POST',
+                'PUT',
                 sprintf('/campaigns/%s/offers/stocks', $this->getCompany()),
-                ['json' =>
-                    ['skus' =>
-                        [
+                [
+                    'json' => [
+                        'skus' => [
                             [
                                 'sku' => $this->article,
-                                "items" => [["count" => $this->total]]
+                                "items" => [
+                                    ["count" => $this->total]
+                                ]
                             ]
                         ]
                     ]
@@ -83,8 +83,6 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
 
         $content = $response->toArray(false);
 
-        dd($content);
-
         if($response->getStatusCode() !== 200)
         {
             foreach($content['errors'] as $error)
@@ -92,7 +90,7 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
                 $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
             }
 
-            throw new \DomainException(
+            throw new DomainException(
                 message: 'Ошибка '.self::class,
                 code: $response->getStatusCode()
             );

@@ -66,6 +66,8 @@ final class YandexMarketProductDTO
 
     public function __construct(UserProfileUid $profile, array $data)
     {
+
+
         $this->pictures = $data['pictures'];
         $this->params = $data['params'];
 
@@ -157,8 +159,31 @@ final class YandexMarketProductDTO
         return $this->currency;
     }
 
-    public function equals(array $request) : bool
+    public function equals(array $request): bool
     {
+        if($request['name'] !== $this->name)
+        {
+            return false;
+        }
+
+        if($request['vendor'] !== $this->vendor)
+        {
+            return false;
+        }
+
+
+
+
+        if(!in_array($this->barcode, $request['barcodes'], true))
+        {
+            return false;
+        }
+
+        if(!in_array($this->country, $request['manufacturerCountries'], true))
+        {
+            return false;
+        }
+
         /** Проверка изображений */
 
         if(count($request['pictures']) !== count($this->pictures))
@@ -168,7 +193,7 @@ final class YandexMarketProductDTO
 
         foreach($request['pictures'] as $picture)
         {
-            if(!in_array($picture, $this->pictures))
+            if(!in_array($picture, $this->pictures, true))
             {
                 return false;
             }
@@ -183,7 +208,7 @@ final class YandexMarketProductDTO
 
         foreach($request['params'] as $param)
         {
-            if(!in_array($param, $this->params))
+            if(!in_array($param, $this->params, false))
             {
                 return false;
             }

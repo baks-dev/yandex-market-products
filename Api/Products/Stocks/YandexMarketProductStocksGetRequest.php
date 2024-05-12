@@ -86,7 +86,6 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
 
         $warehouses = current($content['result']['warehouses']);
 
-        /** Если не указан ранее остаток (остатки по артикулу не найдены) */
         if(empty($warehouses))
         {
             return false;
@@ -94,8 +93,23 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
 
         $stocks = current($warehouses['offers'])['stocks'];
 
-        return empty($stocks) ? 0 : $stocks;
+        if(empty($stocks))
+        {
+            return false;
+        }
+
+        $available = array_filter($stocks, static function($v) {
+            return $v['type'] === 'AVAILABLE';
+        });
+
+        if(empty($available))
+        {
+            return 0;
+        }
+
+        $available = current($available);
+
+        return $available['count'];
 
     }
-
 }

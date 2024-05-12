@@ -66,6 +66,7 @@ final class YaMarketProductsPriceUpdate
      */
     public function __invoke(YaMarketProductsCardMessage $message): void
     {
+
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
         if(!$Card)
@@ -79,16 +80,55 @@ final class YaMarketProductsPriceUpdate
             return;
         }
 
-        /** Карточка товара YaMarket */
-        $MarketProduct = $this->yandexMarketProductRequest
-            ->profile($Card['profile'])
-            ->article($Card['article'])
-            ->find();
+        if(
+            empty($Card['width']) ||
+            empty($Card['height']) ||
+            empty($Card['length']) ||
+            empty($Card['weight'])
+        )
+        {
+            $this->logger->critical(
+                sprintf('Параметры упаковки товара %s не найдены! Не обновляем базовую стоимость товара YaMarket', $Card['article']),
+                [__FILE__.':'.__LINE__]
+            );
+
+            return;
+        }
+
+
+        /**
+         * Если карточка новая - ожидаем, пока обновится на YaMarket путем отсрочки usleep
+         */
+
+        $usleep = 100;
+
+        while(true)
+        {
+            usleep($usleep);
+
+            /* Карточка товара YaMarket */
+            $MarketProduct = $this->yandexMarketProductRequest
+                ->profile($Card['profile'])
+                ->article($Card['article'])
+                ->find();
+
+            if($usleep > 1000 || false !== $MarketProduct->valid())
+            {
+                break;
+            }
+
+            $usleep *= 2;
+        }
 
         if(false === $MarketProduct->valid()) // карточка не найдена
         {
+            $this->logger->info(
+                sprintf('Не обновляем базовую стоимость товара %s: карточка товара YaMarket не найдена', $Card['article']),
+                [__FILE__.':'.__LINE__]
+            );
             return;
         }
+        
 
         $Money = new Money($Card['product_price'] / 100);
         $Currency = new Currency($Card['product_currency']);
@@ -120,7 +160,10 @@ final class YaMarketProductsPriceUpdate
                 ->currency($Currency)
                 ->update();
 
-            $this->logger->info(sprintf('Обновили базовую стоимость товара %s: %s %s', $Card['article'], $Price->getValue(), $Currency->getCurrencyValueUpper()));
+            $this->logger->info(
+                sprintf('Обновили базовую стоимость товара %s: %s %s', $Card['article'], $Price->getValue(), $Currency->getCurrencyValueUpper()),
+                [__FILE__.':'.__LINE__]
+            );
 
         }
     }

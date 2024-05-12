@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
 
+use BaksDev\Reference\Currency\Type\Currencies\RUR;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
@@ -69,7 +70,7 @@ final class YandexMarketProductDTO
 
 
         $this->pictures = $data['pictures'];
-        $this->params = $data['params'];
+        $this->params = $data['params'] ?? [];
 
         $this->profile = $profile;
         $this->article = $data['offerId'];
@@ -79,7 +80,7 @@ final class YandexMarketProductDTO
         $this->country = current($data['manufacturerCountries']);
         $this->barcode = current($data['barcodes']);
 
-        $basicPrice = $data['basicPrice'];
+        $basicPrice = $data['basicPrice'] ?? ['value' => 0, 'currencyId' => null];
 
         $this->price = new Money($basicPrice['value']);
         $this->currency = new Currency($basicPrice['currencyId']);

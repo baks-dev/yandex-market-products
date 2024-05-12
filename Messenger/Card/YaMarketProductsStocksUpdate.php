@@ -85,6 +85,7 @@ final class YaMarketProductsStocksUpdate
             ->article($Card['article'])
             ->find();
 
+        /** Обновляем остатки товара если наличие изменилось */
         if($ProductStocks !== $Card['product_quantity'])
         {
             $this->marketProductStocksUpdateRequest

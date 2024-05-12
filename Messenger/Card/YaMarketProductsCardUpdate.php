@@ -129,6 +129,8 @@ final class YaMarketProductsCardUpdate
             ->profile($Card['profile'])
             ->update($request);
 
+        sleep(1);
+
         $this->logger->info(sprintf('Обновили карточку товара %s', $request['offerId']));
 
     }

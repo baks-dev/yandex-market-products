@@ -115,6 +115,11 @@ final class PicturesYaMarketProductProperty implements YaMarketProductPropertyIn
             {
                 $images = json_decode($data['product_images']);
 
+                /* Сортируем коллекцию изображений по root */
+                usort($images, static function ($item1) {
+                    return $item1->product_img_root === false;
+                });
+
                 foreach($images as $image)
                 {
                     $picture = 'https://'.($image->product_img_cdn ? $this->CDN_HOST : $this->HOST).$image->product_img.'/'.($image->product_img_cdn ? 'large.' : 'image.').$image->product_img_ext;

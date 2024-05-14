@@ -11,20 +11,17 @@
 
 namespace BaksDev\Yandex\Market\Products\Command;
 
-use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Yandex\Market\Products\Entity\Card\YaMarketProductsCard;
 use BaksDev\Yandex\Market\Products\Repository\Card\ProductsNotExistsYaMarketCard\ProductsNotExistsYaMarketCardInterface;
-
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\Market\YaMarketProductsCardMarketDTO;
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\YaMarketProductsCardDTO;
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\YaMarketProductsCardHandler;
-use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -87,72 +84,18 @@ class YaMarketPostNewCardCommand extends Command
 
             $YaMarketProductsCardMarketDTO->setProfile($profile);
 
-            /** TODO: */
-            dd($YaMarketProductsCardMarketDTO);
-
-
             $YaMarketProductsCardDTO = new YaMarketProductsCardDTO();
             $YaMarketProductsCardDTO->setMarket($YaMarketProductsCardMarketDTO);
 
             $YaMarketProductsCard = $this->marketProductsCardHandler->handle($YaMarketProductsCardDTO);
 
-
-        }
-
-        dd(46545);
-
-
-        return Command::SUCCESS;
-
-
-        if($profile)
-        {
-            /** Если требуется выбрать профиль из списка */
-            if($profile === 'choice')
+            if($YaMarketProductsCard instanceof  YaMarketProductsCard)
             {
-                $helper = $this->getHelper('question');
-
-                $profiles = $this->allProfileToken->fetchAllWbTokenProfileAssociative();
-
-                $questions = null;
-
-                foreach($profiles as $quest)
-                {
-                    $questions[] = $quest->getAttr();
-                }
-
-                $question = new Question('Профиль пользователя: ');
-                $question->setAutocompleterValues($questions);
-
-                $profileName = $helper->ask($input, $output, $question);
-
-                foreach($profiles as $profile)
-                {
-                    if($profile->getAttr() === $profileName)
-                    {
-                        break;
-                    }
-                }
+                $io->success(sprintf('Добавили карточку с артикулом %s', $YaMarketProductsCardMarketDTO->getSku()));
             }
-
-            /* Присваиваем профиль пользователя */
-            $profile = new UserProfileUid($profile);
-
-            /* Отправляем сообщение в шину профиля */
-            $this->messageDispatch->dispatch(
-                message: new WbCardNewMessage($profile),
-                transport: (string) $profile,
-            );
-        }
-        else
-        {
-            foreach($this->allProfileToken->fetchAllWbTokenProfileAssociative() as $profile)
+            else
             {
-                /* Отправляем сообщение в шину профиля */
-                $this->messageDispatch->dispatch(
-                    message: new WbCardNewMessage($profile),
-                    transport: (string) $profile,
-                );
+                $io->warning(sprintf('%s: Ошибка при добавлении карточки с артикулом %s', $YaMarketProductsCard, $YaMarketProductsCardMarketDTO->getSku()));
             }
         }
 

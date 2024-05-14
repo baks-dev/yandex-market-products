@@ -69,7 +69,14 @@ final class ProductsYaMarketCardRepository implements ProductsYaMarketCardInterf
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         $dbal
-            ->select('card.*')
+            ->select('card.main')
+            ->addSelect('card.event')
+            ->addSelect('card.profile')
+            ->addSelect('card.sku')
+            ->addSelect('card.product')
+            ->addSelect('card.offer')
+            ->addSelect('card.variation')
+            ->addSelect('card.modification')
             ->from(YaMarketProductsCardMarket::class, 'card')
             ->where('card.product = :product')
             ->setParameter('product', $product, ProductUid::TYPE);

@@ -44,7 +44,6 @@ final class YaMarketProductsCardUpdate
     private iterable $property;
 
     private YandexMarketProductUpdateRequest $marketProductUpdate;
-
     private LoggerInterface $logger;
     private YaMarketProductsCardInterface $marketProductsCard;
     private YandexMarketProductRequest $yandexMarketProductRequest;

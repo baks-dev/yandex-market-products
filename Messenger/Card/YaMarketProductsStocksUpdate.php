@@ -39,14 +39,10 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 final class YaMarketProductsStocksUpdate
 {
-
     private YaMarketProductsCardInterface $marketProductsCard;
-
     private YandexMarketProductStocksUpdateRequest $marketProductStocksUpdateRequest;
-
     private LoggerInterface $logger;
     private YandexMarketProductStocksGetRequest $marketProductStocksGetRequest;
-
 
     public function __construct(
         YandexMarketProductStocksGetRequest $marketProductStocksGetRequest,

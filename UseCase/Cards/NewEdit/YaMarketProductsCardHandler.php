@@ -30,6 +30,7 @@ use BaksDev\Core\Entity\AbstractHandler;
 use BaksDev\Yandex\Market\Products\Entity\Card\Event\YaMarketProductsCardEvent;
 use BaksDev\Yandex\Market\Products\Entity\Card\YaMarketProductsCard;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
+use DomainException;
 
 final class YaMarketProductsCardHandler extends AbstractHandler
 {
@@ -50,7 +51,7 @@ final class YaMarketProductsCardHandler extends AbstractHandler
         {
             $command->getEvent() ? $this->preUpdate($command, true) : $this->prePersist($command);
         }
-        catch(\DomainException $errorUniqid)
+        catch(DomainException $errorUniqid)
         {
             return $errorUniqid->getMessage();
         }
@@ -61,15 +62,12 @@ final class YaMarketProductsCardHandler extends AbstractHandler
             return $this->validatorCollection->getErrorUniqid();
         }
 
-        // TR281-16-235-85-120/116Q
-        //dd($this->event);
-
         $this->entityManager->flush();
 
         /* Отправляем сообщение в шину */
         $this->messageDispatch->dispatch(
             message: new YaMarketProductsCardMessage($this->main->getId(), $this->main->getEvent(), $command->getEvent()),
-            transport: 'yandex-market-products'
+            transport: (string) $command->getMarket()->getProfile()
         );
 
         return $this->main;

@@ -35,11 +35,13 @@ use BaksDev\Yandex\Market\Products\Entity\Card\Event\YaMarketProductsCardEvent;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use InvalidArgumentException;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'ya_market_products_card_market')]
 #[ORM\Index(columns: ['profile'])]
+#[ORM\Index(columns: ['sku'])]
 class YaMarketProductsCardMarket extends EntityReadonly
 {
     /**
@@ -128,7 +130,7 @@ class YaMarketProductsCardMarket extends EntityReadonly
             return parent::getDto($dto);
         }
 
-        throw new \InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
+        throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
 
 
@@ -139,7 +141,7 @@ class YaMarketProductsCardMarket extends EntityReadonly
             return parent::setEntity($dto);
         }
 
-        throw new \InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
+        throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
 
 }

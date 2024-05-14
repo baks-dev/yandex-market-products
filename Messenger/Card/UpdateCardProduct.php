@@ -64,7 +64,7 @@ final class UpdateCardProduct
             /* Отправляем сообщение в шину */
             $this->messageDispatch->dispatch(
                 message: new YaMarketProductsCardMessage($YaMarketProductsCardUid, $YaMarketProductsCardEventUid),
-                transport: 'yandex-market-products'
+                transport: $card['profile']
             );
         }
     }

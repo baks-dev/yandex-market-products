@@ -97,14 +97,55 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
                 'product_event.id = ord_product.product'
             );
 
+
+        $dbal->leftJoin(
+            'product',
+            ProductOffer::class,
+            'product_offer',
+            'product_offer.id = ord_product.offer'
+        );
+
+        $dbal->leftJoin(
+            'product',
+            ProductVariation::class,
+            'product_variation',
+            'product_variation.offer = ord_product.variation'
+        );
+
+        $dbal->leftJoin(
+            'product',
+            ProductModification::class,
+            'product_modification',
+            'product_modification.variation = ord_product.modification'
+        );
+
         $dbal
-            ->select('card.*')
+            ->leftJoin(
+                'product',
+                ProductInfo::class,
+                'product_info',
+                'product_info.product = product_event.main'
+            );
+
+        $dbal
+            ->select('card.main')
+            ->addSelect('card.event')
+            ->addSelect('card.profile')
+            ->addSelect('card.sku')
+            ->addSelect('card.product')
+            ->addSelect('card.offer')
+            ->addSelect('card.variation')
+            ->addSelect('card.modification')
             ->leftJoin(
                 'product_event',
                 YaMarketProductsCardMarket::class,
                 'card',
-                'card.product = product_event.main'
-            );
+                '
+                    card.product = product_event.main AND
+                    card.offer = product_offer.const AND
+                    card.variation = product_variation.const AND
+                    card.modification = product_modification.const
+            ');
 
 
         return $dbal->enableCache('yandex-market-products', 86400)->fetchAllAssociative();

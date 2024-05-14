@@ -99,21 +99,21 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
 
 
         $dbal->leftJoin(
-            'product',
+            'ord_product',
             ProductOffer::class,
             'product_offer',
             'product_offer.id = ord_product.offer'
         );
 
         $dbal->leftJoin(
-            'product',
+            'ord_product',
             ProductVariation::class,
             'product_variation',
             'product_variation.offer = ord_product.variation'
         );
 
         $dbal->leftJoin(
-            'product',
+            'ord_product',
             ProductModification::class,
             'product_modification',
             'product_modification.variation = ord_product.modification'
@@ -121,7 +121,7 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
 
         $dbal
             ->leftJoin(
-                'product',
+                'product_event',
                 ProductInfo::class,
                 'product_info',
                 'product_info.product = product_event.main'

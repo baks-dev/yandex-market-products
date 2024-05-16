@@ -603,16 +603,6 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 
         $dbal->allGroupByExclude();
 
-        //dd($dbal->fetchAssociative());
-
-
-        //        $dbal->leftJoin(
-        //            'card',
-        //            YaMarketProductsCardEvent::class,
-        //            'card_event',
-        //            'card_event.id = card.event'
-        //        );
-
 
         return $dbal
             // ->enableCache('Namespace', 3600)

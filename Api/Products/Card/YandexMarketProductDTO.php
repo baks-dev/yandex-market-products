@@ -52,7 +52,7 @@ final class YandexMarketProductDTO
     private string $desc;
 
     /** Страна, где был произведен товар. */
-    private string $country;
+    private string|bool $country;
 
     /** Стоимость товара */
     private Money $price;

@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger\Card;
+namespace BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsPriceUpdate;
 
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
@@ -32,10 +32,11 @@ use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Price\YandexMarketProductPriceUpdateRequest;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
+use DomainException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(priority: 998)]
+#[AsMessageHandler]
 final class YaMarketProductsPriceUpdate
 {
 
@@ -64,7 +65,7 @@ final class YaMarketProductsPriceUpdate
     /**
      * Обновляем базовую цену товара на Yandex Market
      */
-    public function __invoke(YaMarketProductsCardMessage $message): void
+    public function __invoke(YaMarketProductsPriceMessage $message): void
     {
 
         $Card = $this->marketProductsCard->findByCard($message->getId());
@@ -95,40 +96,22 @@ final class YaMarketProductsPriceUpdate
             return;
         }
 
+        $MarketProduct = $this->yandexMarketProductRequest
+            ->profile($Card['profile'])
+            ->article($Card['article'])
+            ->find();
 
-        /**
-         * Если карточка новая - ожидаем, пока обновится на YaMarket путем отсрочки usleep
-         */
-
-        $usleep = 100;
-
-        while(true)
+        /** Если карточка новая - понадобится время на обновление цены */
+        if(!$MarketProduct->valid())
         {
-            usleep($usleep);
-
-            /* Карточка товара YaMarket */
-            $MarketProduct = $this->yandexMarketProductRequest
-                ->profile($Card['profile'])
-                ->article($Card['article'])
-                ->find();
-
-            if($usleep > 1000 || false !== $MarketProduct->valid())
-            {
-                break;
-            }
-
-            $usleep *= 2;
-        }
-
-        if(false === $MarketProduct->valid()) // карточка не найдена
-        {
-            $this->logger->info(
+            $this->logger->critical(
                 sprintf('Не обновляем базовую стоимость товара %s: карточка товара YaMarket не найдена', $Card['article']),
                 [__FILE__.':'.__LINE__]
             );
-            return;
+
+            throw new DomainException('Карточка товара YaMarket не найдена');
         }
-        
+
 
         $Money = new Money($Card['product_price'] / 100);
         $Currency = new Currency($Card['product_currency']);

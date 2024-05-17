@@ -25,18 +25,19 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDTO;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Update\YandexMarketProductUpdateRequest;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Uid\UuidV7;
 
-#[AsMessageHandler(priority: 999)]
+#[AsMessageHandler]
 final class YaMarketProductsCardUpdate
 {
 
@@ -47,13 +48,15 @@ final class YaMarketProductsCardUpdate
     private LoggerInterface $logger;
     private YaMarketProductsCardInterface $marketProductsCard;
     private YandexMarketProductRequest $yandexMarketProductRequest;
+    private MessageDispatchInterface $messageDispatch;
 
     public function __construct(
         #[TaggedIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')] iterable $property,
         YandexMarketProductRequest $yandexMarketProductRequest,
         YandexMarketProductUpdateRequest $marketProductUpdate,
         YaMarketProductsCardInterface $marketProductsCard,
-        LoggerInterface $yandexMarketProductsLogger
+        LoggerInterface $yandexMarketProductsLogger,
+        MessageDispatchInterface $messageDispatch
     )
     {
         $this->marketProductUpdate = $marketProductUpdate;
@@ -61,6 +64,7 @@ final class YaMarketProductsCardUpdate
         $this->logger = $yandexMarketProductsLogger;
         $this->marketProductsCard = $marketProductsCard;
         $this->yandexMarketProductRequest = $yandexMarketProductRequest;
+        $this->messageDispatch = $messageDispatch;
     }
 
     /**
@@ -103,6 +107,17 @@ final class YaMarketProductsCardUpdate
             return;
         }
 
+
+        /** Создаем сообщение на обновление цены */
+        $YaMarketProductsPriceMessage = new YaMarketProductsPriceMessage($message);
+        $this->messageDispatch->dispatch($YaMarketProductsPriceMessage, transport: $Card['profile']);
+
+
+        /** Создаем сообщение на обновление остатков */
+        $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($message);
+        $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: $Card['profile']);
+
+
         /** Карточка товара YaMarket */
         $MarketProduct = $this->yandexMarketProductRequest
             ->profile($Card['profile'])
@@ -112,6 +127,7 @@ final class YaMarketProductsCardUpdate
         /** Если карточка имеется - проверяем изменения */
         if($MarketProduct->valid())
         {
+
             /** @var YandexMarketProductDTO $YandexMarketProductDTO */
 
             $YandexMarketProductDTO = $MarketProduct->current();
@@ -127,8 +143,6 @@ final class YaMarketProductsCardUpdate
         $this->marketProductUpdate
             ->profile($Card['profile'])
             ->update($request);
-
-        sleep(1);
 
         $this->logger->info(sprintf('Обновили карточку товара %s', $request['offerId']));
 

@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger\Card;
+namespace BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsStocksUpdate;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
@@ -61,7 +61,7 @@ final class YaMarketProductsStocksUpdate
     /**
      * Обновляем базовую цену товара на Yandex Market
      */
-    public function __invoke(YaMarketProductsCardMessage $message): void
+    public function __invoke(YaMarketProductsStocksMessage $message): void
     {
         $Card = $this->marketProductsCard->findByCard($message->getId());
 

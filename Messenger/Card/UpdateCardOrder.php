@@ -27,6 +27,7 @@ namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\OrderYaMarketCard\OrderProductsYaMarketCardInterface;
 use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventUid;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
@@ -59,10 +60,11 @@ final class UpdateCardOrder
         {
             $YaMarketProductsCardUid = new YaMarketProductsCardUid($card['main']);
             $YaMarketProductsCardEventUid = new YaMarketProductsCardEventUid($card['event']);
+            $YaMarketProductsCardMessage = new YaMarketProductsCardMessage($YaMarketProductsCardUid, $YaMarketProductsCardEventUid);
 
-            /* Отправляем сообщение в шину */
+            /* Обновляем только остатки */
             $this->messageDispatch->dispatch(
-                message: new YaMarketProductsCardMessage($YaMarketProductsCardUid, $YaMarketProductsCardEventUid),
+                message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
                 transport: $card['profile']
             );
         }

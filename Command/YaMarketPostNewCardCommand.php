@@ -80,7 +80,7 @@ class YaMarketPostNewCardCommand extends Command
             //            }
 
             // Исключаем блокировку (ОГРАНИЧЕНИЕ! 600 запросов в минуту)'
-            usleep(200);
+            usleep(300);
 
             $YaMarketProductsCardMarketDTO->setProfile($profile);
 

@@ -1,6 +1,7 @@
 # Роль
 
 ROLE_YA_MARKET_PRODUCTS_SETTING:
+  header: 'Yandex Market'
   name: 'Соотношения свойств Yandex Market'
   desc: 'Настройки соотношений данных Yandex Market'
 
@@ -25,6 +26,7 @@ ROLE_YA_MARKET_PRODUCTS_SETTING_DELETE:
 
 
 ROLE_YA_MARKET_PRODUCTS_CARD:
+  header: 'Yandex Market'
   name: 'Карточки товаров'
   desc: 'Карточки товаров Yandex Market'
 

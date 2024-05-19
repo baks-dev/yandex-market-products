@@ -1,6 +1,7 @@
 # Role
 
 ROLE_YA_MARKET_PRODUCTS_SETTING:
+  header: 'Yandex Market'
   name: 'Yandex Market property relationships'
   desc: 'Yandex Market data correlation settings'
 
@@ -25,6 +26,7 @@ ROLE_YA_MARKET_PRODUCTS_SETTING_DELETE:
 
 
 ROLE_YA_MARKET_PRODUCTS_CARD:
+  header: 'Yandex Market'
   name: 'Product cards'
   desc: 'Yandex Market product cards'
 

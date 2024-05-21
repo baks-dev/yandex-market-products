@@ -575,20 +575,19 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 
         $dbal->addSelect(
             '
-            
-            
+
             CASE
 			   WHEN product_modification_quantity.quantity > 0 AND product_modification_quantity.quantity > product_modification_quantity.reserve 
-			   THEN (product_modification_quantity.quantity - product_modification_quantity.reserve)
+			   THEN (product_modification_quantity.quantity - ABS(product_modification_quantity.reserve))
 			
 			   WHEN product_variation_quantity.quantity > 0 AND product_variation_quantity.quantity > product_variation_quantity.reserve 
-			   THEN (product_variation_quantity.quantity - product_variation_quantity.reserve)
+			   THEN (product_variation_quantity.quantity - ABS(product_variation_quantity.reserve))
 			
 			   WHEN product_offer_quantity.quantity > 0 AND product_offer_quantity.quantity > product_offer_quantity.reserve 
-			   THEN (product_offer_quantity.quantity - product_offer_quantity.reserve)
+			   THEN (product_offer_quantity.quantity - ABS(product_offer_quantity.reserve))
 			  
 			   WHEN product_price.quantity > 0 AND product_price.quantity > product_price.reserve 
-			   THEN (product_price.quantity - product_price.reserve)
+			   THEN (product_price.quantity - ABS(product_price.reserve))
 			 
 			   ELSE 0
 			   
@@ -599,6 +598,9 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
             ->addGroupBy('product_variation_quantity.reserve')
             ->addGroupBy('product_offer_quantity.reserve')
             ->addGroupBy('product_price.reserve');
+
+
+
 
 
         $dbal->allGroupByExclude();

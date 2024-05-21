@@ -81,8 +81,10 @@ final class YaMarketProductsStocksUpdate
             ->article($Card['article'])
             ->find();
 
+        $product_quantity = max($Card['product_quantity'], 0);
+
         /** Обновляем остатки товара если наличие изменилось */
-        if($ProductStocks !== $Card['product_quantity'])
+        if($ProductStocks !== $product_quantity)
         {
             $this->marketProductStocksUpdateRequest
                 ->profile($Card['profile'])

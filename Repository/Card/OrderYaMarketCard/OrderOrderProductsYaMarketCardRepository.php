@@ -89,6 +89,7 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
                 'ord_product.event = ord.event'
             );
 
+
         $dbal
             ->leftJoin(
                 'ord_product',
@@ -109,14 +110,14 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
             'ord_product',
             ProductVariation::class,
             'product_variation',
-            'product_variation.offer = ord_product.variation'
+            'product_variation.id = ord_product.variation'
         );
 
         $dbal->leftJoin(
             'ord_product',
             ProductModification::class,
             'product_modification',
-            'product_modification.variation = ord_product.modification'
+            'product_modification.id = ord_product.modification'
         );
 
         $dbal
@@ -147,7 +148,8 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
                     card.modification = product_modification.const
             ');
 
-
-        return $dbal->enableCache('yandex-market-products', 86400)->fetchAllAssociative();
+        return $dbal
+            ->enableCache('yandex-market-products', 86400)
+            ->fetchAllAssociative();
     }
 }

@@ -89,10 +89,10 @@ final class YaMarketProductsStocksUpdate
             $this->marketProductStocksUpdateRequest
                 ->profile($Card['profile'])
                 ->article($Card['article'])
-                ->total($Card['product_quantity'])
+                ->total($product_quantity)
                 ->update();
 
-            $this->logger->info(sprintf('Обновили наличие товара %s: %s', $Card['article'], $Card['product_quantity']));
+            $this->logger->info(sprintf('Обновили наличие товара %s: %s => %s', $Card['article'], $ProductStocks, $Card['product_quantity']));
         }
     }
 }

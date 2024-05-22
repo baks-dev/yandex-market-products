@@ -95,7 +95,7 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
 
         if(empty($stocks))
         {
-            return false;
+            return 0;
         }
 
         $available = array_filter($stocks, static function($v) {

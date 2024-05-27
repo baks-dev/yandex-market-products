@@ -241,33 +241,53 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
                             'value' => $return_index
                         ];
 
+
+                        $params[] = [
+                            'name' => 'Индекс нагрузки',
+                            'value' => filter_var($data['product_modification_postfix'], FILTER_SANITIZE_NUMBER_INT)
+                        ];
                     }
                 }
 
 
                 /** Объединяем карточки по идентификатору */
 
-                if(isset($data['product_uid']))
+                if(isset($data['product_card']))
                 {
-                    $return_value = new UuidV7($data['product_uid']);
+                    $numbers = filter_var((string) $data['product_card'], FILTER_SANITIZE_NUMBER_INT);
 
-                    if($return_value)
-                    {
-                        $numbers = filter_var((string) $return_value, FILTER_SANITIZE_NUMBER_INT);
+                    //$numbers = explode('-', $numbers);
+                    //$numbers = array_map('intval', $numbers);
+                    //$numbers = array_sum($numbers);
 
-                        $numbers = explode('-', $numbers);
-                        $numbers = array_map('intval', $numbers);
-                        $numbers = array_sum($numbers);
+                    (int) $identifier = substr($numbers, 0, 64);
 
-                        (int) $identifier = substr($return_value->getDateTime()->getTimestamp().$numbers, 0, 64);
-
-                        $params[] = [
-                            'name' => 'Номер карточки',
-                            'value' => $identifier
-                        ];
-
-                    }
+                    $params[] = [
+                        'name' => 'Номер карточки',
+                        'value' => $identifier
+                    ];
                 }
+//                else if(isset($data['product_uid']))
+//                {
+//                    $return_value = new UuidV7($data['product_uid']);
+//
+//                    if($return_value)
+//                    {
+//                        $numbers = filter_var((string) $return_value, FILTER_SANITIZE_NUMBER_INT);
+//
+//                        $numbers = explode('-', $numbers);
+//                        $numbers = array_map('intval', $numbers);
+//                        $numbers = array_sum($numbers);
+//
+//                        (int) $identifier = substr($return_value->getDateTime()->getTimestamp().$numbers, 0, 64);
+//
+//                        $params[] = [
+//                            'name' => 'Номер карточки',
+//                            'value' => $identifier
+//                        ];
+//
+//                    }
+//                }
 
             }
         }

@@ -25,11 +25,13 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Tariffs;
 
-use BaksDev\Reference\Currency\Type\Currencies\RUR;
-use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
-use BaksDev\Yandex\Market\Products\Api\AllShops\YandexMarketShopDTO;
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use DateInterval;
+use DomainException;
+use InvalidArgumentException;
+use ReflectionClass;
+use ReflectionProperty;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -117,10 +119,10 @@ final class YandexMarketCalculatorRequest extends YandexMarket
      */
     public function calc(): float
     {
-        $reflect = new \ReflectionClass($this);
-        $properties = $reflect->getProperties(\ReflectionProperty::IS_PRIVATE);
+        $reflect = new ReflectionClass($this);
+        $properties = $reflect->getProperties(ReflectionProperty::IS_PRIVATE);
 
-        /** @var \ReflectionProperty $property */
+        /** @var ReflectionProperty $property */
         foreach($properties as $property)
         {
             $name = $property->getName();
@@ -128,48 +130,64 @@ final class YandexMarketCalculatorRequest extends YandexMarket
             if(empty($this->{$name}))
             {
                 $this->logger->critical(sprintf('Необходимо передать обязательный параметр %s', $name), [__FILE__.':'.__LINE__]);
-                throw new \InvalidArgumentException(sprintf('Invalid Argument %s', $name));
+                throw new InvalidArgumentException(sprintf('Invalid Argument %s', $name));
             }
         }
 
-        $response = $this->TokenHttpClient()
-            ->request(
-                'POST', '/tariffs/calculate',
-                ['json' =>
-                    [
-                        "parameters" => [
-                            "campaignId" => $this->getCompany(),
-                            //"sellingProgram" => "FBS",
-                            "frequency" => "DAILY"
-                        ],
-                        "offers" => [
+
+        $key = md5($this->category.$this->price.$this->length.$this->width.$this->height.$this->weight);
+
+        $cache = new FilesystemAdapter('yandex-market');
+
+        $content = $cache->get($key,
+
+            function(ItemInterface $item) {
+
+                $item->expiresAfter(DateInterval::createFromDateString('1 day'));
+                $response = $this->TokenHttpClient()
+                    ->request(
+                        'POST', '/tariffs/calculate',
+                        ['json' =>
                             [
-                                "categoryId" => $this->category,
-                                "price" => $this->price,
-                                "length" => $this->length,
-                                "width" => $this->width,
-                                "height" => $this->height,
-                                "weight" => $this->weight
+                                "parameters" => [
+                                    "campaignId" => $this->getCompany(),
+                                    //"sellingProgram" => "FBS",
+                                    "frequency" => "DAILY"
+                                ],
+                                "offers" => [
+                                    [
+                                        "categoryId" => $this->category,
+                                        "price" => $this->price,
+                                        "length" => $this->length,
+                                        "width" => $this->width,
+                                        "height" => $this->height,
+                                        "weight" => $this->weight
+                                    ]
+                                ]
                             ]
-                        ]
-                    ]
-                ],
-            );
+                        ],
+                    );
 
-        $content = $response->toArray(false);
 
-        if($response->getStatusCode() !== 200)
-        {
-            foreach($content['errors'] as $error)
-            {
-                $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
-            }
+                $content = $response->toArray(false);
 
-            throw new \DomainException(
-                message: 'Ошибка '.self::class,
-                code: $response->getStatusCode()
-            );
-        }
+                if($response->getStatusCode() !== 200)
+                {
+                    foreach($content['errors'] as $error)
+                    {
+                        $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
+                    }
+
+                    throw new DomainException(
+                        message: 'Ошибка '.self::class,
+                        code: $response->getStatusCode()
+                    );
+                }
+
+                return $content;
+
+            });
+
 
         $tariffs = current($content['result']['offers'])['tariffs'];
 

@@ -36,11 +36,10 @@ return static function(FrameworkConfig $framework) {
         ->failureTransport('failed-yandex-market-products')
         ->retryStrategy()
         ->maxRetries(3)
-        ->delay(1000)
+        ->delay((1000 * 20))
         ->maxDelay(0)
-        ->multiplier(3) // увеличиваем задержку перед каждой повторной попыткой
+        ->multiplier(5) // увеличиваем задержку перед каждой повторной попыткой
         ->service(null)
-
     ;
 
     $messenger->transport('failed-yandex-market-products')

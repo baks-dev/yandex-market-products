@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger\Stocks;
+namespace BaksDev\Yandex\Market\Products\Messenger\ProducStocks;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Stocks\Entity\Event\ProductStockEvent;

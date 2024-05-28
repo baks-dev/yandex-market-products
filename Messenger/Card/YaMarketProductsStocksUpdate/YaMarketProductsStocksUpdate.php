@@ -25,15 +25,10 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsStocksUpdate;
 
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YandexMarketProductStocksGetRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YandexMarketProductStocksUpdateRequest;
-use BaksDev\Yandex\Market\Products\Api\Products\Update\YandexMarketProductUpdateRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
-use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

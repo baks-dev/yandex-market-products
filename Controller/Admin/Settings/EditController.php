@@ -68,6 +68,8 @@ final class EditController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid() && $form->has('product_settings'))
         {
+            $this->refreshTokenForm($form);
+
             $handle = $productsSettingsHandler->handle($SettingsDTO);
 
             if($handle)

@@ -62,6 +62,8 @@ final class GetController extends AbstractController
 
         if($form->isSubmitted() && $form->has('ya_market_product_card_get'))
         {
+            $this->refreshTokenForm($form);
+
             /**
              * Предотвращаем обновление чаще раз в 5 минут
              * @var CacheInterface $AppCache

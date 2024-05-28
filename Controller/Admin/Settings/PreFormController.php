@@ -52,6 +52,8 @@ final class PreFormController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid() && $form->has('ya_market_preform'))
         {
+            $this->refreshTokenForm($form);
+
             return $this->redirectToRoute(
                 'yandex-market-products:admin.settings.newedit.new', ['id' => $PreformDTO->category, 'market' => $PreformDTO->market->getId()]
             );

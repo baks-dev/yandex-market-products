@@ -75,6 +75,8 @@ final class UpdateController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid() && $form->has('ya_market_product_card_delete'))
         {
+            $this->refreshTokenForm($form);
+
             $handle = $WbProductCardHandler->handle($WbProductCardUpdateDTO);
 
 

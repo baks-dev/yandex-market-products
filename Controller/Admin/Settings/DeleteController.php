@@ -60,6 +60,8 @@ final class DeleteController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid() && $form->has('delete_market_products_settings'))
         {
+            $this->refreshTokenForm($form);
+
             $WbProductSettings = $ProductSettingsHandler->handle($DeleteWbProductSettingsDTO);
 
             if($WbProductSettings instanceof YaMarketProductsSettings)

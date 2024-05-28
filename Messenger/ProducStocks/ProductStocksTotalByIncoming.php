@@ -100,7 +100,7 @@ final class ProductStocksTotalByIncoming
                 ->product($product->getProduct())
                 ->offer($product->getOffer())
                 ->variation($product->getVariation())
-                ->modification($product->getVariation())
+                ->modification($product->getModification())
                 ->findByProfile($UserProfileUid);
 
             if($YaMarketProductsCardMessage->valid())

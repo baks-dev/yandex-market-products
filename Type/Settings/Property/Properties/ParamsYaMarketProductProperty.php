@@ -243,15 +243,16 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
 
                     }
 
-                    $cleaned_int = filter_var($data['product_modification_postfix'], FILTER_SANITIZE_NUMBER_INT);
+
+                    $index = explode('/', $data['product_modification_postfix']);
+                    $cleaned_int = filter_var(current($index), FILTER_SANITIZE_NUMBER_INT);
 
                     if(!empty($cleaned_int))
                     {
-
-                            $params[] = [
-                                'name' => 'Индекс нагрузки',
-                                'value' => (int) $cleaned_int
-                            ];
+                        $params[] = [
+                            'name' => 'Индекс нагрузки',
+                            'value' => (int) $cleaned_int
+                        ];
                     }
                 }
 

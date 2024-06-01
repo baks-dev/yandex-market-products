@@ -244,10 +244,18 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
                     }
                 }
 
+                $params[] = [
+                    'name' => 'Омологация',
+                    'value' => 'отсутствует'
+                ];
 
                 /** Объединяем карточки по идентификатору */
+                $params[] = [
+                    'name' => 'Название группы вариантов',
+                    'value' => $data['product_card']
+                ];
 
-                if(isset($data['product_uid']))
+                /*if(isset($data['product_uid']))
                 {
                     $return_value = new UuidV7($data['product_uid']);
 
@@ -259,15 +267,17 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
                         $numbers = array_map('intval', $numbers);
                         $numbers = array_sum($numbers);
 
-                        (int) $identifier = substr($return_value->getDateTime()->getTimestamp().$numbers, 0, 64);
+                        $numberCard = filter_var((string) $data['product_card'], FILTER_SANITIZE_NUMBER_INT);
+
+                        $identifier = (int) substr($numbers.$numberCard, 0, 64);
 
                         $params[] = [
-                            'name' => 'Номер карточки',
-                            'value' => $identifier
+                            'name' => 'Название группы вариантов',
+                            'value' => $data['product_card']
                         ];
 
                     }
-                }
+                }*/
 
             }
         }

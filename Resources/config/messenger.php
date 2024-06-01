@@ -36,7 +36,7 @@ return static function(FrameworkConfig $framework) {
         ->failureTransport('failed-yandex-market-products')
         ->retryStrategy()
         ->maxRetries(3)
-        ->delay(1000)
+        ->delay(1000 * 30)
         ->maxDelay(0)
         ->multiplier(3) // увеличиваем задержку перед каждой повторной попыткой
         ->service(null)

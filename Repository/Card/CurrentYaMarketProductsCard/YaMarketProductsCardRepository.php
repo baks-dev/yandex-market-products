@@ -481,8 +481,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 
 				 
 			) AS product_images
-	"
-        );
+	    ");
 
 
         /* Базовая Цена товара */
@@ -599,15 +598,11 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
             ->addGroupBy('product_offer_quantity.reserve')
             ->addGroupBy('product_price.reserve');
 
-
-
-
-
         $dbal->allGroupByExclude();
 
-
+        /** Кешируем в кеш модуля products-product для сброса при обновлении карточки */
         return $dbal
-            // ->enableCache('Namespace', 3600)
+            ->enableCache('products-product', 60)
             ->fetchAssociative();
     }
 }

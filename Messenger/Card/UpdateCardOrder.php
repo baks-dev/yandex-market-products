@@ -65,7 +65,7 @@ final class UpdateCardOrder
             /* Обновляем только остатки */
             $this->messageDispatch->dispatch(
                 message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
-                transport: $card['profile']
+                transport: 'yandex-market-products'
             );
         }
     }

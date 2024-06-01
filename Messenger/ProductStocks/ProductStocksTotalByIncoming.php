@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger\ProducStocks;
+namespace BaksDev\Yandex\Market\Products\Messenger\ProductStocks;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Stocks\Entity\Event\ProductStockEvent;
@@ -89,7 +89,6 @@ final class ProductStocksTotalByIncoming
             return;
         }
 
-
         /** Идентификатор профиля склада при поступлении */
         $UserProfileUid = $ProductStockEvent->getProfile();
 
@@ -103,10 +102,11 @@ final class ProductStocksTotalByIncoming
                 ->modification($product->getModification())
                 ->findByProfile($UserProfileUid);
 
-            if($YaMarketProductsCardMessage->valid())
+
+            if($YaMarketProductsCardMessage)
             {
-                // Отправляем сообщение на обновление остатков
-                $this->messageDispatch->dispatch($YaMarketProductsCardMessage->current(), transport: (string) $UserProfileUid);
+                // Отправляем сообщение на обновление остатков транспорт профиля (пополнение не имеет приоритета)
+                $this->messageDispatch->dispatch($YaMarketProductsCardMessage, transport: (string) $UserProfileUid);
             }
         }
     }

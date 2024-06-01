@@ -131,7 +131,7 @@ final class YaMarketProductsCardByCriteriaRepository implements YaMarketProducts
     }
 
 
-    public function findByProfile(UserProfileUid|string $profile): Generator
+    public function findByProfile(UserProfileUid|string $profile): ?YaMarketProductsStocksMessage
     {
         if(is_string($profile))
         {

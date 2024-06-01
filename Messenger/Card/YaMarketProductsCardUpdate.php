@@ -107,7 +107,6 @@ final class YaMarketProductsCardUpdate
             return;
         }
 
-
         /** Создаем сообщение на обновление цены */
         $YaMarketProductsPriceMessage = new YaMarketProductsPriceMessage($message);
         $this->messageDispatch->dispatch($YaMarketProductsPriceMessage, transport: $Card['profile']);
@@ -115,7 +114,7 @@ final class YaMarketProductsCardUpdate
 
         /** Создаем сообщение на обновление остатков */
         $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($message);
-        $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: $Card['profile']);
+        $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
 
 
         /** Карточка товара YaMarket */
@@ -127,7 +126,6 @@ final class YaMarketProductsCardUpdate
         /** Если карточка имеется - проверяем изменения */
         if($MarketProduct->valid())
         {
-
             /** @var YandexMarketProductDTO $YandexMarketProductDTO */
 
             $YandexMarketProductDTO = $MarketProduct->current();
@@ -135,7 +133,6 @@ final class YaMarketProductsCardUpdate
             /** Не обновляем карточку если нет изменений (фото параметров) */
             if($YandexMarketProductDTO->equals($request) === true)
             {
-                $this->logger->info(sprintf('Изменения в карточке %s отсутствуют', $request['offerId']));
                 return;
             }
         }

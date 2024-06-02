@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
+use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDTO;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
@@ -49,6 +50,7 @@ final class YaMarketProductsCardUpdate
     private YaMarketProductsCardInterface $marketProductsCard;
     private YandexMarketProductRequest $yandexMarketProductRequest;
     private MessageDispatchInterface $messageDispatch;
+    private AppCacheInterface $cache;
 
     public function __construct(
         #[TaggedIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')] iterable $property,
@@ -56,7 +58,8 @@ final class YaMarketProductsCardUpdate
         YandexMarketProductUpdateRequest $marketProductUpdate,
         YaMarketProductsCardInterface $marketProductsCard,
         LoggerInterface $yandexMarketProductsLogger,
-        MessageDispatchInterface $messageDispatch
+        MessageDispatchInterface $messageDispatch,
+        AppCacheInterface $cache
     )
     {
         $this->marketProductUpdate = $marketProductUpdate;
@@ -65,6 +68,7 @@ final class YaMarketProductsCardUpdate
         $this->marketProductsCard = $marketProductsCard;
         $this->yandexMarketProductRequest = $yandexMarketProductRequest;
         $this->messageDispatch = $messageDispatch;
+        $this->cache = $cache;
     }
 
     /**
@@ -72,6 +76,11 @@ final class YaMarketProductsCardUpdate
      */
     public function __invoke(YaMarketProductsCardMessage $message): void
     {
+        /** Удаляем из кеша идентификатор */
+        $cache = $this->cache->init('yandex-market-products');
+        $item = $cache->getItem((string) $message->getId());
+        $cache->deleteItem($item);
+
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
         if(!$Card)

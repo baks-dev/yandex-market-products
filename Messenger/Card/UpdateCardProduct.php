@@ -25,11 +25,13 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
+use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Messenger\ProductMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\ProductYaMarketCard\ProductsYaMarketCardInterface;
 use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventUid;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
+use DateInterval;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -37,15 +39,17 @@ final class UpdateCardProduct
 {
     private MessageDispatchInterface $messageDispatch;
     private ProductsYaMarketCardInterface $productsYaMarketCard;
+    private AppCacheInterface $cache;
 
     public function __construct(
+        AppCacheInterface $cache,
         ProductsYaMarketCardInterface $productsYaMarketCard,
         MessageDispatchInterface $messageDispatch,
     )
     {
-
         $this->messageDispatch = $messageDispatch;
         $this->productsYaMarketCard = $productsYaMarketCard;
+        $this->cache = $cache;
     }
     
     /**
@@ -53,19 +57,31 @@ final class UpdateCardProduct
      */
     public function __invoke(ProductMessage $message): void
     {
+        $cache = $this->cache->init('yandex-market-products');
+
         /** Получаем идентификаторы карточки YandexMarket товаров */
         $cards = $this->productsYaMarketCard->findAll($message->getId());
 
         foreach($cards as $card)
         {
-            $YaMarketProductsCardUid = new YaMarketProductsCardUid($card['main']);
-            $YaMarketProductsCardEventUid = new YaMarketProductsCardEventUid($card['event']);
+            $item = $cache->getItem($card['main']);
 
-            /* Отправляем сообщение в шину */
-            $this->messageDispatch->dispatch(
-                message: new YaMarketProductsCardMessage($YaMarketProductsCardUid, $YaMarketProductsCardEventUid),
-                transport: $card['profile']
-            );
+            if(false === $item->isHit())
+            {
+                /* Сохраняем идентификатор, предотвращая повторные сообщения */
+                $item->set(true);
+                $item->expiresAfter(DateInterval::createFromDateString('5 minutes'));
+                $cache->save($item);
+
+                /* Отправляем сообщение в шину */
+                $YaMarketProductsCardUid = new YaMarketProductsCardUid($card['main']);
+                $YaMarketProductsCardEventUid = new YaMarketProductsCardEventUid($card['event']);
+
+                $this->messageDispatch->dispatch(
+                    message: new YaMarketProductsCardMessage($YaMarketProductsCardUid, $YaMarketProductsCardEventUid),
+                    transport: $card['profile']
+                );
+            }
         }
     }
 }

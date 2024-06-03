@@ -601,6 +601,8 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
         $dbal->allGroupByExclude();
 
         /** Кешируем в кеш модуля products-product для сброса при обновлении карточки */
-        return $dbal->fetchAssociative();
+        return $dbal
+            ->enableCache('products-product', 1)
+            ->fetchAssociative();
     }
 }

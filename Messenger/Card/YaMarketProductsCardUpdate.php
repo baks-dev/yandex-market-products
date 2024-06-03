@@ -78,8 +78,7 @@ final class YaMarketProductsCardUpdate
     {
         /** Удаляем из кеша идентификатор */
         $cache = $this->cache->init('yandex-market-products');
-        $item = $cache->getItem((string) $message->getId());
-        $cache->deleteItem($item);
+        $cache->deleteItem((string) $message->getId());
 
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
@@ -119,7 +118,6 @@ final class YaMarketProductsCardUpdate
         /** Создаем сообщение на обновление цены */
         $YaMarketProductsPriceMessage = new YaMarketProductsPriceMessage($message);
         $this->messageDispatch->dispatch($YaMarketProductsPriceMessage, transport: $Card['profile']);
-
 
         /** Создаем сообщение на обновление остатков */
         $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($message);

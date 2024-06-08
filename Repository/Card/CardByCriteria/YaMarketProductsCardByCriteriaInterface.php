@@ -28,6 +28,7 @@ use BaksDev\Products\Product\Type\Offers\ConstId\ProductOfferConst;
 use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst;
 use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use Generator;
@@ -42,5 +43,13 @@ interface YaMarketProductsCardByCriteriaInterface
 
     public function modification(ProductModificationConst|string|null $modification): self;
 
-    public function findByProfile(UserProfileUid|string $profile): ?YaMarketProductsStocksMessage;
+    /**
+     * Метод возвращает указанную карточку YaMarket профиля
+     */
+    public function findByProfile(UserProfileUid|string $profile): ?YaMarketProductsCardMessage;
+
+    /**
+     * Метод возвращает все указанные карточки YaMarket
+     */
+    public function findAll(): Generator;
 }

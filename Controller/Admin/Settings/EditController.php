@@ -60,12 +60,6 @@ final class EditController extends AbstractController
         $form = $this->createForm(YaMarketProductsSettingsForm::class, $SettingsDTO);
         $form->handleRequest($request);
 
-        if($form->isSubmitted())
-        {
-            dump($form->getErrors());
-            dump($form->isValid());
-        }
-
         if($form->isSubmitted() && $form->isValid() && $form->has('product_settings'))
         {
             $this->refreshTokenForm($form);

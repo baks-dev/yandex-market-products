@@ -47,14 +47,30 @@ final class YaMarketProductsCardMessage
 
 
     public function __construct(
-        YaMarketProductsCardUid $id,
-        YaMarketProductsCardEventUid $event,
-        ?YaMarketProductsCardEventUid $last = null,
+        YaMarketProductsCardUid|string $id,
+        YaMarketProductsCardEventUid|string $event,
+        YaMarketProductsCardEventUid|string|null $last = null,
     )
     {
-        $this->last = $last;
+        if(is_string($id))
+        {
+            $id = new YaMarketProductsCardUid($id);
+        }
+
+        if(is_string($event))
+        {
+            $event = new YaMarketProductsCardEventUid($event);
+        }
+
+        if($last && is_string($last))
+        {
+            $last = new YaMarketProductsCardEventUid($last);
+        }
+
         $this->id = $id;
         $this->event = $event;
+        $this->last = $last;
+
     }
 
 

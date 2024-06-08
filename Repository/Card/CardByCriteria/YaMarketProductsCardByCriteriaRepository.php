@@ -131,13 +131,8 @@ final class YaMarketProductsCardByCriteriaRepository implements YaMarketProducts
     }
 
 
-    public function findByProfile(UserProfileUid|string $profile): ?YaMarketProductsStocksMessage
+    private function builder(): DBALQueryBuilder
     {
-        if(is_string($profile))
-        {
-            $profile = new UserProfileUid($profile);
-        }
-
         if(empty($this->product))
         {
             throw new InvalidArgumentException('Invalid Argument product');
@@ -147,14 +142,8 @@ final class YaMarketProductsCardByCriteriaRepository implements YaMarketProducts
 
         $dbal
             ->from(YaMarketProductsCardMarket::class, 'market')
-            ->where('market.profile = :profile')
-            ->setParameter('profile', $profile);
-
-
-        $dbal
-            ->andWhere('market.product = :product')
+            ->where('market.product = :product')
             ->setParameter('product', $this->product);
-
 
         if($this->offer)
         {
@@ -192,20 +181,52 @@ final class YaMarketProductsCardByCriteriaRepository implements YaMarketProducts
         }
 
 
-        $dbal
-            ->join(
-                'market',
-                YaMarketProductsCard::class,
-                'main',
-                'main.event = market.event'
-            );
+        $dbal->join(
+            'market',
+            YaMarketProductsCard::class,
+            'main',
+            'main.event = market.event'
+        );
 
+        return $dbal;
+    }
+
+    /**
+     * Метод возвращает указанную карточку YaMarket профиля
+     */
+    public function findByProfile(UserProfileUid|string $profile): ?YaMarketProductsCardMessage
+    {
+        if(is_string($profile))
+        {
+            $profile = new UserProfileUid($profile);
+        }
+
+        $dbal = $this->builder();
+
+        $dbal->andWhere('market.profile = :profile')
+            ->setParameter('profile', $profile);
 
         /** Параметры конструктора объекта гидрации */
 
         $dbal->select('main.id');
         $dbal->addSelect('main.event');
 
-        return $dbal->fetchHydrate(YaMarketProductsStocksMessage::class);
+        return $dbal->fetchHydrate(YaMarketProductsCardMessage::class);
     }
+
+    /**
+     * Метод возвращает все указанные карточки YaMarket
+     */
+    public function findAll(): Generator
+    {
+        $dbal = $this->builder();
+
+        /** Параметры конструктора объекта гидрации */
+
+        $dbal->select('main.id');
+        $dbal->addSelect('main.event');
+
+        return $dbal->fetchAllHydrate(YaMarketProductsCardMessage::class);
+    }
+
 }

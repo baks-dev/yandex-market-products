@@ -148,8 +148,6 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
                     card.modification = product_modification.const
             ');
 
-        return $dbal
-            ->enableCache('yandex-market-products', 86400)
-            ->fetchAllAssociative();
+        return $dbal->fetchAllAssociative();
     }
 }

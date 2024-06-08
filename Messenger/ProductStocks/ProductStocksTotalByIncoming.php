@@ -31,6 +31,7 @@ use BaksDev\Products\Stocks\Entity\Products\ProductStockProduct;
 use BaksDev\Products\Stocks\Messenger\ProductStockMessage;
 use BaksDev\Products\Stocks\Repository\ProductStocksById\ProductStocksByIdInterface;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusIncoming;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\CardByCriteria\YaMarketProductsCardByCriteriaInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -102,11 +103,11 @@ final class ProductStocksTotalByIncoming
                 ->modification($product->getModification())
                 ->findByProfile($UserProfileUid);
 
-
             if($YaMarketProductsCardMessage)
             {
                 // Отправляем сообщение на обновление остатков транспорт профиля (пополнение не имеет приоритета)
-                $this->messageDispatch->dispatch($YaMarketProductsCardMessage, transport: (string) $UserProfileUid);
+                $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
+                $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: (string) $UserProfileUid);
             }
         }
     }

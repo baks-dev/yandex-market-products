@@ -8,7 +8,9 @@
 ## Установка
 
 ``` bash
-$ composer require baks-dev/yandex-market-products
+composer require \
+baks-dev/yandex-market \
+baks-dev/yandex-market-products
 ```
 
 ## Дополнительно
@@ -16,20 +18,20 @@ $ composer require baks-dev/yandex-market-products
 Установка конфигурации и файловых ресурсов:
 
 ``` bash
-$ php bin/console baks:assets:install
+php bin/console baks:assets:install
 ```
 
 Изменения в схеме базы данных с помощью миграции
 
 ``` bash
-$ php bin/console doctrine:migrations:diff
-$ php bin/console doctrine:migrations:migrate
+php bin/console doctrine:migrations:diff
+php bin/console doctrine:migrations:migrate
 ```
 
 ## Тестирование
 
 ``` bash
-$ php bin/phpunit --group=yandex-market-products
+php bin/phpunit --group=yandex-market-products
 ```
 
 ## Лицензия ![License](https://img.shields.io/badge/MIT-green)

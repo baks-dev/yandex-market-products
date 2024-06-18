@@ -29,7 +29,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 #[AsCommand(
     name: 'baks:yandex-market-products:post:new',
-    description: 'Обновляет остатки на Yandex Market')
+    description: 'Обновляет остатки на Yandex Market'
+)
 ]
 class YaMarketPostCardStocksCommand extends Command
 {
@@ -39,8 +40,7 @@ class YaMarketPostCardStocksCommand extends Command
     public function __construct(
         ProductsNotExistsYaMarketCardInterface $productsNotExistsYaMarketCard,
         YaMarketProductsCardHandler $marketProductsCardHandler,
-    )
-    {
+    ) {
         parent::__construct();
 
         $this->productsNotExistsYaMarketCard = $productsNotExistsYaMarketCard;
@@ -74,14 +74,6 @@ class YaMarketPostCardStocksCommand extends Command
         /** @var YaMarketProductsCardMarketDTO $YaMarketProductsCardMarketDTO */
         foreach($YaMarketProductsCardMarket as $i => $YaMarketProductsCardMarketDTO)
         {
-            //            if ($i % 600 === 0) {
-            //                $io->info($i.': Исключаем блокировку (ОГРАНИЧЕНИЕ! 600 запросов в минуту)');
-            //                sleep(60);
-            //            }
-
-            // Исключаем блокировку (ОГРАНИЧЕНИЕ! 600 запросов в минуту)'
-            usleep(300);
-
             $YaMarketProductsCardMarketDTO->setProfile($profile);
 
             $YaMarketProductsCardDTO = new YaMarketProductsCardDTO();
@@ -89,7 +81,7 @@ class YaMarketPostCardStocksCommand extends Command
 
             $YaMarketProductsCard = $this->marketProductsCardHandler->handle($YaMarketProductsCardDTO);
 
-            if($YaMarketProductsCard instanceof  YaMarketProductsCard)
+            if($YaMarketProductsCard instanceof YaMarketProductsCard)
             {
                 $io->success(sprintf('Добавили карточку с артикулом %s', $YaMarketProductsCardMarketDTO->getSku()));
             }

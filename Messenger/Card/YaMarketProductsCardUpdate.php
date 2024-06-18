@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
 use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDTO;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
@@ -41,7 +42,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 final class YaMarketProductsCardUpdate
 {
-
     /** Свойства карточки товара */
     private iterable $property;
 
@@ -50,7 +50,7 @@ final class YaMarketProductsCardUpdate
     private YaMarketProductsCardInterface $marketProductsCard;
     private YandexMarketProductRequest $yandexMarketProductRequest;
     private MessageDispatchInterface $messageDispatch;
-    private AppCacheInterface $cache;
+    private AppLockInterface $appLock;
 
     public function __construct(
         #[TaggedIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')] iterable $property,
@@ -59,16 +59,15 @@ final class YaMarketProductsCardUpdate
         YaMarketProductsCardInterface $marketProductsCard,
         LoggerInterface $yandexMarketProductsLogger,
         MessageDispatchInterface $messageDispatch,
-        AppCacheInterface $cache
-    )
-    {
+        AppLockInterface $appLock
+    ) {
         $this->marketProductUpdate = $marketProductUpdate;
         $this->property = $property;
         $this->logger = $yandexMarketProductsLogger;
         $this->marketProductsCard = $marketProductsCard;
         $this->yandexMarketProductRequest = $yandexMarketProductRequest;
         $this->messageDispatch = $messageDispatch;
-        $this->cache = $cache;
+        $this->appLock = $appLock;
     }
 
     /**
@@ -76,10 +75,6 @@ final class YaMarketProductsCardUpdate
      */
     public function __invoke(YaMarketProductsCardMessage $message): void
     {
-        /** Удаляем из кеша идентификатор */
-        $cache = $this->cache->init('yandex-market-products');
-        $cache->deleteItem((string) $message->getId());
-
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
         if(!$Card)
@@ -123,6 +118,15 @@ final class YaMarketProductsCardUpdate
         $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($message);
         $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
 
+        $lock = $this->appLock->createLock([
+            $Card['profile'],
+            $Card['article']
+        ]);
+
+        if($lock->isLock())
+        {
+            return;
+        }
 
         /** Карточка товара YaMarket */
         $MarketProduct = $this->yandexMarketProductRequest
@@ -134,7 +138,6 @@ final class YaMarketProductsCardUpdate
         if($MarketProduct->valid())
         {
             /** @var YandexMarketProductDTO $YandexMarketProductDTO */
-
             $YandexMarketProductDTO = $MarketProduct->current();
 
             /** Не обновляем карточку если нет изменений (фото параметров) */

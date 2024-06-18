@@ -44,8 +44,7 @@ final class YaMarketProductsStocksUpdate
         YandexMarketProductStocksUpdateRequest $marketProductStocksUpdateRequest,
         YaMarketProductsCardInterface $marketProductsCard,
         LoggerInterface $yandexMarketProductsLogger
-    )
-    {
+    ) {
         $this->marketProductStocksGetRequest = $marketProductStocksGetRequest;
         $this->marketProductStocksUpdateRequest = $marketProductStocksUpdateRequest;
         $this->marketProductsCard = $marketProductsCard;

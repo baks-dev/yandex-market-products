@@ -50,8 +50,7 @@ final class YaMarketProductsCardMessage
         YaMarketProductsCardUid|string $id,
         YaMarketProductsCardEventUid|string $event,
         YaMarketProductsCardEventUid|string|null $last = null,
-    )
-    {
+    ) {
         if(is_string($id))
         {
             $id = new YaMarketProductsCardUid($id);

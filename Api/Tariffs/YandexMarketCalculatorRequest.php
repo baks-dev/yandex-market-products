@@ -28,8 +28,8 @@ namespace BaksDev\Yandex\Market\Products\Api\Tariffs;
 use BaksDev\Reference\Currency\Type\Currencies\RUR;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
-use BaksDev\Yandex\Market\Products\Api\AllShops\YandexMarketShopDTO;
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use BaksDev\Yandex\Market\Products\Api\AllShops\YandexMarketShopDTO;
 use DomainException;
 use InvalidArgumentException;
 use ReflectionClass;
@@ -138,7 +138,8 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
         $response = $this->TokenHttpClient()
             ->request(
-                'POST', '/tariffs/calculate',
+                'POST',
+                '/tariffs/calculate',
                 ['json' =>
                     [
                         "parameters" => [
@@ -177,7 +178,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
         $tariffs = current($content['result']['offers'])['tariffs'];
 
-        $totalAmount = array_reduce($tariffs, static function($carry, $item) {
+        $totalAmount = array_reduce($tariffs, static function ($carry, $item) {
             return $carry + $item['amount'];
         }, 0);
 

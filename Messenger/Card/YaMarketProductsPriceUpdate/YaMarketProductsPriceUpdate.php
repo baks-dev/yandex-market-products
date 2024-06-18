@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsPriceUpdate;
 
+use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDTO;
@@ -39,27 +40,28 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 final class YaMarketProductsPriceUpdate
 {
-
     private YaMarketProductsCardInterface $marketProductsCard;
     private YandexMarketProductPriceUpdateRequest $marketProductPriceRequest;
     private LoggerInterface $logger;
     private YandexMarketCalculatorRequest $marketCalculatorRequest;
     private YandexMarketProductRequest $yandexMarketProductRequest;
+    private AppLockInterface $appLock;
 
     public function __construct(
         YandexMarketCalculatorRequest $marketCalculatorRequest,
         YandexMarketProductRequest $yandexMarketProductRequest,
         YandexMarketProductPriceUpdateRequest $marketProductPriceRequest,
         YaMarketProductsCardInterface $marketProductsCard,
-        LoggerInterface $yandexMarketProductsLogger
-    )
-    {
+        LoggerInterface $yandexMarketProductsLogger,
+        AppLockInterface $appLock
+    ) {
 
         $this->marketProductsCard = $marketProductsCard;
         $this->logger = $yandexMarketProductsLogger;
         $this->marketProductPriceRequest = $marketProductPriceRequest;
         $this->marketCalculatorRequest = $marketCalculatorRequest;
         $this->yandexMarketProductRequest = $yandexMarketProductRequest;
+        $this->appLock = $appLock;
     }
 
     /**
@@ -86,8 +88,7 @@ final class YaMarketProductsPriceUpdate
             empty($Card['height']) ||
             empty($Card['length']) ||
             empty($Card['weight'])
-        )
-        {
+        ) {
             $this->logger->critical(
                 sprintf('Параметры упаковки товара %s не найдены! Не обновляем базовую стоимость товара YaMarket', $Card['article']),
                 [__FILE__.':'.__LINE__]
@@ -116,6 +117,13 @@ final class YaMarketProductsPriceUpdate
         $Money = new Money($Card['product_price'] / 100);
         $Currency = new Currency($Card['product_currency']);
 
+
+        /** Лимит: 100 запросов в минуту, добавляем лок на 0.6 сек */
+        $lock = $this->appLock
+            ->createLock(md5($Card['profile'].self::class))
+            ->lifetime(0.6)
+            ->waitAllTime();
+
         /** Добавляем к стоимости товара стоимость услуг YaMarket */
         $marketCalculator = $this->marketCalculatorRequest
             ->profile($Card['profile'])
@@ -126,6 +134,9 @@ final class YaMarketProductsPriceUpdate
             ->length(($Card['length'] / 10))
             ->weight(($Card['weight'] / 100))
             ->calc();
+
+        $lock->release();
+
 
         $Price = new Money($marketCalculator);
 

@@ -17,6 +17,7 @@ use BaksDev\Yandex\Market\Products\Repository\Card\ProductsNotExistsYaMarketCard
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\Market\YaMarketProductsCardMarketDTO;
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\YaMarketProductsCardDTO;
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\YaMarketProductsCardHandler;
+use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -34,10 +35,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 ]
 class YaMarketPostNewCardCommand extends Command
 {
+    private SymfonyStyle $io;
     private ProductsNotExistsYaMarketCardInterface $productsNotExistsYaMarketCard;
     private YaMarketProductsCardHandler $marketProductsCardHandler;
+    private AllProfileTokenInterface $allProfileYaMarketToken;
 
     public function __construct(
+        AllProfileTokenInterface $allProfileYaMarketToken,
         ProductsNotExistsYaMarketCardInterface $productsNotExistsYaMarketCard,
         YaMarketProductsCardHandler $marketProductsCardHandler,
     ) {
@@ -45,6 +49,7 @@ class YaMarketPostNewCardCommand extends Command
 
         $this->productsNotExistsYaMarketCard = $productsNotExistsYaMarketCard;
         $this->marketProductsCardHandler = $marketProductsCardHandler;
+        $this->allProfileYaMarketToken = $allProfileYaMarketToken;
     }
 
     protected function configure(): void
@@ -54,20 +59,36 @@ class YaMarketPostNewCardCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $this->io = new SymfonyStyle($input, $output);
 
         $profile = $input->getArgument('profile');
 
-        if(!$profile)
+        if(!empty($profile))
         {
-            $io->error("Не указан идентификатор профиля пользователя. Пример:".PHP_EOL
-                ." php bin/console baks:yandex-market-products:post:new <UID>");
-            return Command::INVALID;
+            $this->update(new UserProfileUid($profile));
+        }
+        else
+        {
+            /** Получаем все профили для обновления YaMarket */
+            $profiles = $this->allProfileYaMarketToken->findAll();
+
+            if($profiles->valid())
+            {
+                /** @var UserProfileUid $profile */
+                foreach($profiles as $profile)
+                {
+                    $this->update($profile);
+                }
+            }
         }
 
-        $profile = new UserProfileUid($profile);
+        $this->io->success('Карточки успешно добавлены в очередь');
 
+        return Command::SUCCESS;
+    }
 
+    public function update(UserProfileUid $profile): void
+    {
         /** Получаем все новые карточки, которых нет в маркете */
         $YaMarketProductsCardMarket = $this->productsNotExistsYaMarketCard->findAll($profile);
 
@@ -83,17 +104,12 @@ class YaMarketPostNewCardCommand extends Command
 
             if($YaMarketProductsCard instanceof YaMarketProductsCard)
             {
-                $io->success(sprintf('Добавили карточку с артикулом %s', $YaMarketProductsCardMarketDTO->getSku()));
+                $this->io->text(sprintf('Добавили карточку с артикулом %s', $YaMarketProductsCardMarketDTO->getSku()));
             }
             else
             {
-                $io->warning(sprintf('%s: Ошибка при добавлении карточки с артикулом %s', $YaMarketProductsCard, $YaMarketProductsCardMarketDTO->getSku()));
+                $this->io->warning(sprintf('%s: Ошибка при добавлении карточки с артикулом %s', $YaMarketProductsCard, $YaMarketProductsCardMarketDTO->getSku()));
             }
         }
-
-        $io->success('Карточки успешно добавлены в очередь');
-
-        return Command::SUCCESS;
     }
-
 }

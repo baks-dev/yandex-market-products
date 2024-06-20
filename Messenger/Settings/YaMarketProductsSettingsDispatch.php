@@ -30,5 +30,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 final class YaMarketProductsSettingsDispatch
 {
-    public function __invoke(YaMarketProductsSettingsMessage $message): void {}
+    public function __invoke(YaMarketProductsSettingsMessage $message): void
+    {
+    }
 }

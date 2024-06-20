@@ -50,8 +50,7 @@ final class YaMarketProductsSettingsMessage
         CategoryProductUid $id,
         YaMarketProductsSettingsEventUid $event,
         ?YaMarketProductsSettingsEventUid $last = null,
-    )
-    {
+    ) {
         $this->last = $last;
         $this->id = $id;
         $this->event = $event;

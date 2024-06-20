@@ -36,8 +36,6 @@ use BaksDev\Products\Product\Entity\Offers\ProductOffer;
 use BaksDev\Products\Product\Entity\Offers\Variation\Modification\ProductModification;
 use BaksDev\Products\Product\Entity\Offers\Variation\ProductVariation;
 use BaksDev\Yandex\Market\Products\Entity\Card\Market\YaMarketProductsCardMarket;
-use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\Market\YaMarketProductsCardMarketDTO;
-
 
 final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaMarketCardInterface
 {
@@ -45,8 +43,7 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
 
     public function __construct(
         DBALQueryBuilder $DBALQueryBuilder,
-    )
-    {
+    ) {
         $this->DBALQueryBuilder = $DBALQueryBuilder;
     }
 
@@ -146,7 +143,8 @@ final class OrderOrderProductsYaMarketCardRepository implements OrderProductsYaM
                     card.offer = product_offer.const AND
                     card.variation = product_variation.const AND
                     card.modification = product_modification.const
-            ');
+            '
+            );
 
         return $dbal->fetchAllAssociative();
     }

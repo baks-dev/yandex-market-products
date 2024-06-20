@@ -29,6 +29,8 @@ use BaksDev\Reference\Currency\Type\Currencies\RUR;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use DomainException;
+use InvalidArgumentException;
 
 final class YandexMarketProductPriceUpdateRequest extends YandexMarket
 {
@@ -71,12 +73,12 @@ final class YandexMarketProductPriceUpdateRequest extends YandexMarket
 
         if(empty($this->article))
         {
-            throw new \InvalidArgumentException('Invalid Argument article');
+            throw new InvalidArgumentException('Invalid Argument article: call method article(string $article);');
         }
 
         if($this->price === null)
         {
-            throw new \InvalidArgumentException('Invalid Argument price');
+            throw new InvalidArgumentException('Invalid Argument price: call method price(Money $price);');
         }
 
         if(empty($this->currency))
@@ -110,7 +112,7 @@ final class YandexMarketProductPriceUpdateRequest extends YandexMarket
                 $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
             }
 
-            throw new \DomainException(
+            throw new DomainException(
                 message: 'Ошибка '.self::class,
                 code: $response->getStatusCode()
             );

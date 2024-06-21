@@ -17,7 +17,7 @@ use BaksDev\Yandex\Market\Products\Repository\Card\ProductsNotExistsYaMarketCard
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\Market\YaMarketProductsCardMarketDTO;
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\YaMarketProductsCardDTO;
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\YaMarketProductsCardHandler;
-use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileTokenInterface;
+use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,20 +36,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class YaMarketPostNewCardCommand extends Command
 {
     private SymfonyStyle $io;
-    private ProductsNotExistsYaMarketCardInterface $productsNotExistsYaMarketCard;
-    private YaMarketProductsCardHandler $marketProductsCardHandler;
-    private AllProfileTokenInterface $allProfileYaMarketToken;
 
     public function __construct(
-        AllProfileTokenInterface $allProfileYaMarketToken,
-        ProductsNotExistsYaMarketCardInterface $productsNotExistsYaMarketCard,
-        YaMarketProductsCardHandler $marketProductsCardHandler,
+        private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+        private readonly ProductsNotExistsYaMarketCardInterface $productsNotExistsYaMarketCard,
+        private readonly YaMarketProductsCardHandler $marketProductsCardHandler,
     ) {
         parent::__construct();
-
-        $this->productsNotExistsYaMarketCard = $productsNotExistsYaMarketCard;
-        $this->marketProductsCardHandler = $marketProductsCardHandler;
-        $this->allProfileYaMarketToken = $allProfileYaMarketToken;
     }
 
     protected function configure(): void
@@ -69,8 +62,10 @@ class YaMarketPostNewCardCommand extends Command
         }
         else
         {
-            /** Получаем все профили для обновления YaMarket */
-            $profiles = $this->allProfileYaMarketToken->findAll();
+            /** Получаем активные токены авторизации профилей Yandex Market */
+            $profiles = $this->allProfileYaMarketToken
+                ->onlyActiveToken()
+                ->findAll();
 
             if($profiles->valid())
             {

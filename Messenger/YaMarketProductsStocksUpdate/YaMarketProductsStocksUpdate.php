@@ -31,7 +31,6 @@ use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YandexMarketProductStocks
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsStocks\YaMarketProductsStocksInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 
 #[AsMessageHandler]
 final class YaMarketProductsStocksUpdate

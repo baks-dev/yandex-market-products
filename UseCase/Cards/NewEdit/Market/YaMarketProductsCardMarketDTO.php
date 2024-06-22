@@ -79,8 +79,7 @@ final class YaMarketProductsCardMarketDTO implements YaMarketProductsCardMarketI
         ProductOfferConst|string|null $offer = null,
         ProductVariationConst|string|null $variation = null,
         ProductModificationConst|string|null $modification = null
-    ): self
-    {
+    ): self {
 
         $this->sku = $sku;
         $this->product = is_string($product) ? new ProductUid($product) : $product;

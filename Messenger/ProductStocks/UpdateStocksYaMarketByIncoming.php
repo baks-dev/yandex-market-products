@@ -104,9 +104,9 @@ final class UpdateStocksYaMarketByIncoming
 
             if($YaMarketProductsCardMessage)
             {
-                // Отправляем сообщение на обновление остатков транспорт профиля (пополнение не имеет приоритета)
+                /** Транспорт yandex-market-products чтобы не мешать общей очереди */
                 $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
-                $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: (string) $UserProfileUid);
+                $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
             }
         }
     }

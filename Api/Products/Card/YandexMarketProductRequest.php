@@ -26,7 +26,6 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
-use DateInterval;
 use DomainException;
 use Generator;
 use InvalidArgumentException;
@@ -58,41 +57,30 @@ final class YandexMarketProductRequest extends YandexMarket
             throw new InvalidArgumentException('Invalid Argument article');
         }
 
-        $cache = new FilesystemAdapter('yandex-market-products');
+        $data['offerIds'] = is_array($this->article) ? $this->article : [$this->article];
 
-        $content = $cache->get('ya-market-product-'.$this->profile->getValue().'-'.$this->article,
+        $response = $this->TokenHttpClient()
+            ->request(
+                'POST',
+                sprintf('/businesses/%s/offer-mappings', $this->getBusiness()),
+                ['json' => $data],
+            );
 
-            function(ItemInterface $item) {
+        $content = $response->toArray(false);
 
-                $item->expiresAfter(DateInterval::createFromDateString('1 minutes'));
+        if($response->getStatusCode() !== 200)
+        {
+            foreach($content as $error)
+            {
+                $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
+            }
 
-                $data['offerIds'] = is_array($this->article) ? $this->article : [$this->article];
+            throw new DomainException(
+                message: 'Ошибка YandexMarketShopRequest',
+                code: $response->getStatusCode()
+            );
+        }
 
-                $response = $this->TokenHttpClient()
-                    ->request(
-                        'POST',
-                        sprintf('/businesses/%s/offer-mappings', $this->getBusiness()),
-                        ['json' => $data],
-                    );
-
-                $content = $response->toArray(false);
-
-                if($response->getStatusCode() !== 200)
-                {
-                    foreach($content as $error)
-                    {
-                        $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
-                    }
-
-                    throw new DomainException(
-                        message: 'Ошибка YandexMarketShopRequest',
-                        code: $response->getStatusCode()
-                    );
-                }
-
-                return $response->toArray(false);
-
-            });
 
         if(empty($content['result']['offerMappings']))
         {
@@ -101,7 +89,7 @@ final class YandexMarketProductRequest extends YandexMarket
 
         foreach($content['result']['offerMappings'] as $offer)
         {
-           yield new YandexMarketProductDTO($this->getProfile(), $offer['offer']);
+            yield new YandexMarketProductDTO($this->getProfile(), $offer['offer']);
         }
 
     }

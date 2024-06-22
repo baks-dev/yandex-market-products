@@ -31,8 +31,6 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDTO;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Update\YandexMarketProductUpdateRequest;
-use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
-use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
 use Psr\Log\LoggerInterface;
@@ -110,23 +108,21 @@ final class YaMarketProductsCardUpdate
             return;
         }
 
-        /** Создаем сообщение на обновление цены */
-        $YaMarketProductsPriceMessage = new YaMarketProductsPriceMessage($message);
-        $this->messageDispatch->dispatch($YaMarketProductsPriceMessage, transport: $Card['profile']);
+        //        /** Создаем сообщение на обновление цены */
+        //        $YaMarketProductsPriceMessage = new YaMarketProductsPriceMessage($message);
+        //        $this->messageDispatch->dispatch($YaMarketProductsPriceMessage, transport: $Card['profile']);
 
-        /** Создаем сообщение на обновление остатков */
-        $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($message);
-        $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
+        //        /** Создаем сообщение на обновление остатков */
+        //        $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($message);
+        //        $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
 
-        $lock = $this->appLock->createLock([
-            $Card['profile'],
-            $Card['article']
-        ]);
 
-        if($lock->isLock())
-        {
-            return;
-        }
+        /** Лимит: 600 запросов в минуту, добавляем лок на 0.6 сек */
+        $lock = $this->appLock
+            ->createLock([$Card['profile'], self::class])
+            ->lifetime((60 / 600))
+            ->waitAllTime();
+
 
         /** Карточка товара YaMarket */
         $MarketProduct = $this->yandexMarketProductRequest
@@ -152,6 +148,8 @@ final class YaMarketProductsCardUpdate
             ->update($request);
 
         $this->logger->info(sprintf('Обновили карточку товара %s', $request['offerId']));
+
+        $lock->release();
 
     }
 }

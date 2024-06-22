@@ -11,12 +11,10 @@
 
 namespace BaksDev\Yandex\Market\Products\Command;
 
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Yandex\Market\Products\Entity\Card\YaMarketProductsCard;
-use BaksDev\Yandex\Market\Products\Repository\Card\ProductsNotExistsYaMarketCard\ProductsNotExistsYaMarketCardInterface;
-use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\Market\YaMarketProductsCardMarketDTO;
-use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\YaMarketProductsCardDTO;
-use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\YaMarketProductsCardHandler;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
+use BaksDev\Yandex\Market\Products\Repository\Card\ProductYaMarketCard\ProductsYaMarketCardInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -29,17 +27,17 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Получаем карточки товаров и добавляем отсутствующие
  */
 #[AsCommand(
-    name: 'baks:yandex-market-products:post:new',
-    description: 'Выгружает новые карточки на Yandex Market'
+    name: 'baks:yandex-market-products:post:update',
+    description: 'Обновляет все карточки на Yandex Market'
 )]
-class YaMarketPostNewCardCommand extends Command
+class YaMarketPostUpdateCardCommand extends Command
 {
     private SymfonyStyle $io;
 
     public function __construct(
         private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
-        private readonly ProductsNotExistsYaMarketCardInterface $productsNotExistsYaMarketCard,
-        private readonly YaMarketProductsCardHandler $marketProductsCardHandler,
+        private readonly ProductsYaMarketCardInterface $productsYaMarketCard,
+        private readonly MessageDispatchInterface $messageDispatch
     ) {
         parent::__construct();
     }
@@ -85,31 +83,22 @@ class YaMarketPostNewCardCommand extends Command
     {
         $this->io->note(sprintf('Обновили профиль %s', $profile));
 
-        /** Получаем все новые карточки, которых нет в маркете */
-        $YaMarketProductsCardMarket = $this->productsNotExistsYaMarketCard->findAll($profile);
+        /** Получаем все имеющиеся карточки профиля */
+        $YaMarketProductsCardMarket = $this->productsYaMarketCard
+            ->whereProfile($profile)
+            ->findAll();
 
-        /** @var YaMarketProductsCardMarketDTO $YaMarketProductsCardMarketDTO */
-        foreach($YaMarketProductsCardMarket as $YaMarketProductsCardMarketDTO)
+        foreach($YaMarketProductsCardMarket as $card)
         {
-            $YaMarketProductsCardMarketDTO->setProfile($profile);
+            $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
+                $card['main'],
+                $card['event'],
+            );
 
-            $YaMarketProductsCardDTO = new YaMarketProductsCardDTO();
-            $YaMarketProductsCardDTO->setMarket($YaMarketProductsCardMarketDTO);
+            /** Транспорт async чтобы не мешать очереди профиля */
+            $this->messageDispatch->dispatch($YaMarketProductsCardMessage, transport: 'async');
 
-            $YaMarketProductsCard = $this->marketProductsCardHandler->handle($YaMarketProductsCardDTO);
-
-            if($YaMarketProductsCard instanceof YaMarketProductsCard)
-            {
-                $this->io->text(sprintf('Добавили артикул %s', $YaMarketProductsCardMarketDTO->getSku()));
-            }
-            else
-            {
-                $this->io->warning(sprintf(
-                    '%s: Ошибка при добавлении карточки с артикулом %s',
-                    $YaMarketProductsCard,
-                    $YaMarketProductsCardMarketDTO->getSku()
-                ));
-            }
+            $this->io->text(sprintf('Обновили артикул %s', $card['sku']));
         }
     }
 }

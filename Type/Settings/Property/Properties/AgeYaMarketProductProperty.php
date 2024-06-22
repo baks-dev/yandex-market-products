@@ -43,7 +43,8 @@ final class AgeYaMarketProductProperty implements YaMarketProductPropertyInterfa
 
     private ?YaMarketProductsCardInterface $yaMarketProductsCard;
 
-    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null) {
+    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null)
+    {
 
         $this->yaMarketProductsCard = $yaMarketProductsCard;
     }
@@ -105,7 +106,7 @@ final class AgeYaMarketProductProperty implements YaMarketProductPropertyInterfa
             {
                 $property = json_decode($data['product_propertys']);
 
-                $filter = current(array_filter($property, function($element) {
+                $filter = current(array_filter($property, function ($element) {
                     return self::equals($element->type);
                 }));
 

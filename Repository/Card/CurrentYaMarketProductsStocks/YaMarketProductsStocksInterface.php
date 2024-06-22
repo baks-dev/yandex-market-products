@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,14 @@
  *  THE SOFTWARE.
  */
 
-declare(strict_types=1);
+namespace BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsStocks;
 
-namespace BaksDev\Yandex\Market\Products\Messenger\Settings;
+use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-
-#[AsMessageHandler]
-final class YaMarketProductsSettingsDispatch
+interface YaMarketProductsStocksInterface
 {
-    public function __invoke(YaMarketProductsSettingsMessage $message): void
-    {
-    }
+    /**
+     * Метод получает активные остатки продукции
+     */
+    public function findByCard(YaMarketProductsCardUid|string $card): array|bool;
 }

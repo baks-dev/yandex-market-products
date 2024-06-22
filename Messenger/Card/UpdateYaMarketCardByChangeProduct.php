@@ -29,8 +29,6 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Messenger\ProductMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\ProductYaMarketCard\ProductsYaMarketCardInterface;
-use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventUid;
-use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -52,17 +50,16 @@ final class UpdateYaMarketCardByChangeProduct
      */
     public function __invoke(ProductMessage $message): void
     {
-        /** Получаем идентификаторы карточки YandexMarket товаров */
-        $cards = $this->productsYaMarketCard->findAll($message->getId());
+        /** Получаем идентификаторы карточек товаров YandexMarket  */
+        $cards = $this->productsYaMarketCard
+            ->whereProduct($message->getId())
+            ->findAll();
 
         foreach($cards as $card)
         {
-            /* Отправляем сообщение в шину */
-            $YaMarketProductsCardUid = new YaMarketProductsCardUid($card['main']);
-            $YaMarketProductsCardEventUid = new YaMarketProductsCardEventUid($card['event']);
-
+            /** Транспорт async чтобы не мешать общей очереди */
             $this->messageDispatch->dispatch(
-                message: new YaMarketProductsCardMessage($YaMarketProductsCardUid, $YaMarketProductsCardEventUid),
+                message: new YaMarketProductsCardMessage($card['main'], $card['event']),
                 transport: $card['profile']
             );
         }

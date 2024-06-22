@@ -26,35 +26,29 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Repository\Card\ProductYaMarketCard;
 
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
-use BaksDev\Orders\Order\Entity\Event\OrderEvent;
-use BaksDev\Orders\Order\Entity\Order;
-use BaksDev\Orders\Order\Entity\Products\OrderProduct;
-use BaksDev\Orders\Order\Type\Id\OrderUid;
-use BaksDev\Products\Product\Entity\Event\ProductEvent;
-use BaksDev\Products\Product\Entity\Info\ProductInfo;
-use BaksDev\Products\Product\Entity\Offers\ProductOffer;
-use BaksDev\Products\Product\Entity\Offers\Variation\Modification\ProductModification;
-use BaksDev\Products\Product\Entity\Offers\Variation\ProductVariation;
 use BaksDev\Products\Product\Entity\Product;
 use BaksDev\Products\Product\Type\Id\ProductUid;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Entity\Card\Market\YaMarketProductsCardMarket;
-use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\Market\YaMarketProductsCardMarketDTO;
 
 final class ProductsYaMarketCardRepository implements ProductsYaMarketCardInterface
 {
     private DBALQueryBuilder $DBALQueryBuilder;
 
+    private ?ProductUid $product = null;
+
+    private ?UserProfileUid $profile = null;
+
     public function __construct(
         DBALQueryBuilder $DBALQueryBuilder,
-    )
-    {
+    ) {
         $this->DBALQueryBuilder = $DBALQueryBuilder;
     }
 
     /**
-     * Метод получает все карточки товара
+     * Метод присваивает фильтр по идентификатору продукции
      */
-    public function findAll(Product|ProductUid|string $product): ?array
+    public function whereProduct(Product|ProductUid|string $product): self
     {
         if(is_string($product))
         {
@@ -66,6 +60,31 @@ final class ProductsYaMarketCardRepository implements ProductsYaMarketCardInterf
             $product = $product->getId();
         }
 
+        $this->product = $product;
+
+        return $this;
+    }
+
+    /**
+     * Метод присваивает фильтр по идентификатору профиля пользователя
+     */
+    public function whereProfile(UserProfileUid|string $profile): self
+    {
+        if(is_string($profile))
+        {
+            $profile = new UserProfileUid($profile);
+        }
+
+        $this->profile = $profile;
+
+        return $this;
+    }
+
+    /**
+     * Метод получает все карточки товара
+     */
+    public function findAll(): ?array
+    {
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         $dbal
@@ -77,11 +96,25 @@ final class ProductsYaMarketCardRepository implements ProductsYaMarketCardInterf
             ->addSelect('card.offer')
             ->addSelect('card.variation')
             ->addSelect('card.modification')
-            ->from(YaMarketProductsCardMarket::class, 'card')
-            ->where('card.product = :product')
-            ->setParameter('product', $product, ProductUid::TYPE);
+            ->from(YaMarketProductsCardMarket::class, 'card');
 
 
-        return $dbal->enableCache('yandex-market-products', 86400)->fetchAllAssociative();
+        if($this->profile)
+        {
+            $dbal
+                ->where('card.profile = :profile')
+                ->setParameter('profile', $this->profile, UserProfileUid::TYPE);
+        }
+
+        if($this->product)
+        {
+            $dbal
+                ->where('card.product = :product')
+                ->setParameter('product', $this->product, ProductUid::TYPE);
+        }
+
+        return $dbal
+            ->enableCache('yandex-market-products', 86400)
+            ->fetchAllAssociative();
     }
 }

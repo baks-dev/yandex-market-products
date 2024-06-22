@@ -25,35 +25,33 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 
+use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YandexMarketProductStocksGetRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YandexMarketProductStocksUpdateRequest;
-use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsStocks\YaMarketProductsStocksInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 
 #[AsMessageHandler]
 final class YaMarketProductsStocksUpdate
 {
-    private YaMarketProductsCardInterface $marketProductsCard;
-    private YandexMarketProductStocksUpdateRequest $marketProductStocksUpdateRequest;
     private LoggerInterface $logger;
-    private YandexMarketProductStocksGetRequest $marketProductStocksGetRequest;
 
     public function __construct(
-        YandexMarketProductStocksGetRequest $marketProductStocksGetRequest,
-        YandexMarketProductStocksUpdateRequest $marketProductStocksUpdateRequest,
-        YaMarketProductsCardInterface $marketProductsCard,
-        LoggerInterface $yandexMarketProductsLogger
+        private readonly YandexMarketProductStocksGetRequest $marketProductStocksGetRequest,
+        private readonly YandexMarketProductStocksUpdateRequest $marketProductStocksUpdateRequest,
+        private readonly YaMarketProductsStocksInterface $marketProductsCard,
+        private readonly AppLockInterface $appLock,
+        LoggerInterface $yandexMarketProductsLogger,
     ) {
-        $this->marketProductStocksGetRequest = $marketProductStocksGetRequest;
-        $this->marketProductStocksUpdateRequest = $marketProductStocksUpdateRequest;
-        $this->marketProductsCard = $marketProductsCard;
+
         $this->logger = $yandexMarketProductsLogger;
 
     }
 
     /**
-     * Обновляем базовую цену товара на Yandex Market
+     * Обновляем остатки товаров Yandex Market
      */
     public function __invoke(YaMarketProductsStocksMessage $message): void
     {
@@ -68,6 +66,16 @@ final class YaMarketProductsStocksUpdate
         if(empty($Card['product_price']))
         {
             return;
+        }
+
+        /** Добавляем лок на процесс, остатки обновляются в порядке очереди! */
+        $lock = $this->appLock
+            ->createLock([$Card['profile'], $Card['article'], self::class]);
+
+        /** Если процесс заблокирован - придем позже */
+        if($lock->isLock())
+        {
+            throw new RecoverableMessageHandlingException(sprintf('Остатки артикула %s уже обновляются! попробуем позже ... ', $Card['article']));
         }
 
         $ProductStocks = $this->marketProductStocksGetRequest
@@ -88,5 +96,7 @@ final class YaMarketProductsStocksUpdate
 
             $this->logger->info(sprintf('Обновили наличие товара %s: %s => %s', $Card['article'], $ProductStocks, $Card['product_quantity']));
         }
+
+        $lock->release();
     }
 }

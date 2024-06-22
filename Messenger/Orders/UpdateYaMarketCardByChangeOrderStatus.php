@@ -23,17 +23,16 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger\Card;
+namespace BaksDev\Yandex\Market\Products\Messenger\Orders;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\OrderYaMarketCard\OrderProductsYaMarketCardInterface;
-use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventUid;
-use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(priority: 100)]
 final class UpdateYaMarketCardByChangeOrderStatus
 {
     private MessageDispatchInterface $messageDispatch;
@@ -57,14 +56,12 @@ final class UpdateYaMarketCardByChangeOrderStatus
 
         foreach($cards as $card)
         {
-            $YaMarketProductsCardUid = new YaMarketProductsCardUid($card['main']);
-            $YaMarketProductsCardEventUid = new YaMarketProductsCardEventUid($card['event']);
-            $YaMarketProductsCardMessage = new YaMarketProductsCardMessage($YaMarketProductsCardUid, $YaMarketProductsCardEventUid);
+            $YaMarketProductsCardMessage = new YaMarketProductsCardMessage($card['main'], $card['event']);
 
-            /* Обновляем только остатки */
+            /** Добавляем в очередь обновление остатков через транспорт профиля */
             $this->messageDispatch->dispatch(
                 message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
-                transport: 'yandex-market-products'
+                transport: $card['profile']
             );
         }
     }

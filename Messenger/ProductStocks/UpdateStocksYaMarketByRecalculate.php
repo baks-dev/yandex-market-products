@@ -62,7 +62,7 @@ final class UpdateStocksYaMarketByRecalculate
             /** @var YaMarketProductsStocksMessage $YaMarketProductsCardMessage */
             foreach($cards as $YaMarketProductsCardMessage)
             {
-                // Отправляем сообщение на обновление остатков
+                /** Транспорт yandex-market-products чтобы не мешать общей очереди */
                 $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
                 $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
             }

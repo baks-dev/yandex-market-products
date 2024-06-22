@@ -35,23 +35,18 @@ use BaksDev\Products\Product\Entity\Product;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Entity\Card\Market\YaMarketProductsCardMarket;
 use BaksDev\Yandex\Market\Products\UseCase\Cards\NewEdit\Market\YaMarketProductsCardMarketDTO;
-
+use Generator;
 
 final class ProductsNotExistsYaMarketCard implements ProductsNotExistsYaMarketCardInterface
 {
-    private DBALQueryBuilder $DBALQueryBuilder;
-
     public function __construct(
-        DBALQueryBuilder $DBALQueryBuilder,
-    )
-    {
-        $this->DBALQueryBuilder = $DBALQueryBuilder;
-    }
+        private readonly DBALQueryBuilder $DBALQueryBuilder,
+    ) {}
 
     /**
      * Метод получает все товары, которых нет в карточки Ya Market
      */
-    public function findAll(UserProfileUid|string $profile): \Generator
+    public function findAll(UserProfileUid|string $profile): Generator
     {
         if(is_string($profile))
         {

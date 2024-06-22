@@ -40,8 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'ya_market_products_card_market')]
-#[ORM\Index(columns: ['profile'])]
-#[ORM\Index(columns: ['sku'])]
+#[ORM\UniqueConstraint(columns: ['profile', 'sku'])]
 class YaMarketProductsCardMarket extends EntityReadonly
 {
     /**
@@ -71,7 +70,7 @@ class YaMarketProductsCardMarket extends EntityReadonly
      * Наименование характеристики
      */
     #[Assert\NotBlank]
-    #[ORM\Column(type: Types::STRING, unique: true)]
+    #[ORM\Column(type: Types::STRING)]
     private string $sku;
 
     /**

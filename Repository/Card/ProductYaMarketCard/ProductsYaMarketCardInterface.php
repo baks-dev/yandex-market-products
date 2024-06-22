@@ -32,7 +32,28 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 interface ProductsYaMarketCardInterface
 {
     /**
-     * Метод получает все товары, имеющиеся в заказе
+     * Метод присваивает фильтр по идентификатору продукции
      */
-    public function findAll(Product|ProductUid|string $product): ?array;
+    public function whereProduct(Product|ProductUid|string $product): self;
+
+
+    /**
+     * Метод присваивает фильтр по идентификатору профиля пользователя
+     */
+    public function whereProfile(UserProfileUid|string $profile): self;
+
+    /**
+     * Метод получает все карточки товара
+     *
+     * //        ->select('card.main')
+     * //        ->addSelect('card.event')
+     * //        ->addSelect('card.profile')
+     * //        ->addSelect('card.sku')
+     * //        ->addSelect('card.product')
+     * //        ->addSelect('card.offer')
+     * //        ->addSelect('card.variation')
+     * //        ->addSelect('card.modification')
+     *
+     */
+    public function findAll(): ?array;
 }

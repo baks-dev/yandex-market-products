@@ -28,13 +28,10 @@ namespace BaksDev\Yandex\Market\Products\Type\Card\Event;
 use BaksDev\Core\Type\UidType\Uid;
 use Symfony\Component\Uid\AbstractUid;
 
-
 final class YaMarketProductsCardEventUid extends Uid
 {
-
     public const TEST = '414e6656-d30b-735f-8754-3b2db8332c6d';
 
     public const TYPE = 'ya_market_products_card_event';
-
 
 }

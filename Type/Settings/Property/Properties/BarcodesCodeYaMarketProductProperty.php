@@ -34,7 +34,6 @@ use Symfony\Component\Uid\UuidV7;
 #[AutoconfigureTag('baks.ya.product.property')]
 final class BarcodesCodeYaMarketProductProperty implements YaMarketProductPropertyInterface
 {
-
     /**
      * Указывайте в виде последовательности цифр.
      * Подойдут коды EAN-13, EAN-8, UPC-A, UPC-E или Code 128.
@@ -43,12 +42,9 @@ final class BarcodesCodeYaMarketProductProperty implements YaMarketProductProper
      */
     public const PARAM = 'barcodes';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-
-    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null)
-    {
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-    }
+    public function __construct(
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
+    ) {}
 
     public function getValue(): string
     {

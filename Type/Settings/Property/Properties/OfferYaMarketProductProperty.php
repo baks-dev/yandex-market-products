@@ -33,19 +33,22 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('baks.ya.product.property')]
 final class OfferYaMarketProductProperty implements YaMarketProductPropertyInterface
 {
-
     /**
-     * Параметр включает для товара пометку 18+.
-     * Устанавливайте ее только для товаров, которые относятся к удовлетворению сексуальных потребностей.
+     * Ваш SKU — идентификатор товара в вашей системе.
+     *
+     * Разрешена любая последовательность длиной до 255 знаков.
+     *
+     * Правила использования SKU:
+     * У каждого товара SKU должен быть свой.
+     * SKU товара нельзя менять — можно только удалить товар и добавить заново с новым SKU.
+     * Уже заданный SKU нельзя освободить и использовать заново для другого товара. Каждый товар должен получать новый идентификатор, до того никогда не использовавшийся в вашем каталоге.
+     *
      */
     public const PARAM = 'offerId';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-
-    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null) {
-
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-    }
+    public function __construct(
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
+    ) {}
 
     public function getValue(): string
     {

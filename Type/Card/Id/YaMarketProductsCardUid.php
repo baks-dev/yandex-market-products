@@ -29,7 +29,6 @@ use BaksDev\Core\Type\UidType\Uid;
 
 final class YaMarketProductsCardUid extends Uid
 {
-
     public const TEST = 'cb3e2477-06c1-7b21-9faa-1dda01853bbc';
 
     public const TYPE = 'ya_market_products_card';

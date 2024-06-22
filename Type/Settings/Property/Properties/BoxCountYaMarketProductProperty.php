@@ -42,12 +42,9 @@ final class BoxCountYaMarketProductProperty implements YaMarketProductPropertyIn
      */
     public const PARAM = 'boxCount';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-
-    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null) {
-
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-    }
+    public function __construct(
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
+    ) {}
 
     public function getValue(): string
     {
@@ -107,7 +104,7 @@ final class BoxCountYaMarketProductProperty implements YaMarketProductPropertyIn
             {
                 $property = json_decode($data['product_propertys']);
 
-                $filter = current(array_filter($property, function($element) {
+                $filter = current(array_filter($property, function ($element) {
                     return self::equals($element->type);
                 }));
 
@@ -118,6 +115,6 @@ final class BoxCountYaMarketProductProperty implements YaMarketProductPropertyIn
             }
         }
 
-        return null;
+        return 1;
     }
 }

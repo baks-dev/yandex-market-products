@@ -38,12 +38,9 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
      */
     public const PARAM = 'name';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-
-    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null)
-    {
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-    }
+    public function __construct(
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
+    ) {}
 
     public function getValue(): string
     {

@@ -9,7 +9,6 @@ use InvalidArgumentException;
 
 final class YaMarketProductPropertyType extends Type
 {
-
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return (string) $value;

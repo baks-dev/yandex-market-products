@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties;
 
-
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
@@ -35,19 +34,15 @@ use Symfony\Component\Uid\UuidV7;
 #[AutoconfigureTag('baks.ya.product.property')]
 final class VendorCodeYaMarketProductProperty implements YaMarketProductPropertyInterface
 {
-
     /**
      * Артикул товара от производителя.
      * Example: VNDR-0005A
      */
     public const PARAM = 'vendorCode';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-
-    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null)
-    {
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-    }
+    public function __construct(
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
+    ) {}
 
     public function getValue(): string
     {
@@ -106,7 +101,7 @@ final class VendorCodeYaMarketProductProperty implements YaMarketProductProperty
             {
                 $property = json_decode($data['product_propertys']);
 
-                $filter = current(array_filter($property, function($element) {
+                $filter = current(array_filter($property, function ($element) {
                     return self::equals($element->type);
                 }));
 

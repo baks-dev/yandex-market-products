@@ -33,19 +33,15 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('baks.ya.product.property')]
 final class AdultYaMarketProductProperty implements YaMarketProductPropertyInterface
 {
-
     /**
      * Параметр включает для товара пометку 18+.
      * Устанавливайте ее только для товаров, которые относятся к удовлетворению сексуальных потребностей.
      */
     public const PARAM = 'adult';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-
-    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null) {
-
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-    }
+    public function __construct(
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
+    ) {}
 
     public function getValue(): string
     {
@@ -104,7 +100,7 @@ final class AdultYaMarketProductProperty implements YaMarketProductPropertyInter
             {
                 $property = json_decode($data['product_propertys']);
 
-                $filter = current(array_filter($property, function($element) {
+                $filter = current(array_filter($property, function ($element) {
                     return self::equals($element->type);
                 }));
 

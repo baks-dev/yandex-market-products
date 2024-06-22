@@ -34,7 +34,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('baks.ya.product.property')]
 final class ManufacturerCountriesYaMarketProductProperty implements YaMarketProductPropertyInterface
 {
-
     /**
      * Страна, где был произведен товар.
      *
@@ -43,18 +42,11 @@ final class ManufacturerCountriesYaMarketProductProperty implements YaMarketProd
      */
     public const PARAM = 'manufacturerCountries';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-
-    private ?TranslatorInterface $translator;
 
     public function __construct(
-        ?YaMarketProductsCardInterface $yaMarketProductsCard = null,
-        ?TranslatorInterface $translator = null
-    )
-    {
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-        $this->translator = $translator;
-    }
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null,
+        private readonly ?TranslatorInterface $translator = null
+    ) {}
 
 
     public function getValue(): string
@@ -116,13 +108,13 @@ final class ManufacturerCountriesYaMarketProductProperty implements YaMarketProd
             {
                 $property = json_decode($data['product_propertys']);
 
-                $filter = current(array_filter($property, function($element) {
+                $filter = current(array_filter($property, function ($element) {
                     return self::equals($element->type);
                 }));
 
                 if($filter && $filter->value)
                 {
-                    return [$this->translator->trans($filter->value, domain: 'field-country')] ;
+                    return [$this->translator->trans($filter->value, domain: 'field-country')];
                 }
             }
         }

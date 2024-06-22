@@ -44,12 +44,10 @@ final class YaMarketProductProperty
 
             if($declare::equals($property))
             {
-                $this->property = new $declare;
+                $this->property = new $declare();
                 return;
             }
         }
-
-        //throw new InvalidArgumentException(sprintf('Invalid argument %s', $property));
 
     }
 
@@ -77,7 +75,7 @@ final class YaMarketProductProperty
         foreach(self::getDeclared() as $property)
         {
             /** @var YaMarketProductPropertyInterface $property */
-            $class = new $property;
+            $class = new $property();
             $case[$class::priority()] = new self($class);
         }
 
@@ -88,7 +86,7 @@ final class YaMarketProductProperty
     {
         return array_filter(
             get_declared_classes(),
-            static function($className) {
+            static function ($className) {
                 return in_array(YaMarketProductPropertyInterface::class, class_implements($className), true);
             }
         );

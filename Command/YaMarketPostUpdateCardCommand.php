@@ -95,8 +95,8 @@ class YaMarketPostUpdateCardCommand extends Command
                 $card['event'],
             );
 
-            /** Транспорт async чтобы не мешать очереди профиля */
-            $this->messageDispatch->dispatch($YaMarketProductsCardMessage, transport: 'async');
+            /** Консольную комманду выполняем синхронно */
+            $this->messageDispatch->dispatch($YaMarketProductsCardMessage);
 
             $this->io->text(sprintf('Обновили артикул %s', $card['sku']));
         }

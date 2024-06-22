@@ -39,23 +39,15 @@ final class PicturesYaMarketProductProperty implements YaMarketProductPropertyIn
      */
     public const PARAM = 'pictures';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-
-    private ?string $HOST;
-
-    private ?string $CDN_HOST;
 
     public function __construct(
-        #[Autowire(env: 'HOST')] string $HOST = null,
-        #[Autowire(env: 'CDN_HOST')] string $CDN_HOST = null,
-        ?YaMarketProductsCardInterface $yaMarketProductsCard = null
-    )
-    {
+        #[Autowire(env: 'HOST')]
+        private readonly ?string $HOST = null,
+        #[Autowire(env: 'CDN_HOST')]
+        private readonly ?string $CDN_HOST = null,
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
+    ) {}
 
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-        $this->HOST = $HOST;
-        $this->CDN_HOST = $CDN_HOST;
-    }
 
     public function getValue(): string
     {
@@ -126,7 +118,7 @@ final class PicturesYaMarketProductProperty implements YaMarketProductPropertyIn
 
                     // Проверяе м доступность файла изображения
                     $Headers = get_headers($picture);
-                    $Headers =  current($Headers);
+                    $Headers = current($Headers);
 
                     if(str_contains($Headers, '200')) // ожидаем HTTP/1.1 200 OK
                     {

@@ -41,12 +41,10 @@ final class TagsYaMarketProductProperty implements YaMarketProductPropertyInterf
      */
     public const PARAM = 'tags';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
 
-    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null)
-    {
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-    }
+    public function __construct(
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
+    ) {}
 
     public function getValue(): string
     {
@@ -105,15 +103,17 @@ final class TagsYaMarketProductProperty implements YaMarketProductPropertyInterf
             {
                 $property = json_decode($data['product_propertys']);
 
-                $filter = current(array_filter($property, function($element) {
+                $filter = current(array_filter($property, function ($element) {
                     return self::equals($element->type);
                 }));
 
                 if($filter && $filter->value)
                 {
-                    return $filter->value;
+                    return $filter->value ?: $data['product_card'];
                 }
             }
+
+            return $data['product_card'];
         }
 
         return null;

@@ -27,16 +27,12 @@ namespace BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Colle
 
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
-final class YaMarketProductPropertyCollection
+final readonly class YaMarketProductPropertyCollection
 {
-    private iterable $property;
-
     public function __construct(
-        #[TaggedIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')] iterable $property,
-    )
-    {
-        $this->property = $property;
-    }
+        #[TaggedIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')]
+        private iterable $property,
+    ) {}
 
     public function cases(): array
     {

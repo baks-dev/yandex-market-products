@@ -76,7 +76,7 @@ class YaMarketPostNewCardCommand extends Command
             }
         }
 
-        $this->io->success('Карточки успешно добавлены в очередь');
+        $this->io->success('Карточки успешно обновлены');
 
         return Command::SUCCESS;
     }

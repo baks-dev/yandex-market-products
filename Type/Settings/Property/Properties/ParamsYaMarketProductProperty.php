@@ -40,18 +40,10 @@ final class ParamsYaMarketProductProperty implements YaMarketProductPropertyInte
      */
     public const PARAM = 'params';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-    private ?TranslatorInterface $translator;
-
     public function __construct(
-        ?YaMarketProductsCardInterface $yaMarketProductsCard = null,
-        ?TranslatorInterface $translator = null
-    )
-    {
-
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-        $this->translator = $translator;
-    }
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null,
+        private readonly ?TranslatorInterface $translator = null
+    ) {}
 
     public function getValue(): string
     {

@@ -42,12 +42,9 @@ final class CustomsCommodityCodeYaMarketProductProperty implements YaMarketProdu
      */
     public const PARAM = 'customsCommodityCode';
 
-    private ?YaMarketProductsCardInterface $yaMarketProductsCard;
-
-    public function __construct(?YaMarketProductsCardInterface $yaMarketProductsCard = null) {
-
-        $this->yaMarketProductsCard = $yaMarketProductsCard;
-    }
+    public function __construct(
+        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
+    ) {}
 
     public function getValue(): string
     {
@@ -106,7 +103,7 @@ final class CustomsCommodityCodeYaMarketProductProperty implements YaMarketProdu
             {
                 $property = json_decode($data['product_propertys']);
 
-                $filter = current(array_filter($property, function($element) {
+                $filter = current(array_filter($property, function ($element) {
                     return self::equals($element->type);
                 }));
 

@@ -116,7 +116,6 @@ final class YaMarketProductsCardUpdate
         //        $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($message);
         //        $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
 
-
         /** Лимит: 600 запросов в минуту, добавляем лок на 0.6 сек */
         $lock = $this->appLock
             ->createLock([$Card['profile'], self::class])
@@ -124,24 +123,27 @@ final class YaMarketProductsCardUpdate
             ->waitAllTime();
 
 
-        /** Карточка товара YaMarket */
-        $MarketProduct = $this->yandexMarketProductRequest
-            ->profile($Card['profile'])
-            ->article($Card['article'])
-            ->find();
+        /** Проверка изменений в карточке */
 
-        /** Если карточка имеется - проверяем изменения */
-        if($MarketProduct->valid())
-        {
-            /** @var YandexMarketProductDTO $YandexMarketProductDTO */
-            $YandexMarketProductDTO = $MarketProduct->current();
+        //        /** Карточка товара YaMarket */
+        //        $MarketProduct = $this->yandexMarketProductRequest
+        //            ->profile($Card['profile'])
+        //            ->article($Card['article'])
+        //            ->find();
+        //
+        //        /** Если карточка имеется - проверяем изменения */
+        //        if($MarketProduct->valid())
+        //        {
+        //            /** @var YandexMarketProductDTO $YandexMarketProductDTO */
+        //            $YandexMarketProductDTO = $MarketProduct->current();
+        //
+        //            /** Не обновляем карточку если нет изменений (фото параметров) */
+        //            if($YandexMarketProductDTO->equals($request) === true)
+        //            {
+        //                return;
+        //            }
+        //        }
 
-            /** Не обновляем карточку если нет изменений (фото параметров) */
-            if($YandexMarketProductDTO->equals($request) === true)
-            {
-                return;
-            }
-        }
 
         $this->marketProductUpdate
             ->profile($Card['profile'])

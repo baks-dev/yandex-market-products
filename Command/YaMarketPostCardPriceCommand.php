@@ -28,7 +28,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Получаем карточки товаров и добавляем отсутствующие
  */
 #[AsCommand(
-    name: 'baks:yandex-market-products:post:new',
+    name: 'baks:yandex-market-products:post:price',
     description: 'Обновляет цены на Yandex Market'
 )]
 class YaMarketPostCardPriceCommand extends Command
@@ -76,7 +76,7 @@ class YaMarketPostCardPriceCommand extends Command
             }
         }
 
-        $this->io->success('Карточки успешно добавлены в очередь на обновление');
+        $this->io->success('Цены успешно обновлены');
 
         return Command::SUCCESS;
     }
@@ -99,9 +99,8 @@ class YaMarketPostCardPriceCommand extends Command
                 )
             );
 
-            /** Транспорт async чтобы не мешать очереди профиля */
-            $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'async');
-
+            /** Консольную комманду выполняем синхронно */
+            $this->messageDispatch->dispatch($YaMarketProductsStocksMessage);
             $this->io->text(sprintf('Обновили артикул %s', $card['sku']));
         }
     }

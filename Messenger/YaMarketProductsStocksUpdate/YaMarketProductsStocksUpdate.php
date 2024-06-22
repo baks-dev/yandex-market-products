@@ -70,13 +70,8 @@ final class YaMarketProductsStocksUpdate
 
         /** Добавляем лок на процесс, остатки обновляются в порядке очереди! */
         $lock = $this->appLock
-            ->createLock([$Card['profile'], $Card['article'], self::class]);
-
-        /** Если процесс заблокирован - придем позже */
-        if($lock->isLock())
-        {
-            throw new RecoverableMessageHandlingException(sprintf('Остатки артикула %s уже обновляются! попробуем позже ... ', $Card['article']));
-        }
+            ->createLock([$Card['profile'], $Card['article'], self::class])
+            ->wait();
 
         $ProductStocks = $this->marketProductStocksGetRequest
             ->profile($Card['profile'])

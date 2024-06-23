@@ -113,7 +113,7 @@ class YaMarketPostCardStocksCommand extends Command
 
     public function update(UserProfileUid $profile): void
     {
-        $this->io->note(sprintf('Обновили профиль %s', $profile));
+        $this->io->note(sprintf('Обновили профиль %s', $profile->getAttr()));
 
         /** Получаем все имеющиеся карточки профиля */
         $YaMarketProductsCardMarket = $this->productsYaMarketCard

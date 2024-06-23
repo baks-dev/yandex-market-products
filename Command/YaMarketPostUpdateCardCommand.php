@@ -106,14 +106,14 @@ class YaMarketPostUpdateCardCommand extends Command
 
         }
 
-        $this->io->success('Карточки успешно добавлены в очередь');
+        $this->io->success('Карточки успешно обновлены');
 
         return Command::SUCCESS;
     }
 
     public function update(UserProfileUid $profile): void
     {
-        $this->io->note(sprintf('Обновили профиль %s', $profile));
+        $this->io->note(sprintf('Обновили профиль %s', $profile->getAttr()));
 
         /** Получаем все имеющиеся карточки профиля */
         $YaMarketProductsCardMarket = $this->productsYaMarketCard

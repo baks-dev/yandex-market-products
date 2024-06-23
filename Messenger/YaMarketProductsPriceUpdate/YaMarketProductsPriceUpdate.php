@@ -127,7 +127,7 @@ final class YaMarketProductsPriceUpdate
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
             /** Добавляем к стоимости товара стоимость услуг YaMarket */
-            $Calculator = $this->marketCalculatorRequest
+            $marketCalculator = $this->marketCalculatorRequest
                 ->profile($Card['profile'])
                 ->category($Card['market_category'])
                 ->price($Money)
@@ -143,7 +143,7 @@ final class YaMarketProductsPriceUpdate
                 ->lifetime((60 / 90))
                 ->waitAllTime();
 
-            return $Calculator;
+            return $marketCalculator;
         });
 
         // Не снимаем блокировку процессса

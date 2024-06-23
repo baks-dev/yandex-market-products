@@ -139,26 +139,29 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
 
             if(isset($data['product_params']))
             {
+                $product_params = json_decode($data['product_params'], false, 512, JSON_THROW_ON_ERROR);
+
                 /** Добавляем к названию сезонность */
                 $Season = new SeasonYaMarketProductParams();
 
                 /** Добавляем к названию назначение */
                 $Purpose = new PurposeYaMarketProductParams();
 
-                $product_params = json_decode($data['product_params'], false, 512, JSON_THROW_ON_ERROR);
+                foreach($product_params as $product_param)
+                {
+                    if($Purpose->equals($product_param->name))
+                    {
+                        $purpose_value = $Purpose->getData($data);
+
+                        if(!empty($purpose_value['value']))
+                        {
+                            $name .= ' '.$purpose_value['value'];
+                        }
+                    }
+                }
 
                 foreach($product_params as $product_param)
                 {
-                    if($Season->equals($product_param->name))
-                    {
-                        $season_value = $Season->getData($data);
-
-                        if(!empty($season_value['value']))
-                        {
-                            $name .= ' '.$season_value['value'];
-                        }
-                    }
-
                     if($Purpose->equals($product_param->name))
                     {
                         $purpose_value = $Purpose->getData($data);

@@ -32,7 +32,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 /** @see YaMarketProductsCardProperty */
 final class YaMarketProductsCardPropertyDTO implements YaMarketProductsCardPropertyInterface
 {
-
     /**
      * Свойство карточки
      */

@@ -11,6 +11,8 @@ final class YaMarketProductProperty
 
     private ?YaMarketProductPropertyInterface $property = null;
 
+    public const int CATEGORY_TIRE = 90490;
+
 
     public function __construct(YaMarketProductPropertyInterface|self|string $property)
     {

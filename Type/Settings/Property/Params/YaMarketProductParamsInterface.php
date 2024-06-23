@@ -33,7 +33,7 @@ interface YaMarketProductParamsInterface
     /**
      * Возвращает состояние
      */
-    public function getData(array $data, TranslatorInterface $translator): mixed;
+    public function getData(array $data, ?TranslatorInterface $translator = null): mixed;
 
     /** Возвращает значение по умолчанию */
     public function default(): ?string;

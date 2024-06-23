@@ -32,9 +32,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('baks.ya.product.params')]
 final class IndexLoadYaMarketProductParams implements YaMarketProductParamsInterface
 {
-    /**
-     * Ширина профиля
-     */
     public const int CATEGORY = 90490;
 
     public const int ID = 38009670;
@@ -88,7 +85,7 @@ final class IndexLoadYaMarketProductParams implements YaMarketProductParamsInter
         return false;
     }
 
-    public function getData(array $data, TranslatorInterface $translator): mixed
+    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
     {
         if($data['product_modification_postfix'])
         {

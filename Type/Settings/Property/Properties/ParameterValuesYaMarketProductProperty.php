@@ -111,15 +111,18 @@ final class ParameterValuesYaMarketProductProperty implements YaMarketProductPro
             /** @var YaMarketProductParamsInterface $param */
             foreach($cases as $param)
             {
-                $params[] = $param->getData($data, $this->translator);
-            }
+                $parameter = $param->getData($data, $this->translator);
 
-            $params = array_filter($params, static function ($value) {
-                return is_array($value) && isset($value['parameterId'], $value['value']);
-            });
+                if(
+                    is_array($parameter) &&
+                    !empty($parameter['parameterId']) &&
+                    !empty($parameter['value'])
+                ) {
+                    $params[] = $parameter;
+                }
+            }
         }
 
         return $params ?? null;
     }
-
 }

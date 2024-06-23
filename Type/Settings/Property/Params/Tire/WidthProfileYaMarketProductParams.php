@@ -32,9 +32,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('baks.ya.product.params')]
 final class WidthProfileYaMarketProductParams implements YaMarketProductParamsInterface
 {
-    /**
-     * Ширина профиля
-     */
     public const int CATEGORY = 90490;
 
     public const int ID = 50299747;
@@ -88,7 +85,7 @@ final class WidthProfileYaMarketProductParams implements YaMarketProductParamsIn
         return false;
     }
 
-    public function getData(array $data, TranslatorInterface $translator): mixed
+    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
     {
         if(isset($data['product_params']))
         {

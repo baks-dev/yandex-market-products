@@ -32,9 +32,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('baks.ya.product.params')]
 final class StuddedYaMarketProductParams implements YaMarketProductParamsInterface
 {
-    /**
-     * Шипуемые
-     */
     public const int CATEGORY = 90490;
 
     public const int ID = 38185150;
@@ -91,7 +88,7 @@ final class StuddedYaMarketProductParams implements YaMarketProductParamsInterfa
         return false;
     }
 
-    public function getData(array $data, TranslatorInterface $translator): mixed
+    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
     {
         if(isset($data['product_params']))
         {

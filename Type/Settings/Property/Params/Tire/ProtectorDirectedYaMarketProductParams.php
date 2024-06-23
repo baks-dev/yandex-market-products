@@ -32,9 +32,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AutoconfigureTag('baks.ya.product.params')]
 final class ProtectorDirectedYaMarketProductParams implements YaMarketProductParamsInterface
 {
-    /**
-     * Глубина протектора
-     */
     public const int CATEGORY = 90490;
 
     public const int ID = 38184990;
@@ -91,7 +88,7 @@ final class ProtectorDirectedYaMarketProductParams implements YaMarketProductPar
         return false;
     }
 
-    public function getData(array $data, TranslatorInterface $translator): mixed
+    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
     {
         if(isset($data['product_params']))
         {

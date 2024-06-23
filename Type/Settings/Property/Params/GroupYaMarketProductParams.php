@@ -86,7 +86,7 @@ final class GroupYaMarketProductParams implements YaMarketProductParamsInterface
         return false;
     }
 
-    public function getData(array $data, TranslatorInterface $translator): mixed
+    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
     {
         if(isset($data['product_params']))
         {

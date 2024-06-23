@@ -109,11 +109,6 @@ final class YaMarketProductsPriceUpdate
         $Money = new Money($Card['product_price'] / 100);
         $Currency = new Currency($Card['product_currency']);
 
-        /** Лимит: 100 запросов в минуту, добавляем лок */
-        $lock = $this->appLock
-            ->createLock([$Card['profile'], self::class])
-            ->lifetime((60 / 100))
-            ->waitAllTime();
 
         /** Кешируем на сутки результат калькуляции услуг с одинаковыми параметрами */
         $cache = $this->appCache->init('yandex-market-products');
@@ -132,7 +127,7 @@ final class YaMarketProductsPriceUpdate
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
             /** Добавляем к стоимости товара стоимость услуг YaMarket */
-            return $this->marketCalculatorRequest
+            $Calculator = $this->marketCalculatorRequest
                 ->profile($Card['profile'])
                 ->category($Card['market_category'])
                 ->price($Money)
@@ -141,9 +136,18 @@ final class YaMarketProductsPriceUpdate
                 ->length(($Card['length'] / 10))
                 ->weight(($Card['weight'] / 100))
                 ->calc();
+
+            /** Лимит: 100 запросов в минуту, добавляем лок */
+            $this->appLock
+                ->createLock([$Card['profile'], self::class])
+                ->lifetime((60 / 90))
+                ->waitAllTime();
+
+            return $Calculator;
         });
 
-        $lock->release();
+        // Не снимаем блокировку процессса
+        //$lock->release();
 
         /** @var YandexMarketProductDTO $YandexMarketProductDTO */
         $YandexMarketProductDTO = $MarketProduct->current();

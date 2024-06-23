@@ -116,7 +116,7 @@ final class BarcodesCodeYaMarketProductProperty implements YaMarketProductProper
                 $numbers = array_map('intval', $numbers);
                 $numbers = array_sum($numbers);
 
-                return ['2'.$return_value->getDateTime()->getTimestamp().substr((string) $numbers, 0, 3)];
+                return ['0461'.substr((string) $return_value->getDateTime()->getTimestamp(), 2).substr((string) $numbers, 0, 2)];
             }
         }
 

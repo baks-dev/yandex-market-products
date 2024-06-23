@@ -22,6 +22,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -43,37 +45,62 @@ class YaMarketPostCardPriceCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this->addArgument('profile', InputArgument::OPTIONAL, 'Идентификатор профиля');
-    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
         $this->io = new SymfonyStyle($input, $output);
 
-        $profile = $input->getArgument('profile');
+        /** Получаем активные токены авторизации профилей Yandex Market */
+        $profiles = $this->allProfileYaMarketToken
+            ->onlyActiveToken()
+            ->findAll();
 
-        if(!empty($profile))
+        $profiles = iterator_to_array($profiles);
+
+        $helper = $this->getHelper('question');
+
+        $questions[] = 'Все';
+
+        foreach($profiles as $quest)
         {
-            $this->update(new UserProfileUid($profile));
+            $questions[] = $quest->getAttr();
+        }
+
+        $question = new ChoiceQuestion(
+            'Профиль пользователя',
+            $questions,
+            0
+        );
+
+        $profileName = $helper->ask($input, $output, $question);
+
+        if($profileName === 'Все')
+        {
+            /** @var UserProfileUid $profile */
+            foreach($profiles as $profile)
+            {
+                $this->update($profile);
+            }
         }
         else
         {
-            /** Получаем активные токены авторизации профилей Yandex Market */
-            $profiles = $this->allProfileYaMarketToken
-                ->onlyActiveToken()
-                ->findAll();
+            $UserProfileUid = null;
 
-            if($profiles->valid())
+            foreach($profiles as $profile)
             {
-                /** @var UserProfileUid $profile */
-                foreach($profiles as $profile)
+                if($profile->getAttr() === $profileName)
                 {
-                    $this->update($profile);
+                    /* Присваиваем профиль пользователя */
+                    $UserProfileUid = $profile;
+                    break;
                 }
             }
+
+            if($UserProfileUid)
+            {
+                $this->update($UserProfileUid);
+            }
+
         }
 
         $this->io->success('Цены успешно обновлены');
@@ -83,7 +110,7 @@ class YaMarketPostCardPriceCommand extends Command
 
     public function update(UserProfileUid $profile): void
     {
-        $this->io->note(sprintf('Обновили профиль %s', $profile));
+        $this->io->note(sprintf('Обновляем профиль %s', $profile->getAttr()));
 
         /** Получаем все имеющиеся карточки профиля */
         $YaMarketProductsCardMarket = $this->productsYaMarketCard

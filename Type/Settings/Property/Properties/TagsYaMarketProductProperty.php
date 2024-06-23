@@ -109,11 +109,11 @@ final class TagsYaMarketProductProperty implements YaMarketProductPropertyInterf
 
                 if($filter && $filter->value)
                 {
-                    return $filter->value ?: $data['product_card'];
+                    return $filter->value ? explode(',', $filter->value) : [$data['product_card']];
                 }
             }
 
-            return $data['product_card'];
+            return [$data['product_card']];
         }
 
         return null;

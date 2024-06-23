@@ -31,7 +31,6 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 final class YandexMarketProductUpdateRequest extends YandexMarket
 {
-
     /**
      * Добавляет товары в каталог или редактирует информацию об уже имеющихся товарах.
      *
@@ -70,12 +69,6 @@ final class YandexMarketProductUpdateRequest extends YandexMarket
             );
         }
 
-        /** Удаляем файловый кеш карточки */
-        $cache = new FilesystemAdapter('yandex-market-products');
-        $cache->clear();
-
         return $response->toArray(false);
-
     }
-
 }

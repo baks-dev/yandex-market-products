@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties;
+namespace BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Tire;
 
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
@@ -144,6 +144,19 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
                 /** Добавляем к названию сезонность */
                 $Season = new SeasonYaMarketProductParams();
 
+                foreach($product_params as $product_param)
+                {
+                    if($Season->equals($product_param->name))
+                    {
+                        $season_value = $Season->getData($data);
+
+                        if(!empty($season_value['value']))
+                        {
+                            $name .= ' '.$season_value['value'];
+                        }
+                    }
+                }
+
                 /** Добавляем к названию назначение */
                 $Purpose = new PurposeYaMarketProductParams();
 
@@ -160,18 +173,6 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
                     }
                 }
 
-                foreach($product_params as $product_param)
-                {
-                    if($Purpose->equals($product_param->name))
-                    {
-                        $purpose_value = $Purpose->getData($data);
-
-                        if(!empty($purpose_value['value']))
-                        {
-                            $name .= ' '.$purpose_value['value'];
-                        }
-                    }
-                }
             }
 
             return $name;

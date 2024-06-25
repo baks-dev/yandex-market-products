@@ -18,24 +18,17 @@
 
 namespace BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit;
 
+use BaksDev\Products\Category\Repository\PropertyFieldsCategoryChoice\ModificationCategoryProductSectionField\ModificationCategoryProductSectionFieldInterface;
+use BaksDev\Products\Category\Repository\PropertyFieldsCategoryChoice\OffersCategoryProductSectionField\OffersCategoryProductSectionFieldInterface;
 use BaksDev\Products\Category\Repository\PropertyFieldsCategoryChoice\PropertyFieldsCategoryChoiceInterface;
-
-
-use BaksDev\Products\Category\Type\Id\CategoryProductUid;
-use BaksDev\Products\Category\Type\Offers\Id\CategoryProductOffersUid;
-use BaksDev\Products\Category\Type\Section\Field\Id\CategoryProductSectionFieldUid;
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Products\Category\Repository\PropertyFieldsCategoryChoice\VariationCategoryProductSectionField\VariationCategoryProductSectionFieldInterface;
 use BaksDev\Yandex\Market\Products\Api\Reference\Parameters\YandexMarketParametersDTO;
 use BaksDev\Yandex\Market\Products\Api\Reference\Parameters\YandexMarketParametersRequest;
-use BaksDev\Yandex\Market\Products\Api\Token\Reference\Characteristics\WbCharacteristicByObjectName;
-use BaksDev\Yandex\Market\Products\Api\Token\Reference\Characteristics\WbCharacteristicByObjectNameDTO;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyCollection;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductProperty;
 use BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit\Parameters\YaMarketProductsSettingsParametersDTO;
 use BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit\Property\YaMarketProductsSettingsPropertyDTO;
-use BaksDev\Yandex\Market\Repository\WbTokenByProfile\WbTokenByProfileInterface;
-use DomainException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -47,59 +40,53 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 final class YaMarketProductsSettingsForm extends AbstractType
 {
-    private PropertyFieldsCategoryChoiceInterface $propertyFields;
-
-    //private WbCharacteristicByObjectName $wbCharacteristic;
-
-    //private WbTokenByProfileInterface $wbTokenByProfile;
-    private YaMarketProductPropertyCollection $marketProductPropertyCollection;
-    private YandexMarketParametersRequest $marketParametersRequest;
-    private TokenStorageInterface $tokenStorage;
-
-
     public function __construct(
-        YaMarketProductPropertyCollection $marketProductPropertyCollection,
-        YandexMarketParametersRequest $marketParametersRequest,
-        PropertyFieldsCategoryChoiceInterface $propertyFields,
-        TokenStorageInterface $tokenStorage
-
-        //WbCharacteristicByObjectName $wbCharacteristic,
-        //WbTokenByProfileInterface $wbTokenByProfile,
-    )
-    {
-        $this->propertyFields = $propertyFields;
-        //$this->wbCharacteristic = $wbCharacteristic;
-        //$this->wbTokenByProfile = $wbTokenByProfile;
-        $this->marketProductPropertyCollection = $marketProductPropertyCollection;
-        $this->marketParametersRequest = $marketParametersRequest;
-        $this->tokenStorage = $tokenStorage;
-    }
+        private readonly OffersCategoryProductSectionFieldInterface $offersCategoryProductSectionField,
+        private readonly VariationCategoryProductSectionFieldInterface $variationCategoryProductSectionField,
+        private readonly ModificationCategoryProductSectionFieldInterface $modificationCategoryProductSectionField,
+        private readonly YaMarketProductPropertyCollection $marketProductPropertyCollection,
+        private readonly YandexMarketParametersRequest $marketParametersRequest,
+        private readonly PropertyFieldsCategoryChoiceInterface $propertyFields,
+        private readonly TokenStorageInterface $tokenStorage
+    ) {}
 
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
 
             /** @var YaMarketProductsSettingsDTO $data */
             $data = $event->getData();
             $form = $event->getForm();
 
             /** Коллекция свойств категории для выпадающего списка */
-            $property_fields = $this->propertyFields->getPropertyFieldsCollection($data->getSettings());
+            $property_fields = $this->propertyFields
+                ->category($data->getSettings())
+                ->getPropertyFieldsCollection();
 
             /**  Добавляем к выбору ТП, варианты и модификации */
-            $offer = $this->propertyFields->getOffersFields($data->getSettings());
+            //$offer = $this->propertyFields->getOffersFields($data->getSettings());
+            $offer = $this->offersCategoryProductSectionField
+                ->category($data->getSettings())
+                ->findAllCategoryProductSectionField();
+
 
             if($offer)
             {
-                $variation = $this->propertyFields->getVariationFields($offer->getValue());
+                //$variation = $this->propertyFields->getVariationFields($offer->getValue());
+                $variation = $this->variationCategoryProductSectionField
+                    ->offer($offer->getValue())
+                    ->findAllCategoryProductSectionField();
 
                 if($variation)
                 {
                     //$property_fields[] = $variation;
 
-                    $modification = $this->propertyFields->getModificationFields($variation->getValue());
+                    //$modification = $this->propertyFields->getModificationFields($variation->getValue());
+                    $modification = $this->modificationCategoryProductSectionField
+                        ->variation($variation->getValue())
+                        ->findAllCategoryProductSectionField();
 
                     if($modification)
                     {
@@ -149,7 +136,6 @@ final class YaMarketProductsSettingsForm extends AbstractType
                     ->findAll();
 
 
-
                 /** @var YandexMarketParametersDTO $YandexMarketParametersDTO */
 
                 foreach($marketParameters as $param)
@@ -172,88 +158,6 @@ final class YaMarketProductsSettingsForm extends AbstractType
                     $data->addParameter($YaMarketProductsSettingsParametersDTO);
                 }
             }
-
-
-
-            /* Указывается, если товар:
-
-    лекарство;
-    бумажная или электронная книга;
-    аудиокнига;
-    музыка или видео;
-    изготовляется на заказ. */
-            //            $ddd = new YaMarketProductsSettingsPropertyDTO();
-            //            $ddd->setType('type');
-            //            $ddd->setName('Особый тип товара');
-            //            //$ddd->setRequired(true);
-            //            $characteristics[] = $ddd;
-
-
-            // $characteristics[1]['name'] = 'manufacturerCountries';
-            // $characteristics[2]['name'] = 'boxCount';
-
-            //            if($profile)
-            //            {
-            //                try
-            //                {
-            //                    $characteristics = $this->wbCharacteristic
-            //                        ->profile($profile)
-            //                        ->name($data->getName())
-            //                        ->findCharacteristics();
-            //
-            //
-            //
-            //                } catch(DomainException $e)
-            //                {
-            //                    /** Если токен авторизации не найден */
-            //                    $characteristics = [];
-            //                }
-            //            }
-
-            /** @var YaMarketProductsSettingsPropertyDTO $characteristic */
-            //foreach($parameters as $param)
-            ///{
-
-                //                $new = true;
-                //
-                //
-                //                /** @var YaMarketProductsSettingsPropertyDTO $property */
-                //                foreach($data->getProperty() as $property)
-                //                {
-                //                    if($property->getType() === $characteristic->getName())
-                //                    {
-                //                        //$property->setRequired($characteristic->isRequired());
-                //                        //$property->setUnit($characteristic->getUnit());
-                //                        //$property->setPopular($characteristic->isPopular());
-                //
-                //                        $new = false;
-                //                        break;
-                //                    }
-                //                }
-
-                //                if($new)
-                //                {
-                //                    /**
-                //                     * "objectName": "Косухи", - Наименование подкатегории
-                //                     * "name": "Особенности модели", - Наименование характеристики
-                //                     * "required": false, - Характеристика обязательна к заполнению
-                //                     * "unitName": "", - Единица измерения (см, гр и т.д.)
-                //                     * "maxCount": 1, - Максимальное кол-во значений которое можно присвоить данной характеристике
-                //                     * "popular": false, - Характеристика популярна у пользователей
-                //                     * "charcType": 1 - Тип характеристики (1 и 0 - строка или массив строк; 4 - число или массив чисел)
-                //                     */
-                //
-                //                    $WbProductSettingsPropertyDTO = new YaMarketProductsSettingsPropertyDTO();
-                //                    $WbProductSettingsPropertyDTO->setType($characteristic->getName());
-                //
-                ////                    $WbProductSettingsPropertyDTO->setRequired($characteristic->isRequired());
-                ////                    $WbProductSettingsPropertyDTO->setUnit($characteristic->getUnit());
-                ////                    $WbProductSettingsPropertyDTO->setPopular($characteristic->isPopular());
-                //
-                //                    $data->addProperty($WbProductSettingsPropertyDTO);
-                //                }
-
-            //}
 
             $form->add('property', CollectionType::class, [
                 'entry_type' => Property\YaMarketProductsSettingsPropertyForm::class,
@@ -278,8 +182,7 @@ final class YaMarketProductsSettingsForm extends AbstractType
 
 
         /* Сохранить ******************************************************/
-        $builder->add
-        (
+        $builder->add(
             'product_settings',
             SubmitType::class,
             ['label' => 'Save', 'label_html' => true, 'attr' => ['class' => 'btn-primary']],
@@ -294,7 +197,7 @@ final class YaMarketProductsSettingsForm extends AbstractType
             'data_class' => YaMarketProductsSettingsDTO::class,
             'method' => 'POST',
             'attr' => ['class' => 'w-100'],
-        ],);
+        ], );
     }
 
 }

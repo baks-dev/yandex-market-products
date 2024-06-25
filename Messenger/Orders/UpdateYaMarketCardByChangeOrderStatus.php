@@ -56,6 +56,11 @@ final class UpdateYaMarketCardByChangeOrderStatus
 
         foreach($cards as $card)
         {
+            if(empty($card['main']))
+            {
+                continue;
+            }
+
             $YaMarketProductsCardMessage = new YaMarketProductsCardMessage($card['main'], $card['event']);
 
             /** Добавляем в очередь обновление остатков через транспорт профиля */

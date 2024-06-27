@@ -39,8 +39,7 @@ class YaMarketPostUpdateCardCommand extends Command
         private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private readonly ProductsYaMarketCardInterface $productsYaMarketCard,
         private readonly MessageDispatchInterface $messageDispatch
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -123,6 +122,8 @@ class YaMarketPostUpdateCardCommand extends Command
 
         foreach($YaMarketProductsCardMarket as $card)
         {
+            sleep(1);
+
             $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
                 $card['main'],
                 $card['event'],

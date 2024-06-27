@@ -25,10 +25,8 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
-use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDTO;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Update\YandexMarketProductUpdateRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
@@ -92,7 +90,6 @@ final class YaMarketProductsCardUpdate
         /** @var YaMarketProductPropertyInterface $item */
         foreach($this->property as $item)
         {
-            //$value = $item->getData($message->getId());
             $value = $item->getData($Card);
 
             if($value === null)
@@ -107,14 +104,6 @@ final class YaMarketProductsCardUpdate
         {
             return;
         }
-
-        //        /** Создаем сообщение на обновление цены */
-        //        $YaMarketProductsPriceMessage = new YaMarketProductsPriceMessage($message);
-        //        $this->messageDispatch->dispatch($YaMarketProductsPriceMessage, transport: $Card['profile']);
-
-        //        /** Создаем сообщение на обновление остатков */
-        //        $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($message);
-        //        $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
 
         /** Лимит: 600 запросов в минуту, добавляем лок на 0.6 сек */
         $lock = $this->appLock

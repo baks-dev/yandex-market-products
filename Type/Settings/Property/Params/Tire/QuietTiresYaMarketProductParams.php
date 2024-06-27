@@ -95,15 +95,10 @@ final class QuietTiresYaMarketProductParams implements YaMarketProductParamsInte
             {
                 if($this->equals($product_param->name))
                 {
-                    if($product_param->value === 'false')
-                    {
-                        return null;
-                    }
-
                     return [
                         'parameterId' => $this::ID,
                         'name' => $this->getName(),
-                        'value' => $product_param->value
+                        'value' => ($product_param->value === 'true' || $product_param->value === true)
                     ];
                 }
             }
@@ -112,7 +107,7 @@ final class QuietTiresYaMarketProductParams implements YaMarketProductParamsInte
         return [
             'parameterId' => $this::ID,
             'name' => $this->getName(),
-            'value' => 'false'
+            'value' => false
         ];
     }
 }

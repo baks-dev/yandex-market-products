@@ -107,6 +107,10 @@ final class ChamberYaMarketProductParams implements YaMarketProductParamsInterfa
             }
         }
 
-        return null;
+        return [
+            'parameterId' => $this::ID,
+            'name' => $this->getName(),
+            'value' => false
+        ];
     }
 }

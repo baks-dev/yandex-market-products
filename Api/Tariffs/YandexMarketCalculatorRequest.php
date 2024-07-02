@@ -144,7 +144,6 @@ final class YandexMarketCalculatorRequest extends YandexMarket
                     [
                         "parameters" => [
                             "campaignId" => $this->getCompany(),
-                            //"sellingProgram" => "FBS",
                             "frequency" => "DAILY"
                         ],
                         "offers" => [
@@ -179,11 +178,16 @@ final class YandexMarketCalculatorRequest extends YandexMarket
         $tariffs = current($content['result']['offers'])['tariffs'];
 
         $totalAmount = array_reduce($tariffs, static function ($carry, $item) {
-            return $carry + $item['amount'];
+            return $item['amount'] * 100 + $carry;
         }, 0);
 
-        /** Суммируем и округляем стоимость до десяток */
-        $price = ($totalAmount * 100) + ($this->price * 100);
+        /** Суммируем стоимость товара и услуг  */
+        $price = ($this->price * 100) + $totalAmount;
+
+        /** Наценка стоимости */
+        $price += $this->getPercent($price);
+
+        /** Округляем стоимость до десяток */
         $price = ceil($price / 1000) * 10;
 
         return $price;

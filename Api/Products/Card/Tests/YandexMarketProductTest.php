@@ -31,7 +31,6 @@ use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
 /**
  * @group yandex-market-products
  */

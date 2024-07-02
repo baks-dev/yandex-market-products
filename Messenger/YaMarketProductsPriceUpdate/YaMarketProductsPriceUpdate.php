@@ -62,7 +62,6 @@ final class YaMarketProductsPriceUpdate
      */
     public function __invoke(YaMarketProductsPriceMessage $message): void
     {
-
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
         if(!$Card)
@@ -114,6 +113,7 @@ final class YaMarketProductsPriceUpdate
         $cache = $this->appCache->init('yandex-market-products');
 
         $cacheKey = implode('', [
+            $Card['profile'],
             $Card['market_category'],
             $Card['product_price'],
             $Card['width'],

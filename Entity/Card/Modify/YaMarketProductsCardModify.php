@@ -25,15 +25,13 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Entity\Card\Modify;
 
-
+use BaksDev\Core\Entity\EntityEvent;
+use BaksDev\Core\Type\Ip\IpAddress;
 use BaksDev\Core\Type\Modify\Modify\ModifyActionNew;
 use BaksDev\Core\Type\Modify\Modify\ModifyActionUpdate;
+use BaksDev\Core\Type\Modify\ModifyAction;
 use BaksDev\Users\User\Entity\User;
 use BaksDev\Users\User\Type\Id\UserUid;
-use BaksDev\Core\Entity\EntityEvent;
-use BaksDev\Core\Entity\EntityState;
-use BaksDev\Core\Type\Ip\IpAddress;
-use BaksDev\Core\Type\Modify\ModifyAction;
 use BaksDev\Yandex\Market\Products\Entity\Card\Event\YaMarketProductsCardEvent;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
@@ -52,7 +50,7 @@ class YaMarketProductsCardModify extends EntityEvent
     #[Assert\NotBlank]
     #[Assert\Uuid]
     #[ORM\Id]
-    #[ORM\OneToOne(inversedBy: 'modify', targetEntity: YaMarketProductsCardEvent::class)]
+    #[ORM\OneToOne(targetEntity: YaMarketProductsCardEvent::class, inversedBy: 'modify')]
     #[ORM\JoinColumn(name: 'event', referencedColumnName: 'id')]
     private YaMarketProductsCardEvent $event;
 

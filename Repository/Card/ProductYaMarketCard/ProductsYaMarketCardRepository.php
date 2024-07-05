@@ -30,6 +30,7 @@ use BaksDev\Products\Product\Entity\Product;
 use BaksDev\Products\Product\Type\Id\ProductUid;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Entity\Card\Market\YaMarketProductsCardMarket;
+use BaksDev\Yandex\Market\Products\Entity\Card\Modify\YaMarketProductsCardModify;
 
 final class ProductsYaMarketCardRepository implements ProductsYaMarketCardInterface
 {
@@ -99,6 +100,14 @@ final class ProductsYaMarketCardRepository implements ProductsYaMarketCardInterf
             ->from(YaMarketProductsCardMarket::class, 'card');
 
 
+        $dbal->leftJoin(
+            'card',
+            YaMarketProductsCardModify::class,
+            'modify',
+            'modify.event = card.event'
+        );
+
+
         if($this->profile)
         {
             $dbal
@@ -112,6 +121,9 @@ final class ProductsYaMarketCardRepository implements ProductsYaMarketCardInterf
                 ->where('card.product = :product')
                 ->setParameter('product', $this->product, ProductUid::TYPE);
         }
+
+
+        $dbal->orderBy('modify.mod_date', 'ASC');
 
         return $dbal
             ->enableCache('yandex-market-products', 86400)

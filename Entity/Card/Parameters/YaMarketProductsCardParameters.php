@@ -18,11 +18,8 @@
 
 namespace BaksDev\Yandex\Market\Products\Entity\Card\Parameters;
 
-
 use BaksDev\Core\Entity\EntityEvent;
-use BaksDev\Products\Category\Type\Section\Field\Id\CategoryProductSectionFieldUid;
 use BaksDev\Yandex\Market\Products\Entity\Card\Event\YaMarketProductsCardEvent;
-use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
@@ -43,7 +40,7 @@ class YaMarketProductsCardParameters extends EntityEvent
     #[ORM\ManyToOne(targetEntity: YaMarketProductsCardEvent::class, inversedBy: 'parameters')]
     #[ORM\JoinColumn(name: 'event', referencedColumnName: 'id')]
     private YaMarketProductsCardEvent $event;
-    
+
     /**
      * Наименование характеристики
      */
@@ -60,7 +57,8 @@ class YaMarketProductsCardParameters extends EntityEvent
     private string $value;
 
 
-    public function __construct(YaMarketProductsCardEvent $event) {
+    public function __construct(YaMarketProductsCardEvent $event)
+    {
         $this->event = $event;
     }
 
@@ -72,22 +70,25 @@ class YaMarketProductsCardParameters extends EntityEvent
     public function getDto($dto): mixed
     {
         $dto = is_string($dto) && class_exists($dto) ? new $dto() : $dto;
-        
+
         if($dto instanceof YaMarketProductsCardParametersInterface)
         {
             return parent::getDto($dto);
         }
-        
+
         throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
-    
+
 
     public function setEntity($dto): mixed
     {
         if($dto instanceof YaMarketProductsCardParametersInterface || $dto instanceof self)
         {
-            if(empty($dto->getValue())) { return false; }
-            
+            if(empty($dto->getValue()))
+            {
+                return false;
+            }
+
             return parent::setEntity($dto);
         }
 

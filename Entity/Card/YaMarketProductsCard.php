@@ -29,9 +29,7 @@ use BaksDev\Yandex\Market\Products\Entity\Card\Event\YaMarketProductsCardEvent;
 use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventUid;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Validator\Constraints as Assert;
-
 
 /* YaMarketProductsCard */
 

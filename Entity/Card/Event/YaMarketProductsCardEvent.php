@@ -25,25 +25,18 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Entity\Card\Event;
 
-use BaksDev\Core\Type\Locale\Locale;
-use BaksDev\Core\Type\Modify\ModifyAction;
+use BaksDev\Core\Entity\EntityEvent;
 use BaksDev\Yandex\Market\Products\Entity\Card\Market\YaMarketProductsCardMarket;
 use BaksDev\Yandex\Market\Products\Entity\Card\Modify\YaMarketProductsCardModify;
 use BaksDev\Yandex\Market\Products\Entity\Card\Parameters\YaMarketProductsCardParameters;
 use BaksDev\Yandex\Market\Products\Entity\Card\Property\YaMarketProductsCardProperty;
 use BaksDev\Yandex\Market\Products\Entity\Card\YaMarketProductsCard;
-use BaksDev\Yandex\Market\Products\Entity\Settings\Parameters\YaMarketProductsSettingsParameters;
-use BaksDev\Yandex\Market\Products\Entity\Settings\Property\YaMarketProductsSettingsProperty;
 use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventUid;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\DBAL\Types\Types;
-use BaksDev\Core\Entity\EntityEvent;
-use BaksDev\Core\Entity\EntityState;
 use InvalidArgumentException;
 use Symfony\Component\Validator\Constraints as Assert;
-
 
 /* YaMarketProductsCardEvent */
 
@@ -170,7 +163,7 @@ class YaMarketProductsCardEvent extends EntityEvent
     //	public function getNameByLocale(Locale $locale) : ?string
     //	{
     //		$name = null;
-    //		
+    //
     //		/** @var YaMarketProductsCardTrans $trans */
     //		foreach($this->translate as $trans)
     //		{
@@ -179,7 +172,7 @@ class YaMarketProductsCardEvent extends EntityEvent
     //				break;
     //			}
     //		}
-    //		
+    //
     //		return $name;
     //	}
 }

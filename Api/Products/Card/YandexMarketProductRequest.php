@@ -70,7 +70,7 @@ final class YandexMarketProductRequest extends YandexMarket
 
         if($response->getStatusCode() !== 200)
         {
-            foreach($content as $error)
+            foreach($content['errors'] as $error)
             {
                 $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
             }

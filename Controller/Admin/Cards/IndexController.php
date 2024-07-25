@@ -46,12 +46,13 @@ final class IndexController extends AbstractController
         Request $request,
         PaginatorYaMarketProductsCardInterface $paginatorYaMarketProductsCard,
         int $page = 0,
-    ): Response
-    {
+    ): Response {
 
         /* Поиск */
         $search = new SearchDTO($request);
-        $searchForm = $this->createForm(SearchForm::class, $search,
+        $searchForm = $this->createForm(
+            SearchForm::class,
+            $search,
             ['action' => $this->generateUrl('yandex-market-products:admin.card.index')]
         );
         $searchForm->handleRequest($request);

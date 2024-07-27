@@ -68,8 +68,7 @@ class YandexMarketCalculatorTest extends KernelTestCase
         // FBS 12140.0
         //dd($calc);
 
-        self::assertIsInt($calc);
-
+        self::assertIsFloat($calc);
 
     }
 

@@ -62,6 +62,7 @@ final class YaMarketProductsPriceUpdate
      */
     public function __invoke(YaMarketProductsPriceMessage $message): void
     {
+
         $Card = $this->marketProductsCard->findByCard($message->getId());
 
         if(!$Card)
@@ -94,11 +95,11 @@ final class YaMarketProductsPriceUpdate
             ->article($Card['article'])
             ->find();
 
-        /** Если карточка новая - понадобится время на обновление цены */
+        /** Если карточка новая - понадобится время на публикацию в маркетплейсе */
         if(!$MarketProduct->valid())
         {
             $this->logger->critical(
-                sprintf('Не обновляем базовую стоимость товара %s: карточка товара YaMarket не найдена', $Card['article']),
+                sprintf('Не обновляем базовую стоимость товара %s: карточка товара в каталоге YaMarket пока не доступна', $Card['article']),
                 [__FILE__.':'.__LINE__]
             );
 
@@ -124,10 +125,18 @@ final class YaMarketProductsPriceUpdate
 
         $marketCalculator = $cache->get($cacheKey, function (ItemInterface $item) use ($Card, $Money): float {
 
+            /** Лимит: 100 запросов в минуту, добавляем лок */
+            $this->appLock
+                ->createLock([$Card['profile'], self::class])
+                ->lifetime((60 / 90))
+                ->waitAllTime();
+
+            sleep(1);
+
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
             /** Добавляем к стоимости товара стоимость услуг YaMarket */
-            $marketCalculator = $this->marketCalculatorRequest
+            return $this->marketCalculatorRequest
                 ->profile($Card['profile'])
                 ->category($Card['market_category'])
                 ->price($Money)
@@ -136,18 +145,7 @@ final class YaMarketProductsPriceUpdate
                 ->length(($Card['length'] / 10))
                 ->weight(($Card['weight'] / 100))
                 ->calc();
-
-            /** Лимит: 100 запросов в минуту, добавляем лок */
-            $this->appLock
-                ->createLock([$Card['profile'], self::class])
-                ->lifetime((60 / 90))
-                ->waitAllTime();
-
-            return $marketCalculator;
         });
-
-        // Не снимаем блокировку процессса
-        //$lock->release();
 
         /** @var YandexMarketProductDTO $YandexMarketProductDTO */
         $YandexMarketProductDTO = $MarketProduct->current();

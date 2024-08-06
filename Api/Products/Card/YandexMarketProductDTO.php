@@ -74,6 +74,7 @@ final class YandexMarketProductDTO
 
         $this->profile = $profile;
         $this->article = $data['offerId'];
+
         $this->name = $data['name'];
         $this->vendor = $data['vendor'];
         $this->desc = $data['description'];

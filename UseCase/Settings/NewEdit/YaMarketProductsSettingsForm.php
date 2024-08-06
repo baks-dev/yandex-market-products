@@ -71,19 +71,18 @@ final class YaMarketProductsSettingsForm extends AbstractType
                 ->category($data->getSettings())
                 ->findAllCategoryProductSectionField();
 
-
             if($offer)
             {
-                //$variation = $this->propertyFields->getVariationFields($offer->getValue());
+                array_unshift($property_fields, $offer);
+
                 $variation = $this->variationCategoryProductSectionField
                     ->offer($offer->getValue())
                     ->findAllCategoryProductSectionField();
 
                 if($variation)
                 {
-                    //$property_fields[] = $variation;
+                    array_unshift($property_fields, $variation);
 
-                    //$modification = $this->propertyFields->getModificationFields($variation->getValue());
                     $modification = $this->modificationCategoryProductSectionField
                         ->variation($variation->getValue())
                         ->findAllCategoryProductSectionField();
@@ -91,18 +90,7 @@ final class YaMarketProductsSettingsForm extends AbstractType
                     if($modification)
                     {
                         array_unshift($property_fields, $modification);
-                        array_unshift($property_fields, $variation);
-                        array_unshift($property_fields, $offer);
                     }
-                    else
-                    {
-                        array_unshift($property_fields, $variation);
-                        array_unshift($property_fields, $offer);
-                    }
-                }
-                else
-                {
-                    array_unshift($property_fields, $offer);
                 }
             }
 

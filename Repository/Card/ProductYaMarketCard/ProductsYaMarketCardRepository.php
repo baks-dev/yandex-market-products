@@ -126,7 +126,7 @@ final class ProductsYaMarketCardRepository implements ProductsYaMarketCardInterf
         $dbal->orderBy('modify.mod_date', 'ASC');
 
         return $dbal
-            ->enableCache('yandex-market-products', 86400)
+            ->enableCache('products-product', 86400)
             ->fetchAllAssociative();
     }
 }

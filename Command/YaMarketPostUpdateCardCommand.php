@@ -20,6 +20,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -39,13 +40,14 @@ class YaMarketPostUpdateCardCommand extends Command
         private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private readonly ProductsYaMarketCardInterface $productsYaMarketCard,
         private readonly MessageDispatchInterface $messageDispatch
-    ) {
+    )
+    {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->addArgument('profile', InputArgument::OPTIONAL, 'Идентификатор профиля');
+        $this->addOption('article', 'a', InputOption::VALUE_OPTIONAL, 'Фильтр по артикулу ((--article=... || -a ...))');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -68,11 +70,11 @@ class YaMarketPostUpdateCardCommand extends Command
             $questions[] = $quest->getAttr();
         }
 
+        /** Объявляем вопрос с вариантами ответов */
         $question = new ChoiceQuestion(
-            'Профиль пользователя',
-            // choices can also be PHP objects that implement __toString() method
-            $questions,
-            0
+            question: 'Профиль пользователя',
+            choices: $questions,
+            default: 0
         );
 
         $profileName = $helper->ask($input, $output, $question);
@@ -82,7 +84,7 @@ class YaMarketPostUpdateCardCommand extends Command
             /** @var UserProfileUid $profile */
             foreach($profiles as $profile)
             {
-                $this->update($profile);
+                $this->update($profile, $input->getOption('article'));
             }
         }
         else
@@ -101,7 +103,7 @@ class YaMarketPostUpdateCardCommand extends Command
 
             if($UserProfileUid)
             {
-                $this->update($UserProfileUid);
+                $this->update($UserProfileUid, $input->getOption('article'));
             }
 
         }
@@ -111,7 +113,7 @@ class YaMarketPostUpdateCardCommand extends Command
         return Command::SUCCESS;
     }
 
-    public function update(UserProfileUid $profile): void
+    public function update(UserProfileUid $profile, ?string $article = null): void
     {
         $this->io->note(sprintf('Обновили профиль %s', $profile->getAttr()));
 
@@ -122,6 +124,12 @@ class YaMarketPostUpdateCardCommand extends Command
 
         foreach($YaMarketProductsCardMarket as $card)
         {
+            /** Если передан артикул - фильтруем по вхождению */
+            if(isset($article) && stripos($card['sku'], $article) === false)
+            {
+                continue;
+            }
+
             sleep(1);
 
             $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(

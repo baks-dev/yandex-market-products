@@ -116,7 +116,7 @@ final class ParameterValuesYaMarketProductProperty implements YaMarketProductPro
                 if(
                     is_array($parameter) &&
                     !empty($parameter['parameterId']) &&
-                    !empty($parameter['value'])
+                    isset($parameter['value'])
                 ) {
                     $params[] = $parameter;
                 }

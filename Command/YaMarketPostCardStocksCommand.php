@@ -21,6 +21,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -46,7 +47,7 @@ class YaMarketPostCardStocksCommand extends Command
 
     protected function configure(): void
     {
-        $this->addArgument('profile', InputArgument::OPTIONAL, 'Идентификатор профиля');
+        $this->addOption('article', 'a', InputOption::VALUE_OPTIONAL, 'Фильтр по артикулу ((--article=... || -a ...))');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -82,7 +83,7 @@ class YaMarketPostCardStocksCommand extends Command
             /** @var UserProfileUid $profile */
             foreach($profiles as $profile)
             {
-                $this->update($profile);
+                $this->update($profile, $input->getOption('article'));
             }
         }
         else
@@ -101,7 +102,7 @@ class YaMarketPostCardStocksCommand extends Command
 
             if($UserProfileUid)
             {
-                $this->update($UserProfileUid);
+                $this->update($UserProfileUid, $input->getOption('article'));
             }
 
         }
@@ -111,7 +112,7 @@ class YaMarketPostCardStocksCommand extends Command
         return Command::SUCCESS;
     }
 
-    public function update(UserProfileUid $profile): void
+    public function update(UserProfileUid $profile, ?string $article = null): void
     {
         $this->io->note(sprintf('Обновили профиль %s', $profile->getAttr()));
 
@@ -122,13 +123,18 @@ class YaMarketPostCardStocksCommand extends Command
 
         foreach($YaMarketProductsCardMarket as $card)
         {
+            /** Если передан артикул - фильтруем по вхождению */
+            if(isset($article) && stripos($card['sku'], $article) === false)
+            {
+                continue;
+            }
+
             $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage(
                 new YaMarketProductsCardMessage(
                     $card['main'],
                     $card['event'],
                 )
             );
-
 
             /** Консольную комманду выполняем синхронно */
             $this->messageDispatch->dispatch($YaMarketProductsStocksMessage);

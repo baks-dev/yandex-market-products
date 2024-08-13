@@ -163,10 +163,11 @@ final class YaMarketProductsPriceUpdate
 
             $this->logger->info(
                 sprintf(
-                    'Обновили базовую стоимость товара %s: %s => %s %s',
+                    'Обновили стоимость товара %s (%s) : %s => %s %s',
                     $Card['article'],
                     $Money->getValue(), // стоимость в карточке
-                    $Price->getValue(), // стоимость на маркетплейс
+                    $YandexMarketProductDTO->getPrice()->getValue(), // предыдущая стоимость на маркетплейс
+                    $Price->getValue(), // новая стоимость на маркетплейс
                     $Currency->getCurrencyValueUpper()
                 ),
                 [__FILE__.':'.__LINE__]

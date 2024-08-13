@@ -21,6 +21,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -45,9 +46,10 @@ class YaMarketPostCardPriceCommand extends Command
         parent::__construct();
     }
 
-
-
-
+    protected function configure(): void
+    {
+        $this->addOption('article', 'a', InputOption::VALUE_OPTIONAL, 'Фильтр по артикулу ((--article=... || -a ...))');
+    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -82,7 +84,7 @@ class YaMarketPostCardPriceCommand extends Command
             /** @var UserProfileUid $profile */
             foreach($profiles as $profile)
             {
-                $this->update($profile);
+                $this->update($profile, $input->getOption('article'));
             }
         }
         else
@@ -101,7 +103,7 @@ class YaMarketPostCardPriceCommand extends Command
 
             if($UserProfileUid)
             {
-                $this->update($UserProfileUid);
+                $this->update($UserProfileUid, $input->getOption('article'));
             }
 
         }
@@ -111,7 +113,7 @@ class YaMarketPostCardPriceCommand extends Command
         return Command::SUCCESS;
     }
 
-    public function update(UserProfileUid $profile): void
+    public function update(UserProfileUid $profile, ?string $article = null): void
     {
         $this->io->note(sprintf('Обновляем профиль %s', $profile->getAttr()));
 
@@ -122,6 +124,12 @@ class YaMarketPostCardPriceCommand extends Command
 
         foreach($YaMarketProductsCardMarket as $card)
         {
+            /** Если передан артикул - фильтруем по вхождению */
+            if(isset($article) && stripos($card['sku'], $article) === false)
+            {
+                continue;
+            }
+
             $YaMarketProductsStocksMessage = new YaMarketProductsPriceMessage(
                 new YaMarketProductsCardMessage(
                     $card['main'],

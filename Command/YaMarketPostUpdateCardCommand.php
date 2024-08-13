@@ -40,8 +40,7 @@ class YaMarketPostUpdateCardCommand extends Command
         private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private readonly ProductsYaMarketCardInterface $productsYaMarketCard,
         private readonly MessageDispatchInterface $messageDispatch
-    )
-    {
+    ) {
         parent::__construct();
     }
 

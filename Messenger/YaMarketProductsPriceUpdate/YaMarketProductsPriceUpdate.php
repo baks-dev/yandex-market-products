@@ -84,7 +84,7 @@ final class YaMarketProductsPriceUpdate
         ) {
             $this->logger->critical(
                 sprintf('Параметры упаковки товара %s не найдены! Не обновляем базовую стоимость товара YaMarket', $Card['article']),
-                [__FILE__.':'.__LINE__]
+                [self::class.':'.__LINE__]
             );
 
             return;
@@ -100,13 +100,13 @@ final class YaMarketProductsPriceUpdate
         {
             $this->logger->critical(
                 sprintf('Не обновляем базовую стоимость товара %s: карточка товара в каталоге YaMarket пока не доступна', $Card['article']),
-                [__FILE__.':'.__LINE__]
+                [self::class.':'.__LINE__]
             );
 
             throw new DomainException('Карточка товара YaMarket не найдена');
         }
 
-        $Money = new Money($Card['product_price'] / 100);
+        $Money = new Money($Card['product_price'], true);
         $Currency = new Currency($Card['product_currency']);
 
 
@@ -170,7 +170,7 @@ final class YaMarketProductsPriceUpdate
                     $Price->getValue(), // новая стоимость на маркетплейс
                     $Currency->getCurrencyValueUpper()
                 ),
-                [__FILE__.':'.__LINE__]
+                [self::class.':'.__LINE__]
             );
         }
     }

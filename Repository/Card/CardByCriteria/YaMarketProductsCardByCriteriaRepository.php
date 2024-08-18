@@ -194,7 +194,7 @@ final class YaMarketProductsCardByCriteriaRepository implements YaMarketProducts
     /**
      * Метод возвращает указанную карточку YaMarket профиля
      */
-    public function findByProfile(UserProfileUid|string $profile): ?YaMarketProductsCardMessage
+    public function findByProfile(UserProfileUid|string $profile): YaMarketProductsCardMessage|false
     {
         if(is_string($profile))
         {

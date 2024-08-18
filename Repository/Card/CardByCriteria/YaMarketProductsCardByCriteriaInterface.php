@@ -46,7 +46,7 @@ interface YaMarketProductsCardByCriteriaInterface
     /**
      * Метод возвращает указанную карточку YaMarket профиля
      */
-    public function findByProfile(UserProfileUid|string $profile): ?YaMarketProductsCardMessage;
+    public function findByProfile(UserProfileUid|string $profile): YaMarketProductsCardMessage|false;
 
     /**
      * Метод возвращает все указанные карточки YaMarket

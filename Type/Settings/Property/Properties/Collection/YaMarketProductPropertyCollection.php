@@ -25,12 +25,12 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final readonly class YaMarketProductPropertyCollection
 {
     public function __construct(
-        #[TaggedIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')]
+        #[AutowireIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')]
         private iterable $property,
     ) {}
 

@@ -131,7 +131,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
             if(empty($this->{$name}))
             {
-                $this->logger->critical(sprintf('Необходимо передать обязательный параметр %s', $name), [__FILE__.':'.__LINE__]);
+                $this->logger->critical(sprintf('Необходимо передать обязательный параметр %s', $name), [self::class.':'.__LINE__]);
                 throw new InvalidArgumentException(sprintf('Invalid Argument %s', $name));
             }
         }
@@ -166,7 +166,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
         {
             foreach($content['errors'] as $error)
             {
-                $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
+                $this->logger->critical($error['code'].': '.$error['message'], [self::class.':'.__LINE__]);
             }
 
             throw new DomainException(

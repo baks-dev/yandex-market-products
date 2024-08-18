@@ -32,7 +32,7 @@ use BaksDev\Yandex\Market\Products\Api\Products\Update\YandexMarketProductUpdate
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -49,7 +49,7 @@ final class YaMarketProductsCardUpdate
     private AppLockInterface $appLock;
 
     public function __construct(
-        #[TaggedIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')] iterable $property,
+        #[AutowireIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')] iterable $property,
         YandexMarketProductRequest $yandexMarketProductRequest,
         YandexMarketProductUpdateRequest $marketProductUpdate,
         YaMarketProductsCardInterface $marketProductsCard,

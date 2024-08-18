@@ -18,12 +18,8 @@
 
 namespace BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit\Property;
 
-//use App\Module\Products\Category\Repository\PropertyFieldsByCategoryChoiceForm\PropertyFieldsByCategoryChoiceFormInterface;
-//use App\Module\Products\Category\Type\Id\CategoryUid;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -32,13 +28,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class YaMarketProductsSettingsPropertyForm extends AbstractType
 {
-
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /* TextType */
-        //$builder->add('type', HiddenType::class);
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) use ($options) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
 
             /** @var YaMarketProductsSettingsPropertyDTO $data */
             $data = $event->getData();
@@ -51,10 +43,10 @@ final class YaMarketProductsSettingsPropertyForm extends AbstractType
                 $form
                     ->add('field', ChoiceType::class, [
                         'choices' => $options['property_fields'],  // array_flip(Main::LANG),
-                        'choice_value' => function($type) {
+                        'choice_value' => function ($type) {
                             return $type?->getValue();
                         },
-                        'choice_label' => function($type) {
+                        'choice_label' => function ($type) {
                             return $type->getAttr();
                         },
 
@@ -72,7 +64,7 @@ final class YaMarketProductsSettingsPropertyForm extends AbstractType
                 {
                     $form
                         ->add('def', ChoiceType::class, [
-                            'choices' =>  array_combine($YaMarketProperty->choices(), $YaMarketProperty->choices()),
+                            'choices' => array_combine($YaMarketProperty->choices(), $YaMarketProperty->choices()),
                             'expanded' => false,
                             'multiple' => false,
                             'translation_domain' => 'yandex-market-products.property',
@@ -82,24 +74,27 @@ final class YaMarketProductsSettingsPropertyForm extends AbstractType
                 }
                 else
                 {
-                    $form->add('def', TextType::class,
+                    $form->add(
+                        'def',
+                        TextType::class,
                         [
                             'data' => $data->getDef() ?: $YaMarketProperty->default(),
                             'required' => $YaMarketProperty->required()
-                        ]);
+                        ]
+                    );
                 }
             }
         });
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults
-        (
+        $resolver->setDefaults(
             [
                 'data_class' => YaMarketProductsSettingsPropertyDTO::class,
                 'property_fields' => null,
-            ]);
+            ]
+        );
     }
 
 }

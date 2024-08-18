@@ -87,7 +87,7 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
         {
             foreach($content['errors'] as $error)
             {
-                $this->logger->critical($error['code'].': '.$error['message'], [__FILE__.':'.__LINE__]);
+                $this->logger->critical($error['code'].': '.$error['message'], [self::class.':'.__LINE__]);
             }
 
             throw new DomainException(

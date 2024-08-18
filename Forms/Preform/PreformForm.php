@@ -39,23 +39,22 @@ final class PreformForm extends AbstractType
         TokenStorageInterface $tokenStorage,
         YandexMarketCategoryRequest $yandexMarketCategoryRequest,
         CategoryChoiceInterface $categoryChoice,
-    )
-    {
+    ) {
         $this->categoryChoice = $categoryChoice;
         $this->tokenStorage = $tokenStorage;
         $this->yandexMarketCategoryRequest = $yandexMarketCategoryRequest;
     }
 
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('category', ChoiceType::class, [
                 'choices' => $this->categoryChoice->findAll(),
-                'choice_value' => function(?CategoryProductUid $type) {
+                'choice_value' => function (?CategoryProductUid $type) {
                     return $type?->getValue();
                 },
-                'choice_label' => function(CategoryProductUid $type) {
+                'choice_label' => function (CategoryProductUid $type) {
                     return $type?->getOptions();
                 },
 
@@ -83,10 +82,10 @@ final class PreformForm extends AbstractType
             $builder
                 ->add('market', ChoiceType::class, [
                     'choices' => $market,  // array_flip(Main::LANG),
-                    'choice_value' => function(?YandexMarketCategoryDTO $type) {
+                    'choice_value' => function (?YandexMarketCategoryDTO $type) {
                         return $type?->getId();
                     },
-                    'choice_label' => function(YandexMarketCategoryDTO $type) {
+                    'choice_label' => function (YandexMarketCategoryDTO $type) {
                         return $type?->getName();
                     },
 
@@ -100,8 +99,7 @@ final class PreformForm extends AbstractType
 
 
         /* Сохранить ******************************************************/
-        $builder->add
-        (
+        $builder->add(
             'ya_market_preform',
             SubmitType::class,
             ['label_html' => true, 'attr' => ['class' => 'btn-primary']],
@@ -110,10 +108,9 @@ final class PreformForm extends AbstractType
     }
 
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults
-        (
+        $resolver->setDefaults(
             [
                 'data_class' => PreformDTO::class,
                 'method' => 'POST',

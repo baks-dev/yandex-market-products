@@ -25,13 +25,17 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties;
 
+use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
+use DateInterval;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[AutoconfigureTag('baks.ya.product.property')]
 final class BasePriceYaMarketProductProperty implements YaMarketProductPropertyInterface
@@ -45,6 +49,8 @@ final class BasePriceYaMarketProductProperty implements YaMarketProductPropertyI
     public function __construct(
         private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null,
         private readonly ?YandexMarketCalculatorRequest $marketCalculatorRequest = null,
+        private readonly ?AppLockInterface $appLock = null,
+        private readonly ?AppCacheInterface $appCache = null,
     ) {}
 
     public function getValue(): string
@@ -114,10 +120,50 @@ final class BasePriceYaMarketProductProperty implements YaMarketProductPropertyI
                 return null;
             }
 
-            $Money = new Money($Card['product_price'] / 100);
+            $Money = new Money($Card['product_price'], true);
+
+
+            /** Кешируем на сутки результат калькуляции услуг с одинаковыми параметрами */
+            $cache = $this->appCache->init('yandex-market-products');
+
+            $cacheKey = implode('', [
+                $Card['profile'],
+                $Card['market_category'],
+                $Card['product_price'],
+                $Card['width'],
+                $Card['height'],
+                $Card['length'],
+                $Card['weight'],
+            ]);
+
 
             /** Добавляем к стоимости товара стоимость услуг YaMarket */
-            $marketCalculator = $this->marketCalculatorRequest
+            $marketCalculator = $cache->get($cacheKey, function (ItemInterface $item) use ($Card, $Money): float {
+
+                /** Лимит: 100 запросов в минуту, добавляем лок */
+                $this->appLock
+                    ->createLock([$Card['profile'], self::class])
+                    ->lifetime((60 / 90))
+                    ->waitAllTime();
+
+                sleep(1);
+
+                $item->expiresAfter(DateInterval::createFromDateString('1 day'));
+
+                /** Добавляем к стоимости товара стоимость услуг YaMarket */
+                return $this->marketCalculatorRequest
+                    ->profile($Card['profile'])
+                    ->category($Card['market_category'])
+                    ->price($Money)
+                    ->width(($Card['width'] / 10))
+                    ->height(($Card['height'] / 10))
+                    ->length(($Card['length'] / 10))
+                    ->weight(($Card['weight'] / 100))
+                    ->calc();
+            });
+
+
+            /*$marketCalculator = $this->marketCalculatorRequest
                 ->profile($Card['profile'])
                 ->category($Card['market_category'])
                 ->price($Money)
@@ -125,7 +171,7 @@ final class BasePriceYaMarketProductProperty implements YaMarketProductPropertyI
                 ->height(($Card['height'] / 10))
                 ->length(($Card['length'] / 10))
                 ->weight(($Card['weight'] / 100))
-                ->calc();
+                ->calc();*/
 
             $Price = new Money($marketCalculator);
             $Currency = new Currency($Card['product_currency']);

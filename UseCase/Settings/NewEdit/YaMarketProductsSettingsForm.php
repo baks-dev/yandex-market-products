@@ -44,9 +44,11 @@ final class YaMarketProductsSettingsForm extends AbstractType
         private readonly OffersCategoryProductSectionFieldInterface $offersCategoryProductSectionField,
         private readonly VariationCategoryProductSectionFieldInterface $variationCategoryProductSectionField,
         private readonly ModificationCategoryProductSectionFieldInterface $modificationCategoryProductSectionField,
+        private readonly PropertyFieldsCategoryChoiceInterface $propertyFields,
+
         private readonly YaMarketProductPropertyCollection $marketProductPropertyCollection,
         private readonly YandexMarketParametersRequest $marketParametersRequest,
-        private readonly PropertyFieldsCategoryChoiceInterface $propertyFields,
+
         private readonly TokenStorageInterface $tokenStorage
     ) {}
 

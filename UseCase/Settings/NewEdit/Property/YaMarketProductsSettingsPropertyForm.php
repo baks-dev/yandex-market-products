@@ -43,9 +43,11 @@ final class YaMarketProductsSettingsPropertyForm extends AbstractType
                 $form
                     ->add('field', ChoiceType::class, [
                         'choices' => $options['property_fields'],  // array_flip(Main::LANG),
+
                         'choice_value' => function ($type) {
                             return $type?->getValue();
                         },
+
                         'choice_label' => function ($type) {
                             return $type->getAttr();
                         },

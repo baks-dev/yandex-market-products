@@ -108,6 +108,15 @@ final class ColorYaMarketProductParams implements YaMarketProductParamsInterface
             $name .= 'R'.$data['product_offer_value'];
         }
 
-        return $name ?: null;
+        if(empty($name))
+        {
+            return null;
+        }
+
+        return [
+            'parameterId' => $this::ID,
+            'name' => $this->getName(),
+            'value' => $name
+        ];
     }
 }

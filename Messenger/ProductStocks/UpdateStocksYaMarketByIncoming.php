@@ -35,8 +35,9 @@ use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMark
 use BaksDev\Yandex\Market\Products\Repository\Card\CardByCriteria\YaMarketProductsCardByCriteriaInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 
-#[AsMessageHandler(priority: 1)]
+#[AsMessageHandler]
 final class UpdateStocksYaMarketByIncoming
 {
     private ProductStocksByIdInterface $productStocks;
@@ -106,7 +107,11 @@ final class UpdateStocksYaMarketByIncoming
             {
                 /** Транспорт yandex-market-products чтобы не мешать общей очереди */
                 $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
-                $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
+                $this->messageDispatch->dispatch(
+                    $YaMarketProductsStocksMessage,
+                    stamps: [new DelayStamp(2000)], // задержка 2 сек для обновления карточки
+                    transport: 'yandex-market-products'
+                );
             }
         }
     }

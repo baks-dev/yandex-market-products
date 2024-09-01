@@ -31,8 +31,9 @@ use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\OrderYaMarketCard\OrderProductsYaMarketCardInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 
-#[AsMessageHandler(priority: 100)]
+#[AsMessageHandler]
 final class UpdateYaMarketCardByChangeOrderStatus
 {
     private MessageDispatchInterface $messageDispatch;
@@ -66,6 +67,7 @@ final class UpdateYaMarketCardByChangeOrderStatus
             /** Добавляем в очередь обновление остатков через транспорт профиля */
             $this->messageDispatch->dispatch(
                 message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
+                stamps: [new DelayStamp(2000)], // задержка 3 сек для обновления карточки
                 transport: $card['profile']
             );
         }

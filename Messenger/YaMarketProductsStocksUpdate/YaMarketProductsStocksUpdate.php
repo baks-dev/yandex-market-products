@@ -70,7 +70,7 @@ final class YaMarketProductsStocksUpdate
         /** Добавляем лок на процесс, остатки обновляются в порядке очереди! */
         $lock = $this->appLock
             ->createLock([$Card['profile'], $Card['article'], self::class])
-            ->wait();
+            ->waitAllTime();
 
         $ProductStocks = $this->marketProductStocksGetRequest
             ->profile($Card['profile'])
@@ -79,17 +79,32 @@ final class YaMarketProductsStocksUpdate
 
         $product_quantity = max($Card['product_quantity'], 0);
 
-        /** Обновляем остатки товара если наличие изменилось */
-        if($ProductStocks !== $product_quantity)
-        {
-            $this->marketProductStocksUpdateRequest
-                ->profile($Card['profile'])
-                ->article($Card['article'])
-                ->total($product_quantity)
-                ->update();
+        //        if($ProductStocks === $product_quantity)
+        //        {
+        //            $this->logger->info(sprintf(
+        //                'Наличие соответствует %s: %s == %s',
+        //                $Card['article'],
+        //                $ProductStocks,
+        //                $product_quantity
+        //            ), [$Card['profile']]);
+        //
+        //            $lock->release();
+        //            return;
+        //        }
 
-            $this->logger->info(sprintf('Обновили наличие товара %s: %s => %s', $Card['article'], $ProductStocks, $Card['product_quantity']));
-        }
+        /** Обновляем остатки товара если наличие изменилось */
+        $this->marketProductStocksUpdateRequest
+            ->profile($Card['profile'])
+            ->article($Card['article'])
+            ->total($product_quantity)
+            ->update();
+
+        $this->logger->info(sprintf(
+            'Обновили наличие %s: %s => %s',
+            $Card['article'],
+            $ProductStocks,
+            $product_quantity
+        ), [$Card['profile']]);
 
         $lock->release();
     }

@@ -91,6 +91,13 @@ final class SpeedIndexYaMarketProductParams implements YaMarketProductParamsInte
         {
             $cleaned_str = preg_replace('/[^a-zA-Z]/u', '', $data['product_modification_postfix']);
 
+            /** Преобразуем русские символы в латиницу */
+            $cleaned_str = str_replace(
+                ['Н', 'К', 'М', 'Р', 'Т'], // русские символы
+                ['H', 'K', 'M', 'P', 'T'], // латиница
+                $cleaned_str
+            );
+
             if(!empty($cleaned_str))
             {
                 $return_index = match ($cleaned_str)

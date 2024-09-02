@@ -88,6 +88,7 @@ final readonly class YaMarketProductsStocksRepository implements YaMarketProduct
                 'card_market.main = card.id'
             );
 
+
         $dbal
             ->join(
                 'card_market',

@@ -79,17 +79,18 @@ final class YaMarketProductsStocksUpdate
 
         $product_quantity = max($Card['product_quantity'], 0);
 
-//        if($ProductStocks === $product_quantity)
-//        {
-//            //            $this->logger->info(sprintf(
-//            //                'Наличие соответствует %s: %s == %s',
-//            //                $Card['article'],
-//            //                $ProductStocks,
-//            //                $product_quantity
-//            //            ), [$Card['profile']]);
-//
-//            $lock->release();
-//        }
+        if($ProductStocks === $product_quantity)
+        {
+            $this->logger->info(sprintf(
+                'Наличие соответствует %s: %s == %s',
+                $Card['article'],
+                $ProductStocks,
+                $product_quantity
+            ), [$Card['profile']]);
+
+            $lock->release();
+            return;
+        }
 
         /** Обновляем остатки товара если наличие изменилось */
         $this->marketProductStocksUpdateRequest

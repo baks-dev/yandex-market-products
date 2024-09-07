@@ -28,7 +28,9 @@ namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YandexMarketProductStocksGetRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YandexMarketProductStocksUpdateRequest;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsStocks\YaMarketProductsStocksInterface;
+use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -40,13 +42,11 @@ final class YaMarketProductsStocksUpdate
     public function __construct(
         private readonly YandexMarketProductStocksGetRequest $marketProductStocksGetRequest,
         private readonly YandexMarketProductStocksUpdateRequest $marketProductStocksUpdateRequest,
-        private readonly YaMarketProductsStocksInterface $marketProductsCard,
+        private readonly YaMarketProductsCardInterface $marketProductsCard,
         private readonly AppLockInterface $appLock,
         LoggerInterface $yandexMarketProductsLogger,
     ) {
-
         $this->logger = $yandexMarketProductsLogger;
-
     }
 
     /**
@@ -54,9 +54,14 @@ final class YaMarketProductsStocksUpdate
      */
     public function __invoke(YaMarketProductsStocksMessage $message): void
     {
-        $Card = $this->marketProductsCard->findByCard($message->getId());
+        $Card = $this->marketProductsCard
+            ->forProduct($message->getProduct())
+            ->forOfferConst($message->getOfferConst())
+            ->forVariationConst($message->getVariationConst())
+            ->forModificationConst($message->getModificationConst())
+            ->find();
 
-        if(!$Card)
+        if($Card === false)
         {
             return;
         }
@@ -69,11 +74,11 @@ final class YaMarketProductsStocksUpdate
 
         /** Добавляем лок на процесс, остатки обновляются в порядке очереди! */
         $lock = $this->appLock
-            ->createLock([$Card['profile'], $Card['article'], self::class])
+            ->createLock([$message->getProfile(), $Card['article'], self::class])
             ->waitAllTime();
 
         $ProductStocks = $this->marketProductStocksGetRequest
-            ->profile($Card['profile'])
+            ->profile($message->getProfile())
             ->article($Card['article'])
             ->find();
 
@@ -86,15 +91,16 @@ final class YaMarketProductsStocksUpdate
                 $Card['article'],
                 $ProductStocks,
                 $product_quantity
-            ), [$Card['profile']]);
+            ), [$message->getProfile()]);
 
             $lock->release();
+
             return;
         }
 
         /** Обновляем остатки товара если наличие изменилось */
         $this->marketProductStocksUpdateRequest
-            ->profile($Card['profile'])
+            ->profile($message->getProfile())
             ->article($Card['article'])
             ->total($product_quantity)
             ->update();
@@ -104,7 +110,8 @@ final class YaMarketProductsStocksUpdate
             $Card['article'],
             $ProductStocks,
             $product_quantity
-        ), [$Card['profile']]);
+        ), [$message->getProfile()]);
+
 
         $lock->release();
     }

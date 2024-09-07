@@ -30,9 +30,10 @@ use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDTO;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Card\FindProductYandexMarketRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Price\YandexMarketProductPriceUpdateRequest;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsStocks\YaMarketProductsStocksInterface;
 use DateInterval;
 use DomainException;
@@ -47,9 +48,9 @@ final class YaMarketProductsPriceUpdate
 
     public function __construct(
         private readonly YandexMarketCalculatorRequest $marketCalculatorRequest,
-        private readonly YandexMarketProductRequest $yandexMarketProductRequest,
+        private readonly FindProductYandexMarketRequest $yandexMarketProductRequest,
         private readonly YandexMarketProductPriceUpdateRequest $marketProductPriceRequest,
-        private readonly YaMarketProductsStocksInterface $marketProductsCard,
+        private readonly YaMarketProductsCardInterface $marketProductsCard,
         private readonly AppLockInterface $appLock,
         private readonly AppCacheInterface $appCache,
         LoggerInterface $yandexMarketProductsLogger,
@@ -63,9 +64,14 @@ final class YaMarketProductsPriceUpdate
     public function __invoke(YaMarketProductsPriceMessage $message): void
     {
 
-        $Card = $this->marketProductsCard->findByCard($message->getId());
+        $Card = $this->marketProductsCard
+            ->forProduct($message->getProduct())
+            ->forOfferConst($message->getOfferConst())
+            ->forVariationConst($message->getVariationConst())
+            ->forModificationConst($message->getModificationConst())
+            ->find();
 
-        if(!$Card)
+        if($Card === false)
         {
             return;
         }
@@ -90,8 +96,9 @@ final class YaMarketProductsPriceUpdate
             return;
         }
 
+        /** Проверяем, что карточка добавлена */
         $MarketProduct = $this->yandexMarketProductRequest
-            ->profile($Card['profile'])
+            ->profile($message->getProfile())
             ->article($Card['article'])
             ->find();
 
@@ -114,7 +121,7 @@ final class YaMarketProductsPriceUpdate
         $cache = $this->appCache->init('yandex-market-products');
 
         $cacheKey = implode('', [
-            $Card['profile'],
+            $message->getProfile(),
             $Card['market_category'],
             $Card['product_price'],
             $Card['width'],
@@ -123,11 +130,12 @@ final class YaMarketProductsPriceUpdate
             $Card['weight'],
         ]);
 
-        $marketCalculator = $cache->get($cacheKey, function (ItemInterface $item) use ($Card, $Money): float {
+
+        $marketCalculator = $cache->get($cacheKey, function (ItemInterface $item) use ($Card, $Money, $message): float {
 
             /** Лимит: 100 запросов в минуту, добавляем лок */
             $this->appLock
-                ->createLock([$Card['profile'], self::class])
+                ->createLock([$message->getProfile(), self::class])
                 ->lifetime((60 / 90))
                 ->waitAllTime();
 
@@ -137,7 +145,7 @@ final class YaMarketProductsPriceUpdate
 
             /** Добавляем к стоимости товара стоимость услуг YaMarket */
             return $this->marketCalculatorRequest
-                ->profile($Card['profile'])
+                ->profile($message->getProfile())
                 ->category($Card['market_category'])
                 ->price($Money)
                 ->width(($Card['width'] / 10))
@@ -155,7 +163,7 @@ final class YaMarketProductsPriceUpdate
         if(false === $YandexMarketProductDTO->getPrice()->equals($Price))
         {
             $this->marketProductPriceRequest
-                ->profile($Card['profile'])
+                ->profile($message->getProfile())
                 ->article($Card['article'])
                 ->price($Price)
                 ->currency($Currency)

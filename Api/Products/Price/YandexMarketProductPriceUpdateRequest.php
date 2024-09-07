@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Products\Price;
 
+use App\Kernel;
 use BaksDev\Reference\Currency\Type\Currencies\RUR;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
@@ -34,7 +35,6 @@ use InvalidArgumentException;
 
 final class YandexMarketProductPriceUpdateRequest extends YandexMarket
 {
-
     private ?string $article = null;
 
     private ?Money $price = null;
@@ -68,8 +68,12 @@ final class YandexMarketProductPriceUpdateRequest extends YandexMarket
      * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/assortment/updatePrices
      *
      */
-    public function update()
+    public function update(): bool
     {
+        if(Kernel::isTestEnvironment())
+        {
+            return true;
+        }
 
         if(empty($this->article))
         {
@@ -118,7 +122,7 @@ final class YandexMarketProductPriceUpdateRequest extends YandexMarket
             );
         }
 
-        return $response->toArray(false);
+        return true;
 
     }
 

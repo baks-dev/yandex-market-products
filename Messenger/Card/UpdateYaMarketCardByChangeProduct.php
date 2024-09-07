@@ -28,40 +28,68 @@ namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Messenger\ProductMessage;
+use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\ProductYaMarketCard\ProductsYaMarketCardInterface;
+use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 final class UpdateYaMarketCardByChangeProduct
 {
-    private MessageDispatchInterface $messageDispatch;
-    private ProductsYaMarketCardInterface $productsYaMarketCard;
-
     public function __construct(
-        ProductsYaMarketCardInterface $productsYaMarketCard,
-        MessageDispatchInterface $messageDispatch,
-    ) {
-        $this->messageDispatch = $messageDispatch;
-        $this->productsYaMarketCard = $productsYaMarketCard;
-    }
+        private readonly AllProductsIdentifierInterface $allProductsIdentifier,
+        private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+        private readonly MessageDispatchInterface $messageDispatch,
+    ) {}
 
     /**
      * Обновляем информацию YandexMarket при изменении системной карточки
      */
     public function __invoke(ProductMessage $message): void
     {
-        /** Получаем идентификаторы карточек товаров YandexMarket  */
-        $cards = $this->productsYaMarketCard
-            ->whereProduct($message->getId())
+
+        /**  Получаем активные токены профилей пользователя */
+
+        $profiles = $this
+            ->allProfileYaMarketToken
+            ->onlyActiveToken()
             ->findAll();
 
-        foreach($cards as $card)
+
+        if($profiles->valid() === false)
         {
-            /** Транспорт async чтобы не мешать общей очереди */
-            $this->messageDispatch->dispatch(
-                message: new YaMarketProductsCardMessage($card['main'], $card['event']),
-                transport: $card['profile']
-            );
+            return;
+        }
+
+        /** Получаем идентификаторы обновляемой продукции  */
+        $products = $this
+            ->allProductsIdentifier
+            ->forProduct($message->getId())
+            ->findAll();
+
+        if($products === false)
+        {
+            return;
+        }
+
+        foreach($profiles as $profile)
+        {
+            foreach($products as $product)
+            {
+                $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
+                    $profile,
+                    $product['product_id'],
+                    $product['offer_const'],
+                    $product['variation_const'],
+                    $product['modification_const'],
+                );
+
+                /** Транспорт async чтобы не мешать общей очереди */
+                $this->messageDispatch->dispatch(
+                    message: $YaMarketProductsCardMessage,
+                    transport: $profile
+                );
+            }
         }
     }
 }

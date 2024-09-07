@@ -27,45 +27,50 @@ namespace BaksDev\Yandex\Market\Products\Messenger\ProductStocks;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Stocks\Messenger\Products\Recalculate\RecalculateProductMessage;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
-use BaksDev\Yandex\Market\Products\Repository\Card\CardByCriteria\YaMarketProductsCardByCriteriaInterface;
+use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 0)]
 final class UpdateStocksYaMarketByRecalculate
 {
-    private YaMarketProductsCardByCriteriaInterface $cardByCriteria;
-    private MessageDispatchInterface $messageDispatch;
-
     public function __construct(
-        YaMarketProductsCardByCriteriaInterface $cardByCriteria,
-        MessageDispatchInterface $messageDispatch
-    ) {
-        $this->cardByCriteria = $cardByCriteria;
-        $this->messageDispatch = $messageDispatch;
-    }
+        private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+        private readonly MessageDispatchInterface $messageDispatch
+    ) {}
 
     /**
      * Отправляем сообщение на обновление остатков при обновлении складского учета
      */
     public function __invoke(RecalculateProductMessage $product): void
     {
-        $cards = $this->cardByCriteria
-            ->product($product->getProduct())
-            ->offer($product->getOffer())
-            ->variation($product->getVariation())
-            ->modification($product->getModification())
+        /**  Получаем активные токены профилей пользователя */
+
+        $profiles = $this
+            ->allProfileYaMarketToken
+            ->onlyActiveToken()
             ->findAll();
 
-        if($cards->valid())
+
+        if($profiles->valid() === false)
         {
-            /** @var YaMarketProductsStocksMessage $YaMarketProductsCardMessage */
-            foreach($cards as $YaMarketProductsCardMessage)
-            {
-                /** Транспорт yandex-market-products чтобы не мешать общей очереди */
-                $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
-                $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
-            }
+            return;
+        }
+
+        foreach($profiles as $profile)
+        {
+            $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
+                $profile,
+                $product->getProduct(),
+                $product->getOffer(),
+                $product->getVariation(),
+                $product->getModification()
+            );
+
+            /** Транспорт yandex-market-products чтобы не мешать общей очереди */
+            $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
+            $this->messageDispatch->dispatch($YaMarketProductsStocksMessage, transport: 'yandex-market-products');
         }
     }
 }

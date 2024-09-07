@@ -51,14 +51,14 @@ class BaksDevYandexMarketProductsBundle extends AbstractBundle
                 self::PATH.'**/*DTO.php',
             ]);
 
-        $services->load(
-            self::NAMESPACE.'Type\Settings\Property\Properties\\',
-            self::PATH.'Type/Settings/Property/Properties'
-        );
+        //        $services->load(
+        //            self::NAMESPACE.'Type\Settings\Property\Properties\\',
+        //            self::PATH.'Type/Settings/Property/Properties'
+        //        );
 
-        $services->load(
-            self::NAMESPACE.'Type\Settings\Property\Params\\',
-            self::PATH.'Type/Settings/Property/Params'
-        );
+        //        $services->load(
+        //            self::NAMESPACE.'Type\Settings\Property\Params\\',
+        //            self::PATH.'Type/Settings/Property/Params'
+        //        );
     }
 }

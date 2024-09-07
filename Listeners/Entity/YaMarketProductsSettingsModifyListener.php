@@ -46,8 +46,8 @@ final class YaMarketProductsSettingsModifyListener
     {
         $token = $this->token->getToken();
 
-        if ($token) {
-
+        if($token)
+        {
             $data->setUsr($token->getUser());
 
             if($token instanceof SwitchUserToken)

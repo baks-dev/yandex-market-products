@@ -25,59 +25,86 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 
+use BaksDev\Products\Product\Type\Id\ProductUid;
+use BaksDev\Products\Product\Type\Offers\ConstId\ProductOfferConst;
+use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst;
+use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
-use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventUid;
-use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 
 final class YaMarketProductsStocksMessage
 {
     /**
-     * Идентификатор
+     * Идентификатор профиля пользователя
      */
-    private YaMarketProductsCardUid $id;
+    private UserProfileUid $profile;
 
     /**
-     * Идентификатор события
+     * ID продукта
      */
-    private YaMarketProductsCardEventUid $event;
+    private ProductUid $product;
 
     /**
-     * Идентификатор предыдущего события
+     * Постоянный уникальный идентификатор ТП
      */
-    private ?YaMarketProductsCardEventUid $last;
+    private ProductOfferConst|null $offerConst;
 
+    /**
+     * Постоянный уникальный идентификатор варианта
+     */
+    private ProductVariationConst|null $variationConst;
+
+    /**
+     * Постоянный уникальный идентификатор модификации
+     */
+    private ProductModificationConst|null $modificationConst;
 
     public function __construct(YaMarketProductsCardMessage $message)
     {
-        $this->id = $message->getId();
-        $this->event = $message->getEvent();
-        $this->last = $message->getLast();
+        $this->profile = $message->getProfile();
+        $this->product = $message->getProduct();
+        $this->offerConst = $message->getOfferConst();
+        $this->variationConst = $message->getVariationConst();
+        $this->modificationConst = $message->getModificationConst();
     }
 
-
     /**
-     * Идентификатор
+     * Profile
      */
-    public function getId(): YaMarketProductsCardUid
+    public function getProfile(): UserProfileUid
     {
-        return $this->id;
+        return $this->profile;
     }
 
-
     /**
-     * Идентификатор события
+     * Product
      */
-    public function getEvent(): YaMarketProductsCardEventUid
+    public function getProduct(): ProductUid
     {
-        return $this->event;
+        return $this->product;
     }
 
+    /**
+     * OfferConst
+     */
+    public function getOfferConst(): ?ProductOfferConst
+    {
+        return $this->offerConst;
+    }
 
     /**
-     * Идентификатор предыдущего события
+     * VariationConst
      */
-    public function getLast(): ?YaMarketProductsCardEventUid
+    public function getVariationConst(): ?ProductVariationConst
     {
-        return $this->last;
+        return $this->variationConst;
+    }
+
+    /**
+     * ModificationConst
+     */
+    public function getModificationConst(): ?ProductModificationConst
+    {
+        return $this->modificationConst;
     }
 }

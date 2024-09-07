@@ -33,5 +33,5 @@ interface PaginatorYaMarketProductsCardInterface
 
     public function filter(ProductFilterDTO $filter): self;
 
-    public function findAll(): PaginatorInterface;
+    public function findPaginator(): PaginatorInterface;
 }

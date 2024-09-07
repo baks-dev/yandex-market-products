@@ -25,32 +25,23 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Repository\Card\PaginatorYaMarketProductsCard;
 
-
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Paginator\PaginatorInterface;
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
+use BaksDev\Products\Product\Entity\Product;
 use BaksDev\Products\Product\Forms\ProductFilter\Admin\ProductFilterDTO;
 use BaksDev\Yandex\Market\Products\Entity\Card\YaMarketProductsCard;
 
 final class PaginatorYaMarketProductsCard implements PaginatorYaMarketProductsCardInterface
 {
-    private PaginatorInterface $paginator;
-
-    private DBALQueryBuilder $DBALQueryBuilder;
-
     private ?SearchDTO $search = null;
 
     private ?ProductFilterDTO $filter = null;
 
-
     public function __construct(
-        DBALQueryBuilder $DBALQueryBuilder,
-        PaginatorInterface $paginator,
-    )
-    {
-        $this->paginator = $paginator;
-        $this->DBALQueryBuilder = $DBALQueryBuilder;
-    }
+        private readonly DBALQueryBuilder $DBALQueryBuilder,
+        private readonly PaginatorInterface $paginator,
+    ) {}
 
     public function search(SearchDTO $search): self
     {
@@ -65,12 +56,12 @@ final class PaginatorYaMarketProductsCard implements PaginatorYaMarketProductsCa
     }
 
     /** Метод возвращает пагинатор YaMarketProductsCard */
-    public function findAll(): PaginatorInterface
+    public function findPaginator(): PaginatorInterface
     {
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         $dbal->select('*');
-        $dbal->from(YaMarketProductsCard::class, 'ya_market_products_card');
+        $dbal->from(Product::class, 'product');
 
         /* Поиск */
         if($this->search->getQuery())

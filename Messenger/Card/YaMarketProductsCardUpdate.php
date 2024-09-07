@@ -27,10 +27,11 @@ namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
 use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Card\FindProductYandexMarketRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Update\YandexMarketProductUpdateRequest;
+use BaksDev\Yandex\Market\Products\Mapper\YandexMarketMapper;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
-use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -38,32 +39,37 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 final class YaMarketProductsCardUpdate
 {
-    /** Свойства карточки товара */
-    private iterable $property;
-
-    private YandexMarketProductUpdateRequest $marketProductUpdate;
     private LoggerInterface $logger;
-    private YaMarketProductsCardInterface $marketProductsCard;
-    private YandexMarketProductRequest $yandexMarketProductRequest;
-    private MessageDispatchInterface $messageDispatch;
-    private AppLockInterface $appLock;
+
+    //
+    //    /** Свойства карточки товара */
+    //    private iterable $property;
+    //
+    //    private YandexMarketProductUpdateRequest $marketProductUpdate;
+    //
+    //    private YaMarketProductsCardInterface $marketProductsCard;
+    //    private FindProductYandexMarketRequest $yandexMarketProductRequest;
+    //    private MessageDispatchInterface $messageDispatch;
+    //    private AppLockInterface $appLock;
 
     public function __construct(
-        #[AutowireIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')] iterable $property,
-        YandexMarketProductRequest $yandexMarketProductRequest,
-        YandexMarketProductUpdateRequest $marketProductUpdate,
-        YaMarketProductsCardInterface $marketProductsCard,
+        #[AutowireIterator('baks.ya.product.property', defaultPriorityMethod: 'priority')] private readonly iterable $property,
+        private readonly FindProductYandexMarketRequest $yandexMarketProductRequest,
+        private readonly YandexMarketProductUpdateRequest $marketProductUpdate,
+        private readonly YaMarketProductsCardInterface $marketProductsCard,
+        private readonly YandexMarketMapper $yandexMarketMapper,
+        private readonly MessageDispatchInterface $messageDispatch,
+        private readonly AppLockInterface $appLock,
         LoggerInterface $yandexMarketProductsLogger,
-        MessageDispatchInterface $messageDispatch,
-        AppLockInterface $appLock
     ) {
-        $this->marketProductUpdate = $marketProductUpdate;
-        $this->property = $property;
+        //        $this->marketProductUpdate = $marketProductUpdate;
+        //        $this->property = $property;
+        //        $this->marketProductsCard = $marketProductsCard;
+        //        $this->yandexMarketProductRequest = $yandexMarketProductRequest;
+        //        $this->messageDispatch = $messageDispatch;
+        //        $this->appLock = $appLock;
+
         $this->logger = $yandexMarketProductsLogger;
-        $this->marketProductsCard = $marketProductsCard;
-        $this->yandexMarketProductRequest = $yandexMarketProductRequest;
-        $this->messageDispatch = $messageDispatch;
-        $this->appLock = $appLock;
     }
 
     /**
@@ -71,7 +77,12 @@ final class YaMarketProductsCardUpdate
      */
     public function __invoke(YaMarketProductsCardMessage $message): void
     {
-        $Card = $this->marketProductsCard->findByCard($message->getId());
+        $Card = $this->marketProductsCard
+            ->forProduct($message->getProduct())
+            ->forOfferConst($message->getOfferConst())
+            ->forVariationConst($message->getVariationConst())
+            ->forModificationConst($message->getModificationConst())
+            ->find();
 
         if(!$Card)
         {
@@ -85,29 +96,12 @@ final class YaMarketProductsCardUpdate
             return;
         }
 
-        $request = null;
-
-        /** @var YaMarketProductPropertyInterface $item */
-        foreach($this->property as $item)
-        {
-            $value = $item->getData($Card);
-
-            if($value === null)
-            {
-                continue;
-            }
-
-            $request[$item->getValue()] = $item->getData($message->getId());
-        }
-
-        if(!$request)
-        {
-            return;
-        }
+        /** Гидрируем карточку на свойства запроса */
+        $request = $this->yandexMarketMapper->getData($Card);
 
         /** Лимит: 600 запросов в минуту, добавляем лок на 0.6 сек */
         $lock = $this->appLock
-            ->createLock([$Card['profile'], self::class])
+            ->createLock([$message->getProfile(), self::class])
             ->lifetime((60 / 600))
             ->waitAllTime();
 
@@ -135,7 +129,7 @@ final class YaMarketProductsCardUpdate
 
 
         $this->marketProductUpdate
-            ->profile($Card['profile'])
+            ->profile($message->getProfile())
             ->update($request);
 
         $this->logger->info(sprintf('Обновили карточку товара %s', $request['offerId']));

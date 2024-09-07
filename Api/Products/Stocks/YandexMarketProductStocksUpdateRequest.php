@@ -25,13 +25,13 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 
+use App\Kernel;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
 use InvalidArgumentException;
 
 final class YandexMarketProductStocksUpdateRequest extends YandexMarket
 {
-
     private ?string $article = null;
 
     private int $total = 0;
@@ -56,8 +56,13 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
      * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/stocks/updateStocks
      *
      */
-    public function update()
+    public function update(): bool
     {
+        if(Kernel::isTestEnvironment())
+        {
+            return true;
+        }
+
         if(empty($this->article))
         {
             throw new InvalidArgumentException('Invalid Argument article');
@@ -96,7 +101,7 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
             );
         }
 
-        return $response->toArray(false);
+        return true;
 
     }
 

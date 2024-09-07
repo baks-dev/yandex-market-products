@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\UseCase\Settings\Delete;
 
-
 use BaksDev\Core\Entity\AbstractHandler;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
 use BaksDev\Yandex\Market\Products\Entity\Settings\YaMarketProductsSettings;
@@ -34,11 +33,9 @@ use DomainException;
 
 final class DeleteYaMarketProductsSettingsHandler extends AbstractHandler
 {
-
     public function handle(
         DeleteYaMarketProductsSettingsDTO $command,
-    ): string|YaMarketProductsSettings
-    {
+    ): string|YaMarketProductsSettings {
 
 
         /** Валидация DTO  */

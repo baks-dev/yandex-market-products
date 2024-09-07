@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Products\Card\Tests;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Card\FindProductYandexMarketRequest;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
@@ -51,12 +51,12 @@ final class YandexMarketProductTest extends KernelTestCase
 
     public function testUseCase(): void
     {
-        /** @var YandexMarketProductRequest $YandexMarketProductRequest */
-        $YandexMarketProductRequest = self::getContainer()->get(YandexMarketProductRequest::class);
+        /** @var FindProductYandexMarketRequest $FindProductYandexMarketRequest */
+        $FindProductYandexMarketRequest = self::getContainer()->get(FindProductYandexMarketRequest::class);
 
-        $YandexMarketProductRequest->TokenHttpClient(self::$Authorization);
+        $FindProductYandexMarketRequest->TokenHttpClient(self::$Authorization);
 
-        $YandexMarketProduct = $YandexMarketProductRequest->article('TEST-ARTICLE')->find();
+        $YandexMarketProduct = $FindProductYandexMarketRequest->article('TEST-ARTICLE')->find();
 
         self::assertIsBool($YandexMarketProduct->valid());
 

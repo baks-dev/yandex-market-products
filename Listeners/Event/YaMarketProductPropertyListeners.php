@@ -25,10 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Listeners\Event;
 
-
-use BaksDev\Yandex\Market\Orders\Type\OrderStatus\Status\Collection\WbOrderStatusCollection;
-use BaksDev\Yandex\Market\Orders\Type\OrderStatus\WbOrderStatusType;
-use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyCollection;
+use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyCollection;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductPropertyType;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -42,7 +39,6 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 #[AsEventListener(event: ConsoleEvents::COMMAND)]
 final class YaMarketProductPropertyListeners
 {
-
     private YaMarketProductPropertyCollection $collection;
 
 

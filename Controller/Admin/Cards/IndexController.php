@@ -73,7 +73,7 @@ final class IndexController extends AbstractController
         $query = $paginatorYaMarketProductsCard
             ->filter($filter)
             ->search($search)
-            ->findAll();
+            ->findPaginator();
 
 
         return $this->render(

@@ -24,8 +24,8 @@ use BaksDev\Products\Category\Repository\PropertyFieldsCategoryChoice\PropertyFi
 use BaksDev\Products\Category\Repository\PropertyFieldsCategoryChoice\VariationCategoryProductSectionField\VariationCategoryProductSectionFieldInterface;
 use BaksDev\Yandex\Market\Products\Api\Reference\Parameters\YandexMarketParametersDTO;
 use BaksDev\Yandex\Market\Products\Api\Reference\Parameters\YandexMarketParametersRequest;
-use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyCollection;
-use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyCollection;
+use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductProperty;
 use BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit\Parameters\YaMarketProductsSettingsParametersDTO;
 use BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit\Property\YaMarketProductsSettingsPropertyDTO;
@@ -45,10 +45,8 @@ final class YaMarketProductsSettingsForm extends AbstractType
         private readonly VariationCategoryProductSectionFieldInterface $variationCategoryProductSectionField,
         private readonly ModificationCategoryProductSectionFieldInterface $modificationCategoryProductSectionField,
         private readonly PropertyFieldsCategoryChoiceInterface $propertyFields,
-
         private readonly YaMarketProductPropertyCollection $marketProductPropertyCollection,
         private readonly YandexMarketParametersRequest $marketParametersRequest,
-
         private readonly TokenStorageInterface $tokenStorage
     ) {}
 

@@ -12,9 +12,11 @@
 namespace BaksDev\Yandex\Market\Products\Command;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\ProductYaMarketCard\ProductsYaMarketCardInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -39,7 +41,8 @@ class YaMarketPostCardStocksCommand extends Command
 
     public function __construct(
         private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
-        private readonly ProductsYaMarketCardInterface $productsYaMarketCard,
+        private readonly AllProductsIdentifierInterface $allProductsIdentifier,
+        private readonly YaMarketProductsCardInterface $marketProductsCard,
         private readonly MessageDispatchInterface $messageDispatch
     ) {
         parent::__construct();
@@ -114,32 +117,53 @@ class YaMarketPostCardStocksCommand extends Command
 
     public function update(UserProfileUid $profile, ?string $article = null): void
     {
-        $this->io->note(sprintf('Обновили профиль %s', $profile->getAttr()));
+        $this->io->note(sprintf('Обновляем профиль %s', $profile->getAttr()));
 
-        /** Получаем все имеющиеся карточки профиля */
-        $YaMarketProductsCardMarket = $this->productsYaMarketCard
-            ->whereProfile($profile)
-            ->findAll();
+        /* Получаем все имеющиеся карточки в системе */
+        $products = $this->allProductsIdentifier->findAll();
 
-        foreach($YaMarketProductsCardMarket as $card)
+        if($products === false)
         {
-            /** Если передан артикул - фильтруем по вхождению */
-            if(isset($article) && stripos($card['sku'], $article) === false)
+            $this->io->warning('Карточек для обновления не найдено');
+            return;
+        }
+
+
+        foreach($products as $product)
+        {
+            $card = $this->marketProductsCard
+                ->forProduct($product['product_id'])
+                ->forOfferConst($product['offer_const'])
+                ->forVariationConst($product['variation_const'])
+                ->forModificationConst($product['modification_const'])
+                ->find();
+
+            /**
+             * Если передан артикул - применяем фильтр по вхождению
+             */
+            if(!empty($article))
             {
-                continue;
+                /** Пропускаем обновление, если соответствие не найдено */
+                if($card === false || stripos($card['article'], $article) === false)
+                {
+                    continue;
+                }
             }
 
-            $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage(
-                new YaMarketProductsCardMessage(
-                    $card['main'],
-                    $card['event'],
-                )
+            $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
+                $profile,
+                $product['product_id'],
+                $product['offer_const'],
+                $product['variation_const'],
+                $product['modification_const'],
             );
+
+            $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
 
             /** Консольную комманду выполняем синхронно */
             $this->messageDispatch->dispatch($YaMarketProductsStocksMessage);
 
-            $this->io->text(sprintf('Обновили артикул %s', $card['sku']));
+            $this->io->text(sprintf('Обновили артикул %s', $card['article']));
         }
     }
 }

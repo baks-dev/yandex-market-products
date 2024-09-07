@@ -2,7 +2,8 @@
 
 namespace BaksDev\Yandex\Market\Products\Type\Settings\Property;
 
-use BaksDev\Yandex\Market\Products\Type\Settings\Property\Properties\Collection\YaMarketProductPropertyInterface;
+
+use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
 use InvalidArgumentException;
 
 final class YaMarketProductProperty
@@ -56,7 +57,7 @@ final class YaMarketProductProperty
 
     public function __toString(): string
     {
-        return $this->property ? $this->property->getvalue() : '';
+        return $this->property ? $this->property->getIndex() : '';
     }
 
     public function getYaMarketProductProperty(): ?YaMarketProductPropertyInterface
@@ -66,7 +67,7 @@ final class YaMarketProductProperty
 
     public function getYaMarketProductPropertyValue(): string
     {
-        return $this->property->getValue();
+        return $this->property->getIndex();
     }
 
 

@@ -18,7 +18,6 @@
 
 namespace BaksDev\Yandex\Market\Products\UseCase\Settings\Delete\Modify;
 
-
 use BaksDev\Core\Type\Modify\Modify\ModifyActionDelete;
 use BaksDev\Core\Type\Modify\ModifyAction;
 use BaksDev\Core\Type\Modify\Modify\ModifyActionNew;
@@ -44,4 +43,3 @@ final class ModifyDTO implements YaMarketProductsSettingsModifyInterface
         return $this->action;
     }
 }
-

@@ -33,7 +33,6 @@ use DomainException;
 
 final class YaMarketProductsSettingsHandler extends AbstractHandler
 {
-
     /** @see ProductsSettings */
     public function handle(YaMarketProductsSettingsDTO $command): string|YaMarketProductsSettings
     {

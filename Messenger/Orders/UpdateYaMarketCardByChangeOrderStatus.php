@@ -27,49 +27,90 @@ namespace BaksDev\Yandex\Market\Products\Messenger\Orders;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
+use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
+use BaksDev\Orders\Order\UseCase\Admin\Edit\EditOrderDTO;
+use BaksDev\Orders\Order\UseCase\Admin\Edit\Products\OrderProductDTO;
+use BaksDev\Products\Product\Repository\CurrentProductIdentifier\CurrentProductIdentifierInterface;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
-use BaksDev\Yandex\Market\Products\Repository\Card\OrderYaMarketCard\OrderProductsYaMarketCardInterface;
+use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 #[AsMessageHandler]
 final class UpdateYaMarketCardByChangeOrderStatus
 {
-    private MessageDispatchInterface $messageDispatch;
-    private OrderProductsYaMarketCardInterface $orderProductsYaMarketCard;
-
     public function __construct(
-        OrderProductsYaMarketCardInterface $orderProductsYaMarketCard,
-        MessageDispatchInterface $messageDispatch,
-    ) {
-        $this->orderProductsYaMarketCard = $orderProductsYaMarketCard;
-        $this->messageDispatch = $messageDispatch;
-    }
+        private readonly CurrentOrderEventInterface $currentOrderEvent,
+        private readonly CurrentProductIdentifierInterface $currentProductIdentifier,
+        private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+        private readonly MessageDispatchInterface $messageDispatch,
+    ) {}
 
     /**
      * Обновляем остатки YandexMarket при изменении статусов заказов
      */
     public function __invoke(OrderMessage $message): void
     {
-        /** Получаем идентификаторы карточек YandexMarket товаров в заказе */
-        $cards = $this->orderProductsYaMarketCard->findAll($message->getId());
+        /**  Получаем активные токены профилей пользователя */
 
-        foreach($cards as $card)
+        $profiles = $this
+            ->allProfileYaMarketToken
+            ->onlyActiveToken()
+            ->findAll();
+
+
+        if($profiles->valid() === false)
         {
-            if(empty($card['main']))
+            return;
+        }
+
+
+        /** Получаем событие заказа */
+        $OrderEvent = $this->currentOrderEvent->forOrder($message->getId())->find();
+
+        if($OrderEvent === false)
+        {
+            return;
+        }
+
+        $EditOrderDTO = new EditOrderDTO();
+        $OrderEvent->getDto($EditOrderDTO);
+
+
+        foreach($profiles as $profile)
+        {
+            /** @var OrderProductDTO $product */
+            foreach($EditOrderDTO->getProduct() as $product)
             {
-                continue;
+                /** Получаем идентификаторы обновляемой продукции для получения констант  */
+                $ProductIdentifier = $this->currentProductIdentifier
+                    ->forEvent($product->getProduct())
+                    ->forOffer($product->getOffer())
+                    ->forVariation($product->getVariation())
+                    ->forModification($product->getModification())
+                    ->find();
+
+                if($ProductIdentifier === false)
+                {
+                    continue;
+                }
+
+                $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
+                    $profile,
+                    $ProductIdentifier['id'],
+                    $ProductIdentifier['offer_const'],
+                    $ProductIdentifier['variation_const'],
+                    $ProductIdentifier['modification_const']
+                );
+
+                /** Добавляем в очередь обновление остатков через транспорт профиля */
+                $this->messageDispatch->dispatch(
+                    message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
+                    stamps: [new DelayStamp(3000)], // задержка 3 сек для обновления карточки
+                    transport: $profile
+                );
             }
-
-            $YaMarketProductsCardMessage = new YaMarketProductsCardMessage($card['main'], $card['event']);
-
-            /** Добавляем в очередь обновление остатков через транспорт профиля */
-            $this->messageDispatch->dispatch(
-                message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
-                stamps: [new DelayStamp(3000)], // задержка 3 сек для обновления карточки
-                transport: $card['profile']
-            );
         }
     }
 }

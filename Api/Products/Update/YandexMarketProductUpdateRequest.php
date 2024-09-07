@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Products\Update;
 
+use App\Kernel;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -45,8 +46,13 @@ final class YandexMarketProductUpdateRequest extends YandexMarket
      * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/business-assortment/updateOfferMappings
      *
      */
-    public function update(array $card)
+    public function update(array $card): bool
     {
+        if(Kernel::isTestEnvironment())
+        {
+            return true;
+        }
+
         $response = $this->TokenHttpClient()
             ->request(
                 'POST',
@@ -69,6 +75,6 @@ final class YandexMarketProductUpdateRequest extends YandexMarket
             );
         }
 
-        return $response->toArray(false);
+        return true;
     }
 }

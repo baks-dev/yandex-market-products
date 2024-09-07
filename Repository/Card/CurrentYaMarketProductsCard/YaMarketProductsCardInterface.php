@@ -23,10 +23,25 @@
 
 namespace BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard;
 
+use BaksDev\Products\Product\Entity\Product;
+use BaksDev\Products\Product\Type\Id\ProductUid;
+use BaksDev\Products\Product\Type\Offers\ConstId\ProductOfferConst;
+use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst;
+use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 
 interface YaMarketProductsCardInterface
 {
+    public function forProduct(Product|ProductUid|string $product): self;
+
+    public function forOfferConst(ProductOfferConst|string|null $offerConst): self;
+
+    public function forVariationConst(ProductVariationConst|string|null $variationConst): self;
+
+    public function forModificationConst(ProductModificationConst|string|null $modificationConst): self;
+
+    public function find(): array|false;
+
     /**
      * Метод получает активную карточку по идентификатору
      */

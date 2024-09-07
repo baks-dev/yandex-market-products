@@ -31,8 +31,9 @@ use BaksDev\Products\Stocks\Entity\Products\ProductStockProduct;
 use BaksDev\Products\Stocks\Messenger\ProductStockMessage;
 use BaksDev\Products\Stocks\Repository\ProductStocksById\ProductStocksByIdInterface;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusIncoming;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
-use BaksDev\Yandex\Market\Products\Repository\Card\CardByCriteria\YaMarketProductsCardByCriteriaInterface;
+use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -40,28 +41,32 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
 #[AsMessageHandler]
 final class UpdateStocksYaMarketByIncoming
 {
-    private ProductStocksByIdInterface $productStocks;
-    private EntityManagerInterface $entityManager;
-    private MessageDispatchInterface $messageDispatch;
-    private YaMarketProductsCardByCriteriaInterface $cardByCriteria;
-
     public function __construct(
-        ProductStocksByIdInterface $productStocks,
-        EntityManagerInterface $entityManager,
-        MessageDispatchInterface $messageDispatch,
-        YaMarketProductsCardByCriteriaInterface $cardByCriteria
-    ) {
-        $this->productStocks = $productStocks;
-        $this->entityManager = $entityManager;
-        $this->messageDispatch = $messageDispatch;
-        $this->cardByCriteria = $cardByCriteria;
-    }
+        private readonly ProductStocksByIdInterface $productStocks,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly MessageDispatchInterface $messageDispatch,
+        private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+    ) {}
 
     /**
-     * Обновляет складские остатки при поступлении продукции на склад
+     * Обновляет остатки при поступлении продукции на склад
      */
     public function __invoke(ProductStockMessage $message): void
     {
+
+        /**  Получаем активные токены профилей пользователя */
+
+        $profiles = $this
+            ->allProfileYaMarketToken
+            ->onlyActiveToken()
+            ->findAll();
+
+
+        if($profiles->valid() === false)
+        {
+            return;
+        }
+
         /** Получаем статус заявки */
         $ProductStockEvent = $this->entityManager
             ->getRepository(ProductStockEvent::class)
@@ -90,28 +95,28 @@ final class UpdateStocksYaMarketByIncoming
             return;
         }
 
-        /** Идентификатор профиля склада при поступлении */
-        $UserProfileUid = $ProductStockEvent->getProfile();
-
-        /** @var ProductStockProduct $product */
-        foreach($products as $product)
+        foreach($profiles as $profile)
         {
-            $YaMarketProductsCardMessage = $this->cardByCriteria
-                ->product($product->getProduct())
-                ->offer($product->getOffer())
-                ->variation($product->getVariation())
-                ->modification($product->getModification())
-                ->findByProfile($UserProfileUid);
-
-            if($YaMarketProductsCardMessage)
+            /** @var ProductStockProduct $product */
+            foreach($products as $product)
             {
+                $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
+                    $profile,
+                    $product->getProduct(),
+                    $product->getOffer(),
+                    $product->getVariation(),
+                    $product->getModification()
+                );
+
                 /** Транспорт yandex-market-products чтобы не мешать общей очереди */
                 $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
+
                 $this->messageDispatch->dispatch(
                     $YaMarketProductsStocksMessage,
                     stamps: [new DelayStamp(2000)], // задержка 2 сек для обновления карточки
                     transport: 'yandex-market-products'
                 );
+
             }
         }
     }

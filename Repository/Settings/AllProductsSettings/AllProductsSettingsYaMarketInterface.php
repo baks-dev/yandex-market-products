@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2023.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,15 @@
  *  THE SOFTWARE.
  */
 
-namespace BaksDev\Yandex\Market\Products\Repository\Card\OrderYaMarketCard;
+namespace BaksDev\Yandex\Market\Products\Repository\Settings\AllProductsSettings;
 
-use BaksDev\Orders\Order\Entity\Order;
-use BaksDev\Orders\Order\Type\Id\OrderUid;
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Core\Form\Search\SearchDTO;
+use BaksDev\Core\Services\Paginator\PaginatorInterface;
 
-interface OrderProductsYaMarketCardInterface
+interface AllProductsSettingsYaMarketInterface
 {
-    /**
-     * Метод получает все товары, имеющиеся в заказе
-     */
-    public function findAll(Order|OrderUid|string $order): ?array;
+    public function search(SearchDTO $search): self;
+
+    /** Метод возвращает пагинатор WbProductsSettings */
+    public function findPaginator(): PaginatorInterface;
 }

@@ -87,7 +87,7 @@ final class UpdateYaMarketCardByChangeProduct
                 /** Транспорт async чтобы не мешать общей очереди */
                 $this->messageDispatch->dispatch(
                     message: $YaMarketProductsCardMessage,
-                    transport: $profile
+                    transport: (string) $profile
                 );
             }
         }

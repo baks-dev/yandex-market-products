@@ -30,7 +30,6 @@ use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
 use BaksDev\Products\Product\Forms\ProductFilter\Admin\ProductFilterDTO;
 use BaksDev\Products\Product\Forms\ProductFilter\Admin\ProductFilterForm;
 use BaksDev\Yandex\Market\Products\Repository\Card\PaginatorYaMarketProductsCard\PaginatorYaMarketProductsCardInterface;
-use BaksDev\Yandex\Market\Products\Repository\Cards\AllWbProductCard\AllWbProductCardInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;

@@ -16,11 +16,9 @@ use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentif
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
-use BaksDev\Yandex\Market\Products\Repository\Card\ProductYaMarketCard\ProductsYaMarketCardInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -58,7 +56,7 @@ class YaMarketPostUpdateCardCommand extends Command
 
         /** Получаем активные токены авторизации профилей Yandex Market */
         $profiles = $this->allProfileYaMarketToken
-            ->onlyActiveToken()
+            //->onlyActiveToken()
             ->findAll();
 
         $profiles = iterator_to_array($profiles);
@@ -162,7 +160,6 @@ class YaMarketPostUpdateCardCommand extends Command
 
             $this->io->text(sprintf('Обновили артикул %s', $card['article']));
 
-            sleep(1);
 
         }
     }

@@ -29,9 +29,9 @@ use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Products\Product\Entity\Info\ProductInfo;
 use BaksDev\Products\Product\Entity\Product;
 
-final class AllProductsTagRepository implements AllProductsTagInterface
+final readonly class AllProductsTagRepository implements AllProductsTagInterface
 {
-    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
+    public function __construct(private DBALQueryBuilder $DBALQueryBuilder) {}
 
     /**
      * Метод получает все теги (корневые артикулы) продукции

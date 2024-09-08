@@ -82,7 +82,7 @@ final class YaMarketProductsStocksUpdate
             ->article($Card['article'])
             ->find();
 
-        $product_quantity = max($Card['product_quantity'], 0);
+        $product_quantity = isset($Card['product_quantity']) ? max($Card['product_quantity'], 0) : 0;
 
         if($ProductStocks === $product_quantity)
         {

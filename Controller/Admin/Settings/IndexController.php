@@ -27,7 +27,7 @@ use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Form\Search\SearchForm;
 use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
-use BaksDev\Yandex\Market\Products\Repository\Settings\AllProductsSettings\AllProductsSettingsInterface;
+use BaksDev\Yandex\Market\Products\Repository\Settings\AllProductsSettings\AllProductsSettingsYaMarketInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -43,26 +43,26 @@ final class IndexController extends AbstractController
     #[Route('/admin/ya/market/product/settings/{page<\d+>}', name: 'admin.settings.index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
-        AllProductsSettingsInterface $allProductsSettings,
+        AllProductsSettingsYaMarketInterface $allProductsSettings,
         int $page = 0,
-    ): Response
-    {
+    ): Response {
+
         /* Поиск */
         $search = new SearchDTO();
-        $searchForm = $this->createForm(SearchForm::class, $search,
+        $searchForm = $this->createForm(
+            SearchForm::class,
+            $search,
             ['action' => $this->generateUrl('yandex-market-products:admin.settings.index')]
         );
         $searchForm->handleRequest($request);
 
         /* Получаем список */
-        $query = $allProductsSettings->fetchAllProductsSettingsAssociative($search);
+        $query = $allProductsSettings->findPaginator($search);
 
-        return $this->render(
-            [
-                'query'  => $query,
-                'search' => $searchForm->createView(),
-            ],
-        );
+        return $this->render([
+            'query' => $query,
+            'search' => $searchForm->createView(),
+        ]);
     }
 
 }

@@ -36,12 +36,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[RoleSecurity('ROLE_YA_MARKET_PRODUCTS_SETTING_NEW')]
 final class PreFormController extends AbstractController
 {
-
     #[Route('/admin/ya/market/product/setting/preforms', name: 'admin.settings.preform', methods: ['POST', 'GET'])]
     public function delete(
         Request $request,
-    ): Response
-    {
+    ): Response {
+
         $PreformDTO = new PreformDTO();
 
         $form = $this->createForm(PreformForm::class, $PreformDTO, [
@@ -55,7 +54,8 @@ final class PreFormController extends AbstractController
             $this->refreshTokenForm($form);
 
             return $this->redirectToRoute(
-                'yandex-market-products:admin.settings.newedit.new', ['id' => $PreformDTO->category, 'market' => $PreformDTO->market->getId()]
+                'yandex-market-products:admin.settings.newedit.new',
+                ['id' => $PreformDTO->category, 'market' => $PreformDTO->market->getId()]
             );
         }
 

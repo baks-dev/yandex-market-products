@@ -44,6 +44,7 @@ final class FindProductYandexMarketRequest extends YandexMarket
     public function article(string|array $article): self
     {
         $this->nextPageToken = null;
+        $this->tags = false;
         $this->article = $article;
         return $this;
     }
@@ -52,6 +53,7 @@ final class FindProductYandexMarketRequest extends YandexMarket
     public function forTag(string|array $tag): self
     {
         $this->nextPageToken = null;
+        $this->article = false;
         $this->tags = $tag;
         return $this;
     }
@@ -126,6 +128,12 @@ final class FindProductYandexMarketRequest extends YandexMarket
 
         foreach($content['result']['offerMappings'] as $offer)
         {
+            // NO_CARD_PROCESSING — Проверяем данные.
+            if($offer['offer']['cardStatus'] === 'NO_CARD_PROCESSING')
+            {
+                continue;
+            }
+
             yield new YandexMarketProductDTO($this->getProfile(), $offer['offer']);
         }
 

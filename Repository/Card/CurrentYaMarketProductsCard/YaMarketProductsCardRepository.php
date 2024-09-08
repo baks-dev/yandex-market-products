@@ -64,7 +64,7 @@ use InvalidArgumentException;
 
 final class YaMarketProductsCardRepository implements YaMarketProductsCardInterface
 {
-    public function __construct(private DBALQueryBuilder $DBALQueryBuilder) {}
+    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
 
     /**
      * ID продукта
@@ -791,17 +791,6 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
             ->enableCache('products-product', 5)
             ->fetchAssociative() ?: false;
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**

@@ -25,8 +25,10 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Products\Card\Tests;
 
+use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\FindProductYandexMarketRequest;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
@@ -51,14 +53,43 @@ final class YandexMarketProductTest extends KernelTestCase
 
     public function testUseCase(): void
     {
+
+        /**   */
+
+        /** @var AllProductsIdentifierInterface $AllProductsIdentifier */
+        $AllProductsIdentifier = self::getContainer()->get(AllProductsIdentifierInterface::class);
+
+        /** @var YaMarketProductsCardInterface $YaMarketProductsCard */
+        $YaMarketProductsCard = self::getContainer()->get(YaMarketProductsCardInterface::class);
+
         /** @var FindProductYandexMarketRequest $FindProductYandexMarketRequest */
         $FindProductYandexMarketRequest = self::getContainer()->get(FindProductYandexMarketRequest::class);
-
         $FindProductYandexMarketRequest->TokenHttpClient(self::$Authorization);
 
-        $YandexMarketProduct = $FindProductYandexMarketRequest->article('TEST-ARTICLE')->find();
+        foreach($AllProductsIdentifier->findAll() as $product)
+        {
+            $YaMarketCard = $YaMarketProductsCard
+                ->forProduct($product['product_id'])
+                ->forOfferConst($product['offer_const'])
+                ->forVariationConst($product['variation_const'])
+                ->forModificationConst($product['modification_const'])
+                ->find();
 
-        self::assertIsBool($YandexMarketProduct->valid());
+            if($YaMarketCard === false || empty($YaMarketCard['product_price']))
+            {
+                continue;
+            }
+
+            $articles = $FindProductYandexMarketRequest->article($YaMarketCard['article'])->find();
+            self::assertIsBool($articles->valid());
+
+            $tags = $FindProductYandexMarketRequest->forTag($YaMarketCard['product_card'])->find();
+            self::assertIsBool($tags->valid());
+
+            break;
+
+        }
+
 
     }
 }

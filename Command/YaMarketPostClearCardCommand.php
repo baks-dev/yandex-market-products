@@ -11,18 +11,14 @@
 
 namespace BaksDev\Yandex\Market\Products\Command;
 
-use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Repository\ProductByArticle\ProductEventByArticleInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\FindProductYandexMarketRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDeleteRequest;
-use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\AllProductsTag\AllProductsTagInterface;
-use BaksDev\Yandex\Market\Products\Repository\Card\ProductYaMarketCard\ProductsYaMarketCardInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -148,7 +144,9 @@ class YaMarketPostClearCardCommand extends Command
                     if($product === false)
                     {
                         /** Удаляем на YandexMarket отсутствующую карточку */
-                        $this->yandexMarketProductDeleteRequest->delete($card->getArticle());
+                        $this->yandexMarketProductDeleteRequest
+                            ->profile($profile)
+                            ->delete($card->getArticle());
 
                         $this->io->text(sprintf('Удаляем артикул %s', $card->getArticle()));
                     }

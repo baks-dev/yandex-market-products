@@ -23,10 +23,6 @@
 
 namespace BaksDev\Yandex\Market\Products\Controller\Admin\Settings;
 
-//use App\Module\User\Profile\UserProfile\Type\Id\UserProfileUid;
-//use App\Module\Wildberries\Rest\Api\Reference\ConfigCard\ConfigCard;
-//use App\Module\Wildberries\Rest\Api\Reference\Сharacteristics\CharacteristicByName;
-//use App\Module\Wildberries\Rest\Auth\WbTokenAuth;
 use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
@@ -48,10 +44,7 @@ final class EditController extends AbstractController
         Request $request,
         #[MapEntity] YaMarketProductsSettingsEvent $Event,
         YaMarketProductsSettingsHandler $productsSettingsHandler,
-    ): Response
-    {
-
-
+    ): Response {
 
         $SettingsDTO = new YaMarketProductsSettingsDTO();
         $Event->getDto($SettingsDTO);
@@ -79,10 +72,7 @@ final class EditController extends AbstractController
 
         }
 
-        return $this->render([
-            'form' => $form->createView(),
-            //'name' => $Event->getName()
-        ]);
+        return $this->render(['form' => $form->createView()]);
 
     }
 

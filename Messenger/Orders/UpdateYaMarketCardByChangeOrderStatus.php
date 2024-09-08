@@ -108,7 +108,7 @@ final class UpdateYaMarketCardByChangeOrderStatus
                 $this->messageDispatch->dispatch(
                     message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
                     stamps: [new DelayStamp(3000)], // задержка 3 сек для обновления карточки
-                    transport: $profile
+                    transport: (string) $profile
                 );
             }
         }

@@ -28,30 +28,19 @@ namespace BaksDev\Yandex\Market\Products\Repository\Settings\AllProductsSettings
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Paginator\PaginatorInterface;
-use BaksDev\Core\Services\Switcher\SwitcherInterface;
-use BaksDev\Core\Type\Locale\Locale;
+use BaksDev\Products\Category\Entity\CategoryProduct;
 use BaksDev\Products\Category\Entity\Cover\CategoryProductCover;
 use BaksDev\Products\Category\Entity\Event\CategoryProductEvent;
-use BaksDev\Products\Category\Entity\CategoryProduct;
 use BaksDev\Products\Category\Entity\Trans\CategoryProductTrans;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
 use BaksDev\Yandex\Market\Products\Entity\Settings\YaMarketProductsSettings;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class AllProductsSettingsRepository implements AllProductsSettingsInterface
+final class AllProductsSettingsYaMarketRepository implements AllProductsSettingsYaMarketInterface
 {
-    private PaginatorInterface $paginator;
-
-    private DBALQueryBuilder $DBALQueryBuilder;
-
     public function __construct(
-        DBALQueryBuilder $DBALQueryBuilder,
-        PaginatorInterface $paginator
-    )
-    {
-        $this->paginator = $paginator;
-        $this->DBALQueryBuilder = $DBALQueryBuilder;
-    }
+        private readonly DBALQueryBuilder $DBALQueryBuilder,
+        private readonly PaginatorInterface $paginator
+    ) {}
 
     private ?SearchDTO $search = null;
 
@@ -64,13 +53,12 @@ final class AllProductsSettingsRepository implements AllProductsSettingsInterfac
 
 
     /** Метод возвращает пагинатор WbProductsSettings */
-    public function fetchAllProductsSettingsAssociative(): PaginatorInterface
+    public function findPaginator(): PaginatorInterface
     {
 
         $dbal = $this->DBALQueryBuilder
             ->createQueryBuilder(self::class)
-            ->bindLocal()
-        ;
+            ->bindLocal();
 
         $dbal->select('settings.id');
         $dbal->addSelect('settings.event');
@@ -95,8 +83,7 @@ final class AllProductsSettingsRepository implements AllProductsSettingsInterfac
         /** События категории */
         $dbal->addSelect('category_event.sort');
 
-        $dbal->join
-        (
+        $dbal->join(
             'category',
             CategoryProductEvent::class,
             'category_event',
@@ -114,7 +101,8 @@ final class AllProductsSettingsRepository implements AllProductsSettingsInterfac
         );
 
 
-        $dbal->addSelect("
+        $dbal->addSelect(
+            "
 			CASE
 			   WHEN category_cover.name IS NOT NULL THEN
 					CONCAT ( '/upload/".$dbal->table(CategoryProductCover::class)."' , '/', category_cover.name)

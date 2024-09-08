@@ -130,16 +130,14 @@ final class YaMarketProductsPriceUpdate
             $Card['weight'],
         ]);
 
+        /** Лимит: 100 запросов в минуту, добавляем лок */
+        $this->appLock
+            ->createLock([$message->getProfile(), self::class])
+            ->lifetime((60 / 100))
+            ->waitAllTime();
+
 
         $marketCalculator = $cache->get($cacheKey, function (ItemInterface $item) use ($Card, $Money, $message): float {
-
-            /** Лимит: 100 запросов в минуту, добавляем лок */
-            $this->appLock
-                ->createLock([$message->getProfile(), self::class])
-                ->lifetime((60 / 90))
-                ->waitAllTime();
-
-            sleep(1);
 
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 

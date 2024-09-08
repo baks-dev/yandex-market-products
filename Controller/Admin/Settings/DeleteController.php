@@ -23,7 +23,6 @@
 
 namespace BaksDev\Yandex\Market\Products\Controller\Admin\Settings;
 
-//use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
@@ -41,14 +40,13 @@ use Symfony\Component\Routing\Attribute\Route;
 #[RoleSecurity('ROLE_YA_MARKET_PRODUCTS_SETTING_DELETE')]
 final class DeleteController extends AbstractController
 {
-
     #[Route('/admin/ya/market/product/setting/delete/{id}', name: 'admin.settings.delete', methods: ['POST', 'GET'])]
     public function delete(
         Request $request,
         DeleteYaMarketProductsSettingsHandler $ProductSettingsHandler,
         #[MapEntity] YaMarketProductsSettingsEvent $Event,
-    ): Response
-    {
+    ): Response {
+
         $DeleteWbProductSettingsDTO = new DeleteYaMarketProductsSettingsDTO();
         $Event->getDto($DeleteWbProductSettingsDTO);
 
@@ -85,7 +83,7 @@ final class DeleteController extends AbstractController
         return $this->render([
             'form' => $form->createView(),
             //'name' => $Event->getName(),
-        ],);
+        ], );
     }
 
 }

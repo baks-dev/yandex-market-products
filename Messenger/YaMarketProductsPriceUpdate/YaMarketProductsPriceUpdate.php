@@ -96,26 +96,6 @@ final class YaMarketProductsPriceUpdate
             return;
         }
 
-        /** Проверяем, что карточка добавлена */
-        $MarketProduct = $this->yandexMarketProductRequest
-            ->profile($message->getProfile())
-            ->article($Card['article'])
-            ->find();
-
-        /** Если карточка новая - понадобится время на публикацию в маркетплейсе */
-        if(!$MarketProduct->valid())
-        {
-            $this->logger->critical(
-                sprintf('Не обновляем базовую стоимость товара %s: карточка товара в каталоге YaMarket пока не доступна', $Card['article']),
-                [self::class.':'.__LINE__]
-            );
-
-            throw new DomainException('Карточка товара YaMarket не найдена');
-        }
-
-        $Money = new Money($Card['product_price'], true);
-        $Currency = new Currency($Card['product_currency']);
-
 
         /** Кешируем на сутки результат калькуляции услуг с одинаковыми параметрами */
         $cache = $this->appCache->init('yandex-market-products');
@@ -130,14 +110,16 @@ final class YaMarketProductsPriceUpdate
             $Card['weight'],
         ]);
 
-        /** Лимит: 100 запросов в минуту, добавляем лок */
-        $this->appLock
-            ->createLock([$message->getProfile(), self::class])
-            ->lifetime((60 / 100))
-            ->waitAllTime();
-
+        $Money = new Money($Card['product_price'], true);
+        $Currency = new Currency($Card['product_currency']);
 
         $marketCalculator = $cache->get($cacheKey, function (ItemInterface $item) use ($Card, $Money, $message): float {
+
+            /** Лимит: 100 запросов в минуту, добавляем лок */
+            $this->appLock
+                ->createLock([$message->getProfile(), self::class])
+                ->lifetime((60 / 90))
+                ->waitAllTime();
 
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
@@ -153,31 +135,46 @@ final class YaMarketProductsPriceUpdate
                 ->calc();
         });
 
-        /** @var YandexMarketProductDTO $YandexMarketProductDTO */
-        $YandexMarketProductDTO = $MarketProduct->current();
+
+        /**
+         * Проверяем изменение цены в карточке если добавлена ранее
+         */
+
         $Price = new Money($marketCalculator);
 
-        /** Обновляем базовую стоимость товара если цена изменилась */
-        if(false === $YandexMarketProductDTO->getPrice()->equals($Price))
-        {
-            $this->marketProductPriceRequest
-                ->profile($message->getProfile())
-                ->article($Card['article'])
-                ->price($Price)
-                ->currency($Currency)
-                ->update();
+        $MarketProduct = $this->yandexMarketProductRequest
+            ->profile($message->getProfile())
+            ->article($Card['article'])
+            ->find();
 
-            $this->logger->info(
-                sprintf(
-                    'Обновили стоимость товара %s (%s) : %s => %s %s',
-                    $Card['article'],
-                    $Money->getValue(), // стоимость в карточке
-                    $YandexMarketProductDTO->getPrice()->getValue(), // предыдущая стоимость на маркетплейс
-                    $Price->getValue(), // новая стоимость на маркетплейс
-                    $Currency->getCurrencyValueUpper()
-                ),
-                [self::class.':'.__LINE__]
-            );
+        if($MarketProduct->valid())
+        {
+            /** @var YandexMarketProductDTO $YandexMarketProductDTO */
+            $YandexMarketProductDTO = $MarketProduct->current();
+
+            if(true === $YandexMarketProductDTO->getPrice()->equals($Price))
+            {
+                return;
+            }
         }
+
+        $this->marketProductPriceRequest
+            ->profile($message->getProfile())
+            ->article($Card['article'])
+            ->price($Price)
+            ->currency($Currency)
+            ->update();
+
+        $this->logger->info(
+            sprintf(
+                'Обновили стоимость товара %s (%s) : %s => %s',
+                $Card['article'],
+                $Money->getValue(), // стоимость в карточке
+                $Price->getValue(), // новая стоимость на маркетплейс
+                $Currency->getCurrencyValueUpper()
+            ),
+            [self::class.':'.__LINE__]
+        );
+
     }
 }

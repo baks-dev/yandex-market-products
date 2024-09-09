@@ -94,7 +94,6 @@ final class YaMarketProductsCardUpdate
             ->profile($message->getProfile())
             ->update($request);
 
-
         /** Добавляем в очередь обновление цены  */
         $this->messageDispatch->dispatch(
             message: new YaMarketProductsPriceMessage($message),

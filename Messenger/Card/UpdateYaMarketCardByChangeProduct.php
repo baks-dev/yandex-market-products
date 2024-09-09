@@ -49,7 +49,6 @@ final class UpdateYaMarketCardByChangeProduct
     {
 
         /**  Получаем активные токены профилей пользователя */
-
         $profiles = $this
             ->allProfileYaMarketToken
             ->onlyActiveToken()
@@ -61,19 +60,20 @@ final class UpdateYaMarketCardByChangeProduct
             return;
         }
 
-        /** Получаем идентификаторы обновляемой продукции  */
-        $products = $this
-            ->allProductsIdentifier
-            ->forProduct($message->getId())
-            ->findAll();
-
-        if($products === false)
-        {
-            return;
-        }
 
         foreach($profiles as $profile)
         {
+            /** Получаем идентификаторы обновляемой продукции  */
+            $products = $this
+                ->allProductsIdentifier
+                ->forProduct($message->getId())
+                ->findAll();
+
+            if($products === false)
+            {
+                return;
+            }
+
             foreach($products as $product)
             {
                 $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
@@ -87,7 +87,7 @@ final class UpdateYaMarketCardByChangeProduct
                 /** Транспорт async чтобы не мешать общей очереди */
                 $this->messageDispatch->dispatch(
                     message: $YaMarketProductsCardMessage,
-                    transport: (string) $profile
+                    transport: 'async'
                 );
             }
         }

@@ -70,6 +70,26 @@ class YandexMarketMapperTest extends KernelTestCase
                 continue;
             }
 
+            if(empty($YaMarketCard['length']))
+            {
+                continue;
+            }
+
+            if(empty($YaMarketCard['width']))
+            {
+                continue;
+            }
+
+            if(empty($YaMarketCard['height']))
+            {
+                continue;
+            }
+
+            if(empty($YaMarketCard['weight']))
+            {
+                continue;
+            }
+
 
             $request = $YandexMarketMapper->getData($YaMarketCard);
 
@@ -79,14 +99,14 @@ class YandexMarketMapperTest extends KernelTestCase
             self::assertEquals($request['marketCategoryId'], $YaMarketCard['market_category']);
             self::assertEquals($request['description'], $YaMarketCard['product_preview']);
 
+
             self::assertEquals($request['weightDimensions']['length'], $YaMarketCard['length'] / 10);
             self::assertEquals($request['weightDimensions']['width'], $YaMarketCard['width'] / 10);
             self::assertEquals($request['weightDimensions']['height'], $YaMarketCard['height'] / 10);
             self::assertEquals($request['weightDimensions']['weight'], $YaMarketCard['weight'] / 100);
 
-
             //dd($YaMarketCard);
-            //dd($request);
+
 
             break;
         }

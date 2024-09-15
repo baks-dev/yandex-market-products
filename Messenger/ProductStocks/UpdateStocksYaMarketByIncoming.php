@@ -39,13 +39,13 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 #[AsMessageHandler]
-final class UpdateStocksYaMarketByIncoming
+final readonly class UpdateStocksYaMarketByIncoming
 {
     public function __construct(
-        private readonly ProductStocksByIdInterface $productStocks,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly MessageDispatchInterface $messageDispatch,
-        private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+        private ProductStocksByIdInterface $productStocks,
+        private EntityManagerInterface $entityManager,
+        private MessageDispatchInterface $messageDispatch,
+        private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
     ) {}
 
     /**

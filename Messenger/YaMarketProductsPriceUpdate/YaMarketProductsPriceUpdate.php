@@ -113,6 +113,11 @@ final class YaMarketProductsPriceUpdate
         $Money = new Money($Card['product_price'], true);
         $Currency = new Currency($Card['product_currency']);
 
+        /**
+         * Делаем расчет стоимости реализации товара
+         * Стоимости товара + Стоимость услуг YaMarket + Торговая наценка
+         */
+
         $marketCalculator = $cache->get($cacheKey, function (ItemInterface $item) use ($Card, $Money, $message): float {
 
             /** Лимит: 100 запросов в минуту, добавляем лок */
@@ -123,7 +128,7 @@ final class YaMarketProductsPriceUpdate
 
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
-            /** Добавляем к стоимости товара стоимость услуг YaMarket */
+            /** Добавляем к стоимости товара стоимость услуг YaMarket + Торговая наценка (%) */
             return $this->marketCalculatorRequest
                 ->profile($message->getProfile())
                 ->category($Card['market_category'])

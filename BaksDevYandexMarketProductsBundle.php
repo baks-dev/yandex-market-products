@@ -36,29 +36,36 @@ class BaksDevYandexMarketProductsBundle extends AbstractBundle
 
     public const PATH = __DIR__.DIRECTORY_SEPARATOR;
 
-    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
-    {
-        $services = $container->services()
-            ->defaults()
-            ->public()
-            ->autowire()
-            ->autoconfigure();
+    //    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+    //    {
+    //        $services = $container->services()
+    //            ->defaults()
+    //            ->public()
+    //            ->autowire()
+    //            ->autoconfigure();
+    //
+    //        $services->load(self::NAMESPACE, self::PATH)
+    //            ->exclude([
+    //                self::PATH.'{Entity,Resources,Type}',
+    //                self::PATH.'**'.DIRECTORY_SEPARATOR.'*Message.php',
+    //                self::PATH.'**'.DIRECTORY_SEPARATOR.'*DTO.php',
+    //            ]);
+    //    }
 
-        $services->load(self::NAMESPACE, self::PATH)
-            ->exclude([
-                self::PATH.'{Entity,Resources,Type}',
-                self::PATH.'**/*Message.php',
-                self::PATH.'**/*DTO.php',
-            ]);
-
-        //        $services->load(
-        //            self::NAMESPACE.'Type\Settings\Property\Properties\\',
-        //            self::PATH.'Type/Settings/Property/Properties'
-        //        );
-
-        //        $services->load(
-        //            self::NAMESPACE.'Type\Settings\Property\Params\\',
-        //            self::PATH.'Type/Settings/Property/Params'
-        //        );
-    }
+//    public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
+    //    {
+    //        $path = self::PATH.implode(DIRECTORY_SEPARATOR, ['Resources', 'config']);
+    //
+    //        $configs = new \RegexIterator(new \DirectoryIterator($path), '/\.php$/');
+    //
+    //        foreach($configs as $config)
+    //        {
+    //            if($config->isDot() || $config->isDir())
+    //            {
+    //                continue;
+    //            }
+    //
+    //            $container->import($config->getPathname());
+    //        }
+    //    }
 }

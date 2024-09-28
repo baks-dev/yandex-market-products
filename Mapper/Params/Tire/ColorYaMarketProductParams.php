@@ -93,6 +93,11 @@ final class ColorYaMarketProductParams implements YaMarketProductParamsInterface
     {
         $name = '';
 
+        if($data['product_offer_value'])
+        {
+            $name .= 'R'.$data['product_offer_value'].' ';
+        }
+
         if($data['product_variation_value'])
         {
             $name .= $data['product_variation_value'];
@@ -101,11 +106,6 @@ final class ColorYaMarketProductParams implements YaMarketProductParamsInterface
         if($data['product_modification_value'])
         {
             $name .= '/'.$data['product_modification_value'];
-        }
-
-        if($data['product_offer_value'])
-        {
-            $name .= 'R'.$data['product_offer_value'];
         }
 
         if(empty($name))

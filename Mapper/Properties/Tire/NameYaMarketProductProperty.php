@@ -91,44 +91,12 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
 
     public function getData(array $data): ?string
     {
-
         if(!isset($data['market_category']) || $data['market_category'] !== YaMarketProductProperty::CATEGORY_TIRE)
         {
             return null;
         }
 
-        $name = 'Шины '.$data['product_name'];
-
-        if($data['product_variation_value'])
-        {
-            $name .= ' '.$data['product_variation_value'];
-        }
-
-        if($data['product_modification_value'])
-        {
-            $name .= '/'.$data['product_modification_value'];
-        }
-
-        if($data['product_offer_value'])
-        {
-            $name .= ' R'.$data['product_offer_value'];
-        }
-
-        if($data['product_offer_postfix'])
-        {
-            $name .= ' '.$data['product_offer_postfix'];
-        }
-
-        if($data['product_variation_postfix'])
-        {
-            $name .= ' '.$data['product_variation_postfix'];
-        }
-
-        if($data['product_modification_postfix'])
-        {
-            $name .= ' '.$data['product_modification_postfix'];
-        }
-
+        $name = '';
 
         if(isset($data['product_params']))
         {
@@ -145,11 +113,57 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
 
                     if(!empty($season_value['value']))
                     {
-                        $name .= ' '.$season_value['value'];
+                        $name .= $season_value['value'].' ';
                     }
                 }
             }
+        }
 
+        $name .= 'шины ';
+
+
+        /** Приводим к нижнему регистру и первой заглавной букве */
+        $name = mb_strtolower(trim($name));
+        $firstChar = mb_substr($name, 0, 1, 'UTF-8');
+        $then = mb_substr($name, 1, null, 'UTF-8');
+        $name = mb_strtoupper($firstChar, 'UTF-8').$then.' ';
+
+
+        $name .= $data['product_name'].' ';
+
+        if($data['product_variation_value'])
+        {
+            $name .= $data['product_variation_value'];
+        }
+
+        if($data['product_modification_value'])
+        {
+            $name .= '/'.$data['product_modification_value'].' ';
+        }
+
+        if($data['product_offer_value'])
+        {
+            $name .= 'R'.$data['product_offer_value'].' ';
+        }
+
+        if($data['product_offer_postfix'])
+        {
+            $name .= $data['product_offer_postfix'].' ';
+        }
+
+        if($data['product_variation_postfix'])
+        {
+            $name .= $data['product_variation_postfix'].' ';
+        }
+
+        if($data['product_modification_postfix'])
+        {
+            $name .= $data['product_modification_postfix'].' ';
+        }
+
+
+        if(isset($data['product_params']))
+        {
             /** Добавляем к названию назначение */
             $Purpose = new PurposeYaMarketProductParams();
 
@@ -161,12 +175,13 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
 
                     if(!empty($purpose_value['value']))
                     {
-                        $name .= ' '.$purpose_value['value'];
+                        $name .= $purpose_value['value'].' ';
                     }
                 }
             }
         }
 
-        return empty($name) ? null : $name;
+
+        return empty($name) ? null : trim($name);
     }
 }

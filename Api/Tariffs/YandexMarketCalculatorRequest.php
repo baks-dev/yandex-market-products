@@ -175,6 +175,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
             );
         }
 
+        /** Суммируем все затраты (услуги)  */
         $tariffs = current($content['result']['offers'])['tariffs'];
 
         $totalAmount = array_reduce($tariffs, static function ($carry, $item) {

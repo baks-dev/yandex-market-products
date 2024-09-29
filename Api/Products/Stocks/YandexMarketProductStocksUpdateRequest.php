@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 
-use App\Kernel;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
 use InvalidArgumentException;
@@ -58,7 +57,10 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
      */
     public function update(): bool
     {
-        if(Kernel::isTestEnvironment())
+        /**
+         * Выполнять операции запроса ТОЛЬКО в PROD окружении
+         */
+        if($this->isExecuteEnvironment() === false)
         {
             return true;
         }

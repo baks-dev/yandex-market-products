@@ -98,7 +98,7 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
             return 0;
         }
 
-        $available = array_filter($stocks, static function($v) {
+        $available = array_filter($stocks, static function ($v) {
             return $v['type'] === 'AVAILABLE';
         });
 

@@ -25,10 +25,8 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
 
-use App\Kernel;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 final class YandexMarketProductDeleteRequest extends YandexMarket
 {
@@ -43,7 +41,10 @@ final class YandexMarketProductDeleteRequest extends YandexMarket
      */
     public function delete(array|string $articles): bool
     {
-        if(Kernel::isTestEnvironment())
+        /**
+         * Выполнять операции запроса ТОЛЬКО в PROD окружении
+         */
+        if($this->isExecuteEnvironment() === false)
         {
             return true;
         }

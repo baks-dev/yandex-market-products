@@ -42,13 +42,11 @@ final class YandexMarketCategoryRequest extends YandexMarket
      * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/categories/getCategoriesTree
      *
      */
-    public function findAll() //: Generator
+    public function findAll(): Generator
     {
-        $cache = new FilesystemAdapter('yandex-market-products');
+        $cache = $this->getCacheInit('yandex-market-products');
 
-        $content = $cache->get('ya-market-categories', function(
-            ItemInterface $item
-        ) {
+        $content = $cache->get('ya-market-categories', function (ItemInterface $item) {
 
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
@@ -83,24 +81,29 @@ final class YandexMarketCategoryRequest extends YandexMarket
         }
     }
 
-    private function processArray($array, string $parent = null) {
+    private function processArray($array, string $parent = null)
+    {
 
         $result = [];
 
-        foreach ($array as $item) {
+        foreach($array as $item)
+        {
 
             $hasChildren = isset($item["children"]) && is_array($item["children"]) && count($item["children"]) > 0;
 
-            $name = $parent ? $parent . ' - ' . $item["name"] : $item["name"];
+            $name = $parent ? $parent.' - '.$item["name"] : $item["name"];
 
-            if (!$hasChildren) {
+            if(!$hasChildren)
+            {
 
                 $result[] = [
                     "id" => $item["id"],
                     "name" => $name
                 ];
 
-            } else {
+            }
+            else
+            {
                 $result = array_merge($result, $this->processArray($item["children"], $name));
             }
         }

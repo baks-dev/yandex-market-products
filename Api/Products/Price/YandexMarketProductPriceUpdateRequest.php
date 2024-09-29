@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Products\Price;
 
-use App\Kernel;
 use BaksDev\Reference\Currency\Type\Currencies\RUR;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
@@ -70,7 +69,10 @@ final class YandexMarketProductPriceUpdateRequest extends YandexMarket
      */
     public function update(): bool
     {
-        if(Kernel::isTestEnvironment())
+        /**
+         * Выполнять операции запроса ТОЛЬКО в PROD окружении
+         */
+        if($this->isExecuteEnvironment() === false)
         {
             return true;
         }

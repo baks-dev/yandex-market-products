@@ -70,11 +70,9 @@ final class YandexMarketParametersRequest extends YandexMarket
             throw new InvalidArgumentException('Invalid Argument Category');
         }
 
-        $cache = new FilesystemAdapter('yandex-market-products');
+        $cache = $this->getCacheInit('yandex-market-products');
 
-        $content = $cache->get('ya-market-parameters-'.$this->category, function(
-            ItemInterface $item
-        ) {
+        $content = $cache->get('ya-market-parameters-'.$this->category, function (ItemInterface $item) {
 
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 

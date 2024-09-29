@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Products\Update;
 
-use App\Kernel;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -48,7 +47,10 @@ final class YandexMarketProductUpdateRequest extends YandexMarket
      */
     public function update(array $card): bool
     {
-        if(Kernel::isTestEnvironment())
+        /**
+         * Выполнять операции запроса ТОЛЬКО в PROD окружении
+         */
+        if($this->isExecuteEnvironment() === false)
         {
             return true;
         }

@@ -57,6 +57,7 @@ final class YaMarketProductsCardUpdate
      */
     public function __invoke(YaMarketProductsCardMessage $message): void
     {
+
         $Card = $this->marketProductsCard
             ->forProduct($message->getProduct())
             ->forOfferConst($message->getOfferConst())

@@ -135,13 +135,19 @@ class YaMarketPostUpdateCardCommand extends Command
                 ->forModificationConst($product['modification_const'])
                 ->find();
 
+            if($card === false)
+            {
+                $this->io->warning('Карточки не найдено, либо не указаны настройки соотношений свойств');
+                continue;
+            }
+
             /**
              * Если передан артикул - применяем фильтр по вхождению
              */
             if(!empty($article))
             {
                 /** Пропускаем обновление, если соответствие не найдено */
-                if($card === false || stripos($card['article'], $article) === false)
+                if(stripos($card['article'], $article) === false)
                 {
                     continue;
                 }

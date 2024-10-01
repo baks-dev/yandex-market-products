@@ -23,46 +23,53 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Api\Products\Update;
+namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use InvalidArgumentException;
 
-final class YandexMarketProductUpdateRequest extends YandexMarket
+/**
+ * Информация об остатках и оборачиваемости
+ */
+final class YaMarketProductGetStocksRequest extends YandexMarket
 {
+    private ?string $article = null;
+
+    public function article(string $article): self
+    {
+        $this->article = $article;
+        return $this;
+    }
+
+
     /**
-     * Добавляет товары в каталог или редактирует информацию об уже имеющихся товарах.
      *
-     * Для новых товаров обязательно укажите параметры:
-     * - offerId (SKU)
-     * - name
-     * - category
-     * - pictures
-     * - vendor
-     * - description
+     * Возвращает данные об остатках товаров (для всех моделей) и об оборачиваемости товаров (для модели FBY).
      *
-     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/business-assortment/updateOfferMappings
+     * Лимит: 100 000 товаров в минуту
+     *
+     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/stocks/getStocks
      *
      */
-    public function update(array $card): bool
+    public function find(): int|bool
     {
-        /**
-         * Выполнять операции запроса ТОЛЬКО в PROD окружении
-         */
-        if($this->isExecuteEnvironment() === false)
+        if(empty($this->article))
         {
-            return true;
+            throw new InvalidArgumentException('Invalid Argument article');
         }
 
         $response = $this->TokenHttpClient()
             ->request(
                 'POST',
-                sprintf('/businesses/%s/offer-mappings/update', $this->getBusiness()),
-                ['json' => ['offerMappings' => [['offer' => $card]]]],
+                sprintf('/campaigns/%s/offers/stocks', $this->getCompany()),
+                ['json' =>
+                    ['offerIds' => [$this->article]]
+                ],
             );
 
         $content = $response->toArray(false);
+
 
         if($response->getStatusCode() !== 200)
         {
@@ -77,6 +84,32 @@ final class YandexMarketProductUpdateRequest extends YandexMarket
             );
         }
 
-        return true;
+        $warehouses = current($content['result']['warehouses']);
+
+        if(empty($warehouses))
+        {
+            return false;
+        }
+
+        $stocks = current($warehouses['offers'])['stocks'];
+
+        if(empty($stocks))
+        {
+            return 0;
+        }
+
+        $available = array_filter($stocks, static function ($v) {
+            return $v['type'] === 'AVAILABLE';
+        });
+
+        if(empty($available))
+        {
+            return 0;
+        }
+
+        $available = current($available);
+
+        return $available['count'];
+
     }
 }

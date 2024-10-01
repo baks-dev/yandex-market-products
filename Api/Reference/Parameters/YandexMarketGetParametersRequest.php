@@ -38,7 +38,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 /**
  * Списки характеристик товаров по категориям
  */
-final class YandexMarketParametersRequest extends YandexMarket
+final class YandexMarketGetParametersRequest extends YandexMarket
 {
     private ?int $category = null;
 

@@ -32,7 +32,7 @@ use Generator;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
-final class YandexMarketCategoryRequest extends YandexMarket
+final class YaMarketGetCategoriesTreeRequest extends YandexMarket
 {
     /**
      * Возвращает дерево категорий Маркета.

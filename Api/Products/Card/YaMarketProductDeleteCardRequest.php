@@ -23,39 +23,23 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
+namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
-use InvalidArgumentException;
 
-final class YandexMarketProductStocksUpdateRequest extends YandexMarket
+final class YaMarketProductDeleteCardRequest extends YandexMarket
 {
-    private ?string $article = null;
-
-    private int $total = 0;
-
-    public function article(string $article): self
-    {
-        $this->article = $article;
-        return $this;
-    }
-
-    public function total(int $total): self
-    {
-        $this->total = $total;
-        return $this;
-    }
-
     /**
-     * Передает данные об остатках товаров на витрине.
+     * Удаление товаров из каталога
      *
-     * Лимит: 100 000 товаров в минуту, не более 500 товаров в одном запросе
+     * Список SKU товаров, которые нужно удалить.
+     * - offerIds (SKU)
      *
-     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/stocks/updateStocks
+     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/business-assortment/deleteOffers
      *
      */
-    public function update(): bool
+    public function delete(array|string $articles): bool
     {
         /**
          * Выполнять операции запроса ТОЛЬКО в PROD окружении
@@ -65,27 +49,13 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
             return true;
         }
 
-        if(empty($this->article))
-        {
-            throw new InvalidArgumentException('Invalid Argument article');
-        }
+        $offer = is_array($articles) ?: [$articles];
 
         $response = $this->TokenHttpClient()
             ->request(
-                'PUT',
-                sprintf('/campaigns/%s/offers/stocks', $this->getCompany()),
-                [
-                    'json' => [
-                        'skus' => [
-                            [
-                                'sku' => $this->article,
-                                "items" => [
-                                    ["count" => $this->total]
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
+                'POST',
+                sprintf('/businesses/%s/offer-mappings/delete', $this->getBusiness()),
+                ['json' => ['offerIds' => $offer]],
             );
 
         $content = $response->toArray(false);
@@ -104,7 +74,5 @@ final class YandexMarketProductStocksUpdateRequest extends YandexMarket
         }
 
         return true;
-
     }
-
 }

@@ -23,22 +23,17 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Api\Products\Price;
+namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 
-use BaksDev\Reference\Currency\Type\Currencies\RUR;
-use BaksDev\Reference\Currency\Type\Currency;
-use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
 use InvalidArgumentException;
 
-final class YandexMarketProductPriceUpdateRequest extends YandexMarket
+final class YaMarketProductUpdateStocksRequest extends YandexMarket
 {
     private ?string $article = null;
 
-    private ?Money $price = null;
-
-    private ?Currency $currency = null;
+    private int $total = 0;
 
     public function article(string $article): self
     {
@@ -46,25 +41,18 @@ final class YandexMarketProductPriceUpdateRequest extends YandexMarket
         return $this;
     }
 
-    public function price(Money $price): self
+    public function total(int $total): self
     {
-        $this->price = $price;
+        $this->total = $total;
         return $this;
     }
-
-    public function currency(Currency $currency): self
-    {
-        $this->currency = $currency;
-        return $this;
-    }
-
 
     /**
-     * Установка цен на товары в конкретном магазине
+     * Передает данные об остатках товаров на витрине.
      *
-     * Лимит: 5000 товаров в минуту, не более 500 товаров в одном запросе
+     * Лимит: 100 000 товаров в минуту, не более 500 товаров в одном запросе
      *
-     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/assortment/updatePrices
+     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/stocks/updateStocks
      *
      */
     public function update(): bool
@@ -79,32 +67,23 @@ final class YandexMarketProductPriceUpdateRequest extends YandexMarket
 
         if(empty($this->article))
         {
-            throw new InvalidArgumentException('Invalid Argument article: call method article(string $article);');
-        }
-
-        if($this->price === null)
-        {
-            throw new InvalidArgumentException('Invalid Argument price: call method price(Money $price);');
-        }
-
-        if(empty($this->currency))
-        {
-            $this->currency = new Currency(RUR::class);
+            throw new InvalidArgumentException('Invalid Argument article');
         }
 
         $response = $this->TokenHttpClient()
             ->request(
-                'POST',
-                sprintf('/businesses/%s/offer-prices/updates', $this->getBusiness()),
-                ['json' =>
-                    ['offers' =>
-                        [[
-                            'offerId' => $this->article,
-                            'price' => [
-                                'value' => $this->price->getValue(),
-                                'currencyId' => $this->currency->getCurrencyValueUpper()
+                'PUT',
+                sprintf('/campaigns/%s/offers/stocks', $this->getCompany()),
+                [
+                    'json' => [
+                        'skus' => [
+                            [
+                                'sku' => $this->article,
+                                "items" => [
+                                    ["count" => $this->total]
+                                ]
                             ]
-                        ]]
+                        ]
                     ]
                 ],
             );

@@ -29,14 +29,12 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDTO;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\FindProductYandexMarketRequest;
-use BaksDev\Yandex\Market\Products\Api\Products\Price\YandexMarketProductPriceUpdateRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductDTO;
+use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCardRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Price\YaMarketProductUpdatePriceRequest;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
-use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsStocks\YaMarketProductsStocksInterface;
 use DateInterval;
-use DomainException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -48,8 +46,8 @@ final class YaMarketProductsPriceUpdate
 
     public function __construct(
         private readonly YandexMarketCalculatorRequest $marketCalculatorRequest,
-        private readonly FindProductYandexMarketRequest $yandexMarketProductRequest,
-        private readonly YandexMarketProductPriceUpdateRequest $marketProductPriceRequest,
+        private readonly YaMarketProductFindCardRequest $yandexMarketProductRequest,
+        private readonly YaMarketProductUpdatePriceRequest $marketProductPriceRequest,
         private readonly YaMarketProductsCardInterface $marketProductsCard,
         private readonly AppLockInterface $appLock,
         private readonly AppCacheInterface $appCache,
@@ -154,7 +152,7 @@ final class YaMarketProductsPriceUpdate
 
         if($MarketProduct->valid())
         {
-            /** @var YandexMarketProductDTO $YandexMarketProductDTO */
+            /** @var YaMarketProductDTO $YandexMarketProductDTO */
             $YandexMarketProductDTO = $MarketProduct->current();
 
             if(true === $YandexMarketProductDTO->getPrice()->equals($Price))

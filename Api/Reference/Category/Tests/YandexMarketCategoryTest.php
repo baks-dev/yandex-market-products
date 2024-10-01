@@ -27,7 +27,7 @@ namespace BaksDev\Yandex\Market\Products\Api\Reference\Category\Tests;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\Reference\Category\YandexMarketCategoryDTO;
-use BaksDev\Yandex\Market\Products\Api\Reference\Category\YandexMarketCategoryRequest;
+use BaksDev\Yandex\Market\Products\Api\Reference\Category\YaMarketGetCategoriesTreeRequest;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
@@ -53,8 +53,8 @@ final class YandexMarketCategoryTest extends KernelTestCase
     public function testUseCase(): void
     {
 
-        /** @var YandexMarketCategoryRequest $YandexMarketCategoryRequest */
-        $YandexMarketCategoryRequest = self::getContainer()->get(YandexMarketCategoryRequest::class);
+        /** @var YaMarketGetCategoriesTreeRequest $YandexMarketCategoryRequest */
+        $YandexMarketCategoryRequest = self::getContainer()->get(YaMarketGetCategoriesTreeRequest::class);
 
         $YandexMarketCategoryRequest->TokenHttpClient(self::$Authorization);
 

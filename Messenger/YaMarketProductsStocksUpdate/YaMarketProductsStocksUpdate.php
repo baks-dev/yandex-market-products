@@ -26,8 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 
 use BaksDev\Core\Lock\AppLockInterface;
-use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YandexMarketProductStocksGetRequest;
-use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YandexMarketProductStocksUpdateRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductGetStocksRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductUpdateStocksRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsStocks\YaMarketProductsStocksInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
@@ -40,8 +40,8 @@ final class YaMarketProductsStocksUpdate
     private LoggerInterface $logger;
 
     public function __construct(
-        private readonly YandexMarketProductStocksGetRequest $marketProductStocksGetRequest,
-        private readonly YandexMarketProductStocksUpdateRequest $marketProductStocksUpdateRequest,
+        private readonly YaMarketProductGetStocksRequest $marketProductStocksGetRequest,
+        private readonly YaMarketProductUpdateStocksRequest $marketProductStocksUpdateRequest,
         private readonly YaMarketProductsCardInterface $marketProductsCard,
         private readonly AppLockInterface $appLock,
         LoggerInterface $yandexMarketProductsLogger,

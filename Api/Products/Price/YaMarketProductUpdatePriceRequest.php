@@ -23,18 +23,22 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
+namespace BaksDev\Yandex\Market\Products\Api\Products\Price;
 
+use BaksDev\Reference\Currency\Type\Currencies\RUR;
+use BaksDev\Reference\Currency\Type\Currency;
+use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
 use InvalidArgumentException;
 
-/**
- * Информация об остатках и оборачиваемости
- */
-final class YandexMarketProductStocksGetRequest extends YandexMarket
+final class YaMarketProductUpdatePriceRequest extends YandexMarket
 {
     private ?string $article = null;
+
+    private ?Money $price = null;
+
+    private ?Currency $currency = null;
 
     public function article(string $article): self
     {
@@ -42,34 +46,70 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
         return $this;
     }
 
+    public function price(Money $price): self
+    {
+        $this->price = $price;
+        return $this;
+    }
+
+    public function currency(Currency $currency): self
+    {
+        $this->currency = $currency;
+        return $this;
+    }
+
 
     /**
+     * Установка цен на товары в конкретном магазине
      *
-     * Возвращает данные об остатках товаров (для всех моделей) и об оборачиваемости товаров (для модели FBY).
+     * Лимит: 5000 товаров в минуту, не более 500 товаров в одном запросе
      *
-     * Лимит: 100 000 товаров в минуту
-     *
-     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/stocks/getStocks
+     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/assortment/updatePrices
      *
      */
-    public function find(): int|bool
+    public function update(): bool
     {
+        /**
+         * Выполнять операции запроса ТОЛЬКО в PROD окружении
+         */
+        if($this->isExecuteEnvironment() === false)
+        {
+            return true;
+        }
+
         if(empty($this->article))
         {
-            throw new InvalidArgumentException('Invalid Argument article');
+            throw new InvalidArgumentException('Invalid Argument article: call method article(string $article);');
+        }
+
+        if($this->price === null)
+        {
+            throw new InvalidArgumentException('Invalid Argument price: call method price(Money $price);');
+        }
+
+        if(empty($this->currency))
+        {
+            $this->currency = new Currency(RUR::class);
         }
 
         $response = $this->TokenHttpClient()
             ->request(
                 'POST',
-                sprintf('/campaigns/%s/offers/stocks', $this->getCompany()),
+                sprintf('/businesses/%s/offer-prices/updates', $this->getBusiness()),
                 ['json' =>
-                    ['offerIds' => [$this->article]]
+                    ['offers' =>
+                        [[
+                            'offerId' => $this->article,
+                            'price' => [
+                                'value' => $this->price->getValue(),
+                                'currencyId' => $this->currency->getCurrencyValueUpper()
+                            ]
+                        ]]
+                    ]
                 ],
             );
 
         $content = $response->toArray(false);
-
 
         if($response->getStatusCode() !== 200)
         {
@@ -84,32 +124,8 @@ final class YandexMarketProductStocksGetRequest extends YandexMarket
             );
         }
 
-        $warehouses = current($content['result']['warehouses']);
-
-        if(empty($warehouses))
-        {
-            return false;
-        }
-
-        $stocks = current($warehouses['offers'])['stocks'];
-
-        if(empty($stocks))
-        {
-            return 0;
-        }
-
-        $available = array_filter($stocks, static function ($v) {
-            return $v['type'] === 'AVAILABLE';
-        });
-
-        if(empty($available))
-        {
-            return 0;
-        }
-
-        $available = current($available);
-
-        return $available['count'];
+        return true;
 
     }
+
 }

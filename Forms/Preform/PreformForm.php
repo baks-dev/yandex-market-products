@@ -21,7 +21,7 @@ namespace BaksDev\Yandex\Market\Products\Forms\Preform;
 use BaksDev\Products\Category\Repository\CategoryChoice\CategoryChoiceInterface;
 use BaksDev\Products\Category\Type\Id\CategoryProductUid;
 use BaksDev\Yandex\Market\Products\Api\Reference\Category\YandexMarketCategoryDTO;
-use BaksDev\Yandex\Market\Products\Api\Reference\Category\YandexMarketCategoryRequest;
+use BaksDev\Yandex\Market\Products\Api\Reference\Category\YaMarketGetCategoriesTreeRequest;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -33,11 +33,11 @@ final class PreformForm extends AbstractType
 {
     private CategoryChoiceInterface $categoryChoice;
     private TokenStorageInterface $tokenStorage;
-    private YandexMarketCategoryRequest $yandexMarketCategoryRequest;
+    private YaMarketGetCategoriesTreeRequest $yandexMarketCategoryRequest;
 
     public function __construct(
         TokenStorageInterface $tokenStorage,
-        YandexMarketCategoryRequest $yandexMarketCategoryRequest,
+        YaMarketGetCategoriesTreeRequest $yandexMarketCategoryRequest,
         CategoryChoiceInterface $categoryChoice,
     ) {
         $this->categoryChoice = $categoryChoice;

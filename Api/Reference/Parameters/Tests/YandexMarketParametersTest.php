@@ -29,7 +29,7 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\AllShops\YandexMarketShopDTO;
 use BaksDev\Yandex\Market\Products\Api\AllShops\YandexMarketShopRequest;
 use BaksDev\Yandex\Market\Products\Api\Reference\Parameters\YandexMarketParametersDTO;
-use BaksDev\Yandex\Market\Products\Api\Reference\Parameters\YandexMarketParametersRequest;
+use BaksDev\Yandex\Market\Products\Api\Reference\Parameters\YandexMarketGetParametersRequest;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
@@ -57,8 +57,8 @@ final class YandexMarketParametersTest extends KernelTestCase
 
         // 90490 - Авто - Шины и диски - Шины
 
-        /** @var YandexMarketParametersRequest $YandexMarketCategoryRequest */
-        $YandexMarketCategoryRequest = self::getContainer()->get(YandexMarketParametersRequest::class);
+        /** @var YandexMarketGetParametersRequest $YandexMarketCategoryRequest */
+        $YandexMarketCategoryRequest = self::getContainer()->get(YandexMarketGetParametersRequest::class);
 
         $YandexMarketCategoryRequest->TokenHttpClient(self::$Authorization);
 

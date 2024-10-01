@@ -27,19 +27,25 @@ namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
-final class YandexMarketProductDeleteRequest extends YandexMarket
+final class YaMarketProductUpdateCardRequest extends YandexMarket
 {
     /**
-     * Удаление товаров из каталога
+     * Добавляет товары в каталог или редактирует информацию об уже имеющихся товарах.
      *
-     * Список SKU товаров, которые нужно удалить.
-     * - offerIds (SKU)
+     * Для новых товаров обязательно укажите параметры:
+     * - offerId (SKU)
+     * - name
+     * - category
+     * - pictures
+     * - vendor
+     * - description
      *
-     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/business-assortment/deleteOffers
+     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/business-assortment/updateOfferMappings
      *
      */
-    public function delete(array|string $articles): bool
+    public function update(array $card): bool
     {
         /**
          * Выполнять операции запроса ТОЛЬКО в PROD окружении
@@ -49,13 +55,11 @@ final class YandexMarketProductDeleteRequest extends YandexMarket
             return true;
         }
 
-        $offer = is_array($articles) ?: [$articles];
-
         $response = $this->TokenHttpClient()
             ->request(
                 'POST',
-                sprintf('/businesses/%s/offer-mappings/delete', $this->getBusiness()),
-                ['json' => ['offerIds' => $offer]],
+                sprintf('/businesses/%s/offer-mappings/update', $this->getBusiness()),
+                ['json' => ['offerMappings' => [['offer' => $card]]]],
             );
 
         $content = $response->toArray(false);

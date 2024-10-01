@@ -13,8 +13,8 @@ namespace BaksDev\Yandex\Market\Products\Command;
 
 use BaksDev\Products\Product\Repository\ProductByArticle\ProductEventByArticleInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\FindProductYandexMarketRequest;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\YandexMarketProductDeleteRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCardRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Card\YaMarketProductDeleteCardRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\AllProductsTag\AllProductsTagInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -38,9 +38,9 @@ class YaMarketPostClearCardCommand extends Command
 
     public function __construct(
         private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
-        private readonly FindProductYandexMarketRequest $findProductYandexMarketRequest,
+        private readonly YaMarketProductFindCardRequest $findProductYandexMarketRequest,
         private readonly ProductEventByArticleInterface $productEventByArticle,
-        private readonly YandexMarketProductDeleteRequest $yandexMarketProductDeleteRequest,
+        private readonly YaMarketProductDeleteCardRequest $yandexMarketProductDeleteRequest,
         private readonly AllProductsTagInterface $allProductsTag,
     ) {
         parent::__construct();

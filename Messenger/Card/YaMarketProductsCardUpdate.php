@@ -27,18 +27,14 @@ namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
 use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\FindProductYandexMarketRequest;
-use BaksDev\Yandex\Market\Products\Api\Products\Update\YandexMarketProductUpdateRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Card\YaMarketProductUpdateCardRequest;
 use BaksDev\Yandex\Market\Products\Mapper\YandexMarketMapper;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceUpdate;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
-use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 #[AsMessageHandler]
 final class YaMarketProductsCardUpdate
@@ -46,7 +42,7 @@ final class YaMarketProductsCardUpdate
     private LoggerInterface $logger;
 
     public function __construct(
-        private readonly YandexMarketProductUpdateRequest $marketProductUpdate,
+        private readonly YaMarketProductUpdateCardRequest $marketProductUpdate,
         private readonly YaMarketProductsCardInterface $marketProductsCard,
         private readonly YandexMarketMapper $yandexMarketMapper,
         private readonly MessageDispatchInterface $messageDispatch,

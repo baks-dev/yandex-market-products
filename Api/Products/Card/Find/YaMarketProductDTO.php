@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
+namespace BaksDev\Yandex\Market\Products\Api\Products\Card\Find;
 
 use BaksDev\Reference\Currency\Type\Currencies\RUR;
 use BaksDev\Reference\Currency\Type\Currency;
@@ -31,7 +31,7 @@ use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class YandexMarketProductDTO
+final class YaMarketProductDTO
 {
     private UserProfileUid $profile;
 

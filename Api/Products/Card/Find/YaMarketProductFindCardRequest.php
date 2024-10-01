@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
+namespace BaksDev\Yandex\Market\Products\Api\Products\Card\Find;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
@@ -32,7 +32,7 @@ use InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
-final class FindProductYandexMarketRequest extends YandexMarket
+final class YaMarketProductFindCardRequest extends YandexMarket
 {
     private string|array|false $article = false;
 
@@ -134,7 +134,7 @@ final class FindProductYandexMarketRequest extends YandexMarket
                 continue;
             }
 
-            yield new YandexMarketProductDTO($this->getProfile(), $offer['offer']);
+            yield new YaMarketProductDTO($this->getProfile(), $offer['offer']);
         }
 
     }

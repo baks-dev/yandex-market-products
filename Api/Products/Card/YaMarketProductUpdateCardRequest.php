@@ -71,10 +71,7 @@ final class YaMarketProductUpdateCardRequest extends YandexMarket
                 $this->logger->critical($error['code'].': '.$error['message'], [self::class.':'.__LINE__]);
             }
 
-            throw new DomainException(
-                message: 'Ошибка '.self::class,
-                code: $response->getStatusCode()
-            );
+            return false;
         }
 
         return true;

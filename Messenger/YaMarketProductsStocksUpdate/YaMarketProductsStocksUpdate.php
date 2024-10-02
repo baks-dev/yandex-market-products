@@ -72,10 +72,10 @@ final class YaMarketProductsStocksUpdate
             return;
         }
 
-        /** Добавляем лок на процесс, остатки обновляются в порядке очереди! */
-        $lock = $this->appLock
-            ->createLock([$message->getProfile(), $Card['article'], self::class])
-            ->waitAllTime();
+//        /** Добавляем лок на процесс, остатки обновляются в порядке очереди! */
+//        $lock = $this->appLock
+//            ->createLock([$message->getProfile(), $Card['article'], self::class])
+//            ->waitAllTime();
 
         $ProductStocks = $this->marketProductStocksGetRequest
             ->profile($message->getProfile())
@@ -93,7 +93,7 @@ final class YaMarketProductsStocksUpdate
                 $product_quantity
             ), [$message->getProfile()]);
 
-            $lock->release();
+            // $lock->release();
 
             return;
         }
@@ -113,6 +113,6 @@ final class YaMarketProductsStocksUpdate
         ), [$message->getProfile()]);
 
 
-        $lock->release();
+        // $lock->release();
     }
 }

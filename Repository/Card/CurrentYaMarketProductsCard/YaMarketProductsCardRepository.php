@@ -1335,7 +1335,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 
         /** Кешируем в кеш модуля products-product для сброса при обновлении карточки */
         return $dbal
-            ->enableCache('products-product', 5)
+            ->enableCache('products-product', 3)
             ->fetchAssociative();
     }
 }

@@ -26,8 +26,10 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use DateInterval;
 use DomainException;
 use InvalidArgumentException;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Информация об остатках и оборачиваемости
@@ -59,14 +61,22 @@ final class YaMarketProductGetStocksRequest extends YandexMarket
             throw new InvalidArgumentException('Invalid Argument article');
         }
 
-        $response = $this->TokenHttpClient()
-            ->request(
-                'POST',
-                sprintf('/campaigns/%s/offers/stocks', $this->getCompany()),
-                ['json' =>
-                    ['offerIds' => [$this->article]]
-                ],
-            );
+        $cache = $this->getCacheInit('yandex-market-products');
+
+        $response = $cache->get($this->getCompany().$this->article, function (ItemInterface $item) {
+
+            $item->expiresAfter(DateInterval::createFromDateString('3 seconds'));
+
+            return $this->TokenHttpClient()
+                ->request(
+                    'POST',
+                    sprintf('/campaigns/%s/offers/stocks', $this->getCompany()),
+                    ['json' =>
+                        ['offerIds' => [$this->article]]
+                    ],
+                );
+        });
+
 
         $content = $response->toArray(false);
 

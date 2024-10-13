@@ -80,7 +80,7 @@ final class YaMarketProductUpdateStocksRequest extends YandexMarket
                             [
                                 'sku' => $this->article,
                                 "items" => [
-                                    ["count" => $this->total]
+                                    ["count" => max($this->total, 0)]
                                 ]
                             ]
                         ]

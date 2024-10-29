@@ -35,8 +35,6 @@ use BaksDev\Products\Product\Repository\CurrentProductIdentifier\CurrentProductI
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
-use DateInterval;
-use Random\Randomizer;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -79,8 +77,6 @@ final class UpdateYaMarketCardByChangeOrderStatus
         $EditOrderDTO = new EditOrderDTO();
         $OrderEvent->getDto($EditOrderDTO);
 
-        $Randomizer = new Randomizer();
-
         foreach($profiles as $profile)
         {
             /** @var OrderProductDTO $product */
@@ -110,11 +106,9 @@ final class UpdateYaMarketCardByChangeOrderStatus
 
                 /** Добавляем в очередь обновление остатков через транспорт профиля */
 
-                $delay = sprintf('%s seconds', $Randomizer->getInt(5, 10));
-
                 $this->messageDispatch->dispatch(
                     message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
-                    stamps: [new MessageDelay(DateInterval::createFromDateString($delay))], // задержка 3 сек для обновления карточки
+                    stamps: [new MessageDelay('5 seconds')],
                     transport: (string) $profile
                 );
             }

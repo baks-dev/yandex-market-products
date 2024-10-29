@@ -35,7 +35,6 @@ use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusInc
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
-use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -114,7 +113,7 @@ final readonly class UpdateStocksYaMarketByIncoming
 
                 $this->messageDispatch->dispatch(
                     $YaMarketProductsStocksMessage,
-                    stamps: [new MessageDelay(DateInterval::createFromDateString('3 seconds'))], // задержка 3 сек для обновления карточки
+                    stamps: [new MessageDelay('5 seconds')], // задержка 3 сек для обновления карточки
                     transport: 'yandex-market-products'
                 );
 

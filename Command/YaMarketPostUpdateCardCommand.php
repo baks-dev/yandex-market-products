@@ -43,7 +43,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 #[AsCommand(
     name: 'baks:yandex-market-products:post:update',
-    description: 'Обновляет все карточки на Yandex Market'
+    description: 'Обновляет все карточки на Yandex Market',
+    aliases: ['baks:yandex-products:post:update']
 )]
 class YaMarketPostUpdateCardCommand extends Command
 {

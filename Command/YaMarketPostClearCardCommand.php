@@ -43,7 +43,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 #[AsCommand(
     name: 'baks:yandex-market-products:clear',
-    description: 'Удаляет отсутствующие карточки на Yandex Market'
+    description: 'Удаляет отсутствующие карточки на Yandex Market',
+    aliases: ['baks:yandex-products:clear']
 )]
 class YaMarketPostClearCardCommand extends Command
 {

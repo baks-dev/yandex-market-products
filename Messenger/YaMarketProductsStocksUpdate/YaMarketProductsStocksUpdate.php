@@ -25,12 +25,10 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 
-use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductGetStocksRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductUpdateStocksRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsStocks\YaMarketProductsStocksInterface;
-use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -43,7 +41,6 @@ final class YaMarketProductsStocksUpdate
         private readonly YaMarketProductGetStocksRequest $marketProductStocksGetRequest,
         private readonly YaMarketProductUpdateStocksRequest $marketProductStocksUpdateRequest,
         private readonly YaMarketProductsCardInterface $marketProductsCard,
-        private readonly AppLockInterface $appLock,
         LoggerInterface $yandexMarketProductsLogger,
     )
     {
@@ -72,11 +69,6 @@ final class YaMarketProductsStocksUpdate
         {
             return;
         }
-
-        //        /** Добавляем лок на процесс, остатки обновляются в порядке очереди! */
-        //        $lock = $this->appLock
-        //            ->createLock([$message->getProfile(), $Card['article'], self::class])
-        //            ->waitAllTime();
 
         $ProductStocks = $this->marketProductStocksGetRequest
             ->profile($message->getProfile())

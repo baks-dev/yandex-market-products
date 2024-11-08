@@ -26,7 +26,6 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 final class YaMarketProductUpdateCardRequest extends YandexMarket
 {
@@ -67,7 +66,17 @@ final class YaMarketProductUpdateCardRequest extends YandexMarket
         {
             foreach($content['errors'] as $error)
             {
-                $this->logger->critical($error['code'].': '.$error['message'], [self::class.':'.__LINE__]);
+                $this->logger->critical(sprintf('yandex-market-products: %s (%s)', $error['code'], $error['message']), [self::class.':'.__LINE__]);
+            }
+
+            return false;
+        }
+
+        if(isset($content['results']['errors']))
+        {
+            foreach($content['results']['errors'] as $error)
+            {
+                $this->logger->critical('yandex-market-products: Ошибка обновления карточки ', [self::class.':'.__LINE__, $error]);
             }
 
             return false;

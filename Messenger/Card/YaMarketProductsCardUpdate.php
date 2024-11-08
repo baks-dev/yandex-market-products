@@ -88,9 +88,19 @@ final class YaMarketProductsCardUpdate
         /** Гидрируем карточку на свойства запроса */
         $request = $this->yandexMarketMapper->getData($Card);
 
-        $this->marketProductUpdate
+        $update = $this->marketProductUpdate
             ->profile($message->getProfile())
             ->update($request);
+
+        if(false === $update)
+        {
+            /**
+             * Ошибка запишется в лог
+             * @see YaMarketProductUpdateCardRequest
+             */
+            return;
+        }
+
 
         /** Добавляем в очередь обновление цены  */
         $this->messageDispatch->dispatch(

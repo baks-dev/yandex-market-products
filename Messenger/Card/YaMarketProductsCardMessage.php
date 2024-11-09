@@ -37,27 +37,27 @@ final class YaMarketProductsCardMessage
     /**
      * Идентификатор профиля пользователя
      */
-    private UserProfileUid $profile;
+    private string $profile;
 
     /**
      * ID продукта
      */
-    private ProductUid $product;
+    private string $product;
 
     /**
      * Постоянный уникальный идентификатор ТП
      */
-    private ProductOfferConst|null $offerConst;
+    private string|null $offerConst;
 
     /**
      * Постоянный уникальный идентификатор варианта
      */
-    private ProductVariationConst|null $variationConst;
+    private string|null $variationConst;
 
     /**
      * Постоянный уникальный идентификатор модификации
      */
-    private ProductModificationConst|null $modificationConst;
+    private string|null $modificationConst;
 
     public function __construct(
         UserProfileUid|string $profile,
@@ -67,75 +67,11 @@ final class YaMarketProductsCardMessage
         ProductModificationConst|string|null $modificationConst
     )
     {
-
-        /** UserProfileUid */
-
-        if(is_string($profile))
-        {
-            $profile = new UserProfileUid($profile);
-        }
-
-        $this->profile = $profile;
-
-
-        /** ProductUid */
-
-        if(is_string($product))
-        {
-            $product = new ProductUid($product);
-        }
-
-        if($product instanceof Product)
-        {
-            $product = $product->getId();
-        }
-
-        $this->product = $product;
-
-
-        /** ProductOfferConst */
-
-        if(empty($offerConst))
-        {
-            $offerConst = null;
-        }
-
-        if(is_string($offerConst))
-        {
-            $offerConst = new ProductOfferConst($offerConst);
-        }
-
-        $this->offerConst = $offerConst;
-
-        /** ProductVariationConst */
-
-        if(empty($variationConst))
-        {
-            $variationConst = null;
-        }
-
-        if(is_string($variationConst))
-        {
-            $variationConst = new ProductVariationConst($variationConst);
-        }
-
-        $this->variationConst = $variationConst;
-
-
-        /** ProductModificationConst */
-
-        if(empty($modificationConst))
-        {
-            $modificationConst = null;
-        }
-
-        if(is_string($modificationConst))
-        {
-            $modificationConst = new ProductModificationConst($modificationConst);
-        }
-
-        $this->modificationConst = $modificationConst;
-
+        $this->profile = (string) $profile;
+        $this->product = (string) $product;
+        $this->offerConst = (string) $offerConst;
+        $this->variationConst = (string) $variationConst;
+        $this->modificationConst = (string) $modificationConst;
     }
 
     /**
@@ -143,15 +79,15 @@ final class YaMarketProductsCardMessage
      */
     public function getProfile(): UserProfileUid
     {
-        return $this->profile;
+        return new UserProfileUid($this->profile);
     }
 
     /**
      * Product
      */
-    public function getProduct(): ProductUid|false
+    public function getProduct(): ProductUid
     {
-        return $this->product;
+        return new ProductUid($this->product);
     }
 
     /**
@@ -159,7 +95,7 @@ final class YaMarketProductsCardMessage
      */
     public function getOfferConst(): ?ProductOfferConst
     {
-        return $this->offerConst;
+        return $this->offerConst ? new ProductOfferConst($this->offerConst) : null;
     }
 
     /**
@@ -167,7 +103,7 @@ final class YaMarketProductsCardMessage
      */
     public function getVariationConst(): ?ProductVariationConst
     {
-        return $this->variationConst;
+        return $this->variationConst ? new ProductVariationConst($this->variationConst) : null;
     }
 
     /**
@@ -175,7 +111,7 @@ final class YaMarketProductsCardMessage
      */
     public function getModificationConst(): ?ProductModificationConst
     {
-        return $this->modificationConst;
+        return $this->modificationConst ? new ProductModificationConst($this->modificationConst) : null;
     }
 
 

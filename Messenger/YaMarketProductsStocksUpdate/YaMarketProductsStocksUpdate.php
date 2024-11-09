@@ -28,7 +28,6 @@ namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductGetStocksRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductUpdateStocksRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
-use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsStocks\YaMarketProductsStocksInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -86,8 +85,6 @@ final class YaMarketProductsStocksUpdate
                 $product_quantity
             ), [$message->getProfile()]);
 
-            // $lock->release();
-
             return;
         }
 
@@ -105,7 +102,5 @@ final class YaMarketProductsStocksUpdate
             $product_quantity
         ), [$message->getProfile()]);
 
-
-        // $lock->release();
     }
 }

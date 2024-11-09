@@ -38,13 +38,13 @@ use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInte
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class UpdateYaMarketCardByChangeOrderStatus
+final readonly class UpdateYaMarketCardByChangeOrderStatus
 {
     public function __construct(
-        private readonly CurrentOrderEventInterface $currentOrderEvent,
-        private readonly CurrentProductIdentifierInterface $currentProductIdentifier,
-        private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
-        private readonly MessageDispatchInterface $messageDispatch,
+        private CurrentOrderEventInterface $currentOrderEvent,
+        private CurrentProductIdentifierInterface $currentProductIdentifier,
+        private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+        private MessageDispatchInterface $messageDispatch,
     ) {}
 
     /**
@@ -108,7 +108,7 @@ final class UpdateYaMarketCardByChangeOrderStatus
 
                 $this->messageDispatch->dispatch(
                     message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
-                    stamps: [new MessageDelay('5 seconds')],
+                    stamps: [new MessageDelay('3 seconds')],
                     transport: (string) $profile
                 );
             }

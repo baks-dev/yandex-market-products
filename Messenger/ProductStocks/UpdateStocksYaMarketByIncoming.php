@@ -113,7 +113,7 @@ final readonly class UpdateStocksYaMarketByIncoming
 
                 $this->messageDispatch->dispatch(
                     $YaMarketProductsStocksMessage,
-                    stamps: [new MessageDelay('5 seconds')], // задержка 3 сек для обновления карточки
+                    stamps: [new MessageDelay('5 seconds')], // задержка 5 сек для обновления карточки
                     transport: 'yandex-market-products'
                 );
 

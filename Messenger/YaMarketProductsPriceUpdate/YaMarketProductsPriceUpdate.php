@@ -27,6 +27,8 @@ namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate;
 
 use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Lock\AppLockInterface;
+use BaksDev\Core\Messenger\MessageDelay;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductDTO;
@@ -51,6 +53,7 @@ final class YaMarketProductsPriceUpdate
         private readonly YaMarketProductsCardInterface $marketProductsCard,
         private readonly AppLockInterface $appLock,
         private readonly AppCacheInterface $appCache,
+        private readonly MessageDispatchInterface $messageDispatch,
         LoggerInterface $yandexMarketProductsLogger,
     )
     {
@@ -151,6 +154,23 @@ final class YaMarketProductsPriceUpdate
             ->profile($message->getProfile())
             ->article($Card['article'])
             ->find();
+
+        if(false === $MarketProduct)
+        {
+            $this->messageDispatch
+                ->dispatch(
+                    $message,
+                    stamps: [new MessageDelay('1 minutes')]
+                );
+
+            $this->logger->critical(
+                sprintf('yandex-market-products: Пробуем обновит стоимость %s через 1 минуту', $Card['article']),
+                [self::class.':'.__LINE__]
+            );
+
+            return;
+        }
+
 
         if($MarketProduct->valid())
         {

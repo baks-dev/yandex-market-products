@@ -25,6 +25,8 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 
+use BaksDev\Core\Messenger\MessageDelay;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductGetStocksRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductUpdateStocksRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
@@ -40,6 +42,7 @@ final class YaMarketProductsStocksUpdate
         private readonly YaMarketProductGetStocksRequest $marketProductStocksGetRequest,
         private readonly YaMarketProductUpdateStocksRequest $marketProductStocksUpdateRequest,
         private readonly YaMarketProductsCardInterface $marketProductsCard,
+        private readonly MessageDispatchInterface $messageDispatch,
         LoggerInterface $yandexMarketProductsLogger,
     )
     {
@@ -69,10 +72,24 @@ final class YaMarketProductsStocksUpdate
             return;
         }
 
+        /** Возвращает данные об остатках товаров н маркетплейсе */
         $ProductStocks = $this->marketProductStocksGetRequest
             ->profile($message->getProfile())
             ->article($Card['article'])
             ->find();
+
+        if(false === $ProductStocks)
+        {
+            $this->messageDispatch->dispatch(
+                message: $message,
+                stamps: [new MessageDelay('5 seconds')],
+                transport: 'yandex-market-products',
+            );
+
+            $this->logger->critical(sprintf('Пробуем обновить остатки артикула %s через 5 секунд', $Card['article']));
+
+            return;
+        }
 
         $product_quantity = isset($Card['product_quantity']) ? max($Card['product_quantity'], 0) : 0;
 

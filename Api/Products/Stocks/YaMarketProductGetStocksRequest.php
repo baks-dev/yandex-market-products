@@ -27,7 +27,6 @@ namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DateInterval;
-use DomainException;
 use InvalidArgumentException;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -65,7 +64,7 @@ final class YaMarketProductGetStocksRequest extends YandexMarket
 
         $response = $cache->get($this->getCompany().$this->article, function(ItemInterface $item) {
 
-            $item->expiresAfter(DateInterval::createFromDateString('3 seconds'));
+            $item->expiresAfter(DateInterval::createFromDateString('5 seconds'));
 
             return $this->TokenHttpClient()
                 ->request(
@@ -80,7 +79,6 @@ final class YaMarketProductGetStocksRequest extends YandexMarket
 
         $content = $response->toArray(false);
 
-
         if($response->getStatusCode() !== 200)
         {
             foreach($content['errors'] as $error)
@@ -88,10 +86,7 @@ final class YaMarketProductGetStocksRequest extends YandexMarket
                 $this->logger->critical($error['code'].': '.$error['message'], [self::class.':'.__LINE__]);
             }
 
-            throw new DomainException(
-                message: 'Ошибка '.self::class,
-                code: $response->getStatusCode()
-            );
+            return false;
         }
 
         $warehouses = current($content['result']['warehouses']);
@@ -108,6 +103,7 @@ final class YaMarketProductGetStocksRequest extends YandexMarket
             return 0;
         }
 
+        /** Получаем остаток «Доступный к заказу» */
         $available = array_filter($stocks, static function($v) {
             return $v['type'] === 'AVAILABLE';
         });

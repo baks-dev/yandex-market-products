@@ -93,7 +93,7 @@ final class YaMarketProductGetStocksRequest extends YandexMarket
 
         if(empty($warehouses))
         {
-            return false;
+            return 0;
         }
 
         $stocks = current($warehouses['offers'])['stocks'];

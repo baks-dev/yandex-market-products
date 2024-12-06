@@ -24,11 +24,12 @@
 
 namespace BaksDev\Yandex\Market\Products\Command;
 
-use BaksDev\Products\Product\Repository\ProductByArticle\ProductEventByArticleInterface;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCardRequest;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\YaMarketProductDeleteCardRequest;
-use BaksDev\Yandex\Market\Products\Repository\Card\AllProductsTag\AllProductsTagInterface;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
+use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -39,23 +40,22 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Удаляет отсутствующие карточки
+ * Получаем карточки товаров и добавляем отсутствующие
  */
 #[AsCommand(
-    name: 'baks:yandex-market-products:clear',
-    description: 'Удаляет отсутствующие карточки на Yandex Market',
-    aliases: ['baks:yandex-products:clear']
+    name: 'baks:yandex-market-products:update:stocks',
+    description: 'Обновляет остатки на Yandex Market',
+    aliases: ['baks:yandex-products:update:stocks', 'baks:yandex:update:stocks']
 )]
-class YaMarketPostClearCardCommand extends Command
+class UpdateYaMarketProductsStocksCommand extends Command
 {
     private SymfonyStyle $io;
 
     public function __construct(
         private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
-        private readonly YaMarketProductFindCardRequest $findProductYandexMarketRequest,
-        private readonly ProductEventByArticleInterface $productEventByArticle,
-        private readonly YaMarketProductDeleteCardRequest $yandexMarketProductDeleteRequest,
-        private readonly AllProductsTagInterface $allProductsTag,
+        private readonly AllProductsIdentifierInterface $allProductsIdentifier,
+        private readonly YaMarketProductsCardInterface $marketProductsCard,
+        private readonly MessageDispatchInterface $messageDispatch
     )
     {
         parent::__construct();
@@ -63,7 +63,7 @@ class YaMarketPostClearCardCommand extends Command
 
     protected function configure(): void
     {
-        $this->addOption('article', 'a', InputOption::VALUE_OPTIONAL, 'Фильтр по тегам ((--article=... || -a ...))');
+        $this->addOption('article', 'a', InputOption::VALUE_OPTIONAL, 'Фильтр по артикулу ((--article=... || -a ...))');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -86,11 +86,10 @@ class YaMarketPostClearCardCommand extends Command
             $questions[] = $quest->getAttr();
         }
 
-        /** Объявляем вопрос с вариантами ответов */
         $question = new ChoiceQuestion(
-            question: 'Профиль пользователя',
-            choices: $questions,
-            default: 0
+            'Профиль пользователя',
+            $questions,
+            0
         );
 
         $profileName = $helper->ask($input, $output, $question);
@@ -124,49 +123,60 @@ class YaMarketPostClearCardCommand extends Command
 
         }
 
-        $this->io->success('Карточки успешно обновлены');
+        $this->io->success('Наличие успешно обновлено');
 
         return Command::SUCCESS;
     }
 
-    public function update(UserProfileUid $profile, ?string $tag = null): void
+    public function update(UserProfileUid $profile, ?string $article = null): void
     {
         $this->io->note(sprintf('Обновляем профиль %s', $profile->getAttr()));
 
-        $tags = $tag ? [['article' => $tag]] : $this->allProductsTag->findAll();
+        /* Получаем все имеющиеся карточки в системе */
+        $products = $this->allProductsIdentifier->findAll();
 
-        foreach($tags as $article)
+        if($products === false)
         {
-            /** Получаем все карточки YandexMarket по тегу */
-            $findProductYandexMarketRequest = $this
-                ->findProductYandexMarketRequest
-                ->profile($profile)
-                ->forTag($article['article']);
+            $this->io->warning('Карточек для обновления не найдено');
+            return;
+        }
 
-            while(true)
+
+        foreach($products as $product)
+        {
+            $card = $this->marketProductsCard
+                ->forProduct($product['product_id'])
+                ->forOfferConst($product['offer_const'])
+                ->forVariationConst($product['variation_const'])
+                ->forModificationConst($product['modification_const'])
+                ->find();
+
+            /**
+             * Если передан артикул - применяем фильтр по вхождению
+             */
+            if(!empty($article))
             {
-                $cards = $findProductYandexMarketRequest->find();
-
-                if($cards === false || $cards->valid() === false)
+                /** Пропускаем обновление, если соответствие не найдено */
+                if($card === false || stripos($card['article'], $article) === false)
                 {
-                    break;
-                }
-
-                foreach($cards as $card)
-                {
-                    $product = $this->productEventByArticle->findProductEventByArticle($card->getArticle());
-
-                    if($product === false)
-                    {
-                        /** Удаляем на YandexMarket отсутствующую карточку */
-                        $this->yandexMarketProductDeleteRequest
-                            ->profile($profile)
-                            ->delete($card->getArticle());
-
-                        $this->io->text(sprintf('Удаляем артикул %s', $card->getArticle()));
-                    }
+                    continue;
                 }
             }
+
+            $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
+                $profile,
+                $product['product_id'],
+                $product['offer_const'],
+                $product['variation_const'],
+                $product['modification_const'],
+            );
+
+            $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
+
+            /** Консольную комманду выполняем синхронно */
+            $this->messageDispatch->dispatch($YaMarketProductsStocksMessage);
+
+            $this->io->text(sprintf('Обновили артикул %s', $card['article']));
         }
     }
 }

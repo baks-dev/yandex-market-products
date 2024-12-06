@@ -28,7 +28,6 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
-use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -43,11 +42,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Получаем карточки товаров и добавляем отсутствующие
  */
 #[AsCommand(
-    name: 'baks:yandex-market-products:post:price',
-    description: 'Обновляет цены на Yandex Market',
-    aliases: ['baks:yandex-products:post:price']
+    name: 'baks:yandex-market-products:update:cards',
+    description: 'Обновляет все карточки на Yandex Market',
+    aliases: ['baks:yandex-products:update:cards', 'baks:yandex:update:cards']
 )]
-class YaMarketPostCardPriceCommand extends Command
+class UpdateYaMarketProductsCardsCommand extends Command
 {
     private SymfonyStyle $io;
 
@@ -72,7 +71,7 @@ class YaMarketPostCardPriceCommand extends Command
 
         /** Получаем активные токены авторизации профилей Yandex Market */
         $profiles = $this->allProfileYaMarketToken
-            ->onlyActiveToken()
+            //->onlyActiveToken()
             ->findAll();
 
         $profiles = iterator_to_array($profiles);
@@ -86,10 +85,11 @@ class YaMarketPostCardPriceCommand extends Command
             $questions[] = $quest->getAttr();
         }
 
+        /** Объявляем вопрос с вариантами ответов */
         $question = new ChoiceQuestion(
-            'Профиль пользователя',
-            $questions,
-            0
+            question: 'Профиль пользователя',
+            choices: $questions,
+            default: 0
         );
 
         $profileName = $helper->ask($input, $output, $question);
@@ -123,7 +123,7 @@ class YaMarketPostCardPriceCommand extends Command
 
         }
 
-        $this->io->success('Цены успешно обновлены');
+        $this->io->success('Карточки успешно обновлены');
 
         return Command::SUCCESS;
     }
@@ -141,7 +141,6 @@ class YaMarketPostCardPriceCommand extends Command
             return;
         }
 
-
         foreach($products as $product)
         {
             $card = $this->marketProductsCard
@@ -151,6 +150,11 @@ class YaMarketPostCardPriceCommand extends Command
                 ->forModificationConst($product['modification_const'])
                 ->find();
 
+            if($card === false)
+            {
+                $this->io->warning('Карточки не найдено, либо не указаны настройки соотношений свойств');
+                continue;
+            }
 
             /**
              * Если передан артикул - применяем фильтр по вхождению
@@ -158,7 +162,7 @@ class YaMarketPostCardPriceCommand extends Command
             if(!empty($article))
             {
                 /** Пропускаем обновление, если соответствие не найдено */
-                if($card === false || stripos($card['article'], $article) === false)
+                if(stripos($card['article'], $article) === false)
                 {
                     continue;
                 }
@@ -172,12 +176,12 @@ class YaMarketPostCardPriceCommand extends Command
                 $product['modification_const'],
             );
 
-            $YaMarketProductsStocksMessage = new YaMarketProductsPriceMessage($YaMarketProductsCardMessage);
-
             /** Консольную комманду выполняем синхронно */
-            $this->messageDispatch->dispatch($YaMarketProductsStocksMessage);
+            $this->messageDispatch->dispatch($YaMarketProductsCardMessage);
 
             $this->io->text(sprintf('Обновили артикул %s', $card['article']));
+
+
         }
     }
 }

@@ -69,6 +69,8 @@ final class YandexMarketParametersTireTest extends KernelTestCase
             ->category(90490) // 90490 - Авто - Шины и диски - Шины
             ->findAll();
 
+        //dd(iterator_to_array($result));
+
 
         /** @var YaMarketProductParamsCollection $YaMarketProductParamsCollection */
         $YaMarketProductParamsCollection = self::getContainer()->get(YaMarketProductParamsCollection::class);

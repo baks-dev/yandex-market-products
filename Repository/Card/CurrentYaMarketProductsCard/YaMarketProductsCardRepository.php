@@ -771,7 +771,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
                 product_variation.article, 
                 product_offer.article, 
                 product_info.article
-            ) AS product_article
+            ) AS article
 		');
 
         $dbal->allGroupByExclude();

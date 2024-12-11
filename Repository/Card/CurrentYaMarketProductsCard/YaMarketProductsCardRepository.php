@@ -696,6 +696,18 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
             ) AS product_price
 		');
 
+        /* Предыдущая стоимость продукта */
+
+        $dbal->addSelect("
+			COALESCE(
+                NULLIF(product_modification_price.old, 0),
+                NULLIF(product_variation_price.old, 0),
+                NULLIF(product_offer_price.old, 0),
+                NULLIF(product_price.old, 0),
+                0
+            ) AS product_old_price
+		");
+
         /* Валюта продукта */
 
         $dbal->addSelect(
@@ -1248,8 +1260,19 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 			   WHEN product_price.price IS NOT NULL AND product_price.price > 0 THEN product_price.price
 			   ELSE NULL
 			END AS product_price
-		'
-        );
+		');
+
+        /* Предыдущая стоимость продукта */
+
+        $dbal->addSelect("
+			COALESCE(
+                NULLIF(product_modification_price.old, 0),
+                NULLIF(product_variation_price.old, 0),
+                NULLIF(product_offer_price.old, 0),
+                NULLIF(product_price.old, 0),
+                0
+            ) AS product_old_price
+		");
 
         /* Валюта продукта */
 

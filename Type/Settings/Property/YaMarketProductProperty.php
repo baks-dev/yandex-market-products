@@ -28,7 +28,7 @@ use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductP
 
 final class YaMarketProductProperty
 {
-    public const TYPE = 'ya_market_product_property';
+    public const string TYPE = 'ya_market_product_property';
 
     private ?YaMarketProductPropertyInterface $property = null;
 

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ return static function(FrameworkConfig $framework) {
     $messenger = $framework->messenger();
 
     $messenger
-        ->transport('yandex-market-products')
+        ->transport('')
         ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?auto_setup=true')
         ->options(['stream' => 'yandex-market-products'])
         ->failureTransport('failed-yandex-market-products')
@@ -39,6 +39,18 @@ return static function(FrameworkConfig $framework) {
         ->delay(1000 * 30)
         ->maxDelay(0)
         ->multiplier(3) // увеличиваем задержку перед каждой повторной попыткой
+        ->service(null);
+
+    $messenger
+        ->transport('yandex-market-products-low')
+        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
+        ->options(['queue_name' => 'yandex-market-products'])
+        ->failureTransport('failed-yandex-market-products')
+        ->retryStrategy()
+        ->maxRetries(1)
+        ->delay(1000)
+        ->maxDelay(1)
+        ->multiplier(2)
         ->service(null);
 
     $failure = $framework->messenger();

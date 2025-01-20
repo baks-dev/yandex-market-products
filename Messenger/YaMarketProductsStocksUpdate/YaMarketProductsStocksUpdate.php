@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,23 +31,19 @@ use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductGetStocksR
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductUpdateStocksRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class YaMarketProductsStocksUpdate
+final readonly class YaMarketProductsStocksUpdate
 {
-    private LoggerInterface $logger;
-
     public function __construct(
-        private readonly YaMarketProductGetStocksRequest $marketProductStocksGetRequest,
-        private readonly YaMarketProductUpdateStocksRequest $marketProductStocksUpdateRequest,
-        private readonly YaMarketProductsCardInterface $marketProductsCard,
-        private readonly MessageDispatchInterface $messageDispatch,
-        LoggerInterface $yandexMarketProductsLogger,
-    )
-    {
-        $this->logger = $yandexMarketProductsLogger;
-    }
+        #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
+        private YaMarketProductGetStocksRequest $marketProductStocksGetRequest,
+        private YaMarketProductUpdateStocksRequest $marketProductStocksUpdateRequest,
+        private YaMarketProductsCardInterface $marketProductsCard,
+        private MessageDispatchInterface $messageDispatch,
+    ) {}
 
     /**
      * Обновляем остатки товаров Yandex Market

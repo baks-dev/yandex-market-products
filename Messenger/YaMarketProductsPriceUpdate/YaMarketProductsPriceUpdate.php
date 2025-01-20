@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -38,27 +38,23 @@ use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use DateInterval;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Contracts\Cache\ItemInterface;
 
 #[AsMessageHandler]
-final class YaMarketProductsPriceUpdate
+final readonly class YaMarketProductsPriceUpdate
 {
-    private LoggerInterface $logger;
-
     public function __construct(
-        private readonly YandexMarketCalculatorRequest $marketCalculatorRequest,
-        private readonly YaMarketProductFindCardRequest $yandexMarketProductRequest,
-        private readonly YaMarketProductUpdatePriceRequest $marketProductPriceRequest,
-        private readonly YaMarketProductsCardInterface $marketProductsCard,
-        private readonly AppLockInterface $appLock,
-        private readonly AppCacheInterface $appCache,
-        private readonly MessageDispatchInterface $messageDispatch,
-        LoggerInterface $yandexMarketProductsLogger,
-    )
-    {
-        $this->logger = $yandexMarketProductsLogger;
-    }
+        #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
+        private YandexMarketCalculatorRequest $marketCalculatorRequest,
+        private YaMarketProductFindCardRequest $yandexMarketProductRequest,
+        private YaMarketProductUpdatePriceRequest $marketProductPriceRequest,
+        private YaMarketProductsCardInterface $marketProductsCard,
+        private AppLockInterface $appLock,
+        private AppCacheInterface $appCache,
+        private MessageDispatchInterface $messageDispatch,
+    ) {}
 
     /**
      * Обновляем базовую цену товара на Yandex Market

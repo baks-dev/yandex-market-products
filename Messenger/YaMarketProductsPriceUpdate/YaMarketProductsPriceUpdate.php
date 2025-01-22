@@ -127,7 +127,9 @@ final readonly class YaMarketProductsPriceUpdate
 
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
-            /** Добавляем к стоимости товара стоимость услуг YaMarket + Торговая наценка (%) */
+            /** Добавляем к стоимости товара стоимость услуг YaMarket
+             * + Торговая наценка (%)
+             */
             return $this->marketCalculatorRequest
                 ->profile($message->getProfile())
                 ->category($Card['market_category'])

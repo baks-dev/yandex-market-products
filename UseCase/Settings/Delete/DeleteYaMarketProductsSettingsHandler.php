@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ use BaksDev\Core\Entity\AbstractHandler;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
 use BaksDev\Yandex\Market\Products\Entity\Settings\YaMarketProductsSettings;
 use BaksDev\Yandex\Market\Products\Messenger\Settings\YaMarketProductsSettingsMessage;
-use DomainException;
 
 final class DeleteYaMarketProductsSettingsHandler extends AbstractHandler
 {
@@ -37,22 +36,8 @@ final class DeleteYaMarketProductsSettingsHandler extends AbstractHandler
         DeleteYaMarketProductsSettingsDTO $command,
     ): string|YaMarketProductsSettings
     {
-
-
-        /** Валидация DTO  */
-        $this->validatorCollection->add($command);
-
-        $this->main = new YaMarketProductsSettings();
-        $this->event = new YaMarketProductsSettingsEvent();
-
-        try
-        {
-            $this->preRemove($command);
-        }
-        catch(DomainException $errorUniqid)
-        {
-            return $errorUniqid->getMessage();
-        }
+        $this->setCommand($command);
+        $this->preEventRemove(YaMarketProductsSettings::class, YaMarketProductsSettingsEvent::class);
 
         /** Валидация всех объектов */
         if($this->validatorCollection->isInvalid())
@@ -60,7 +45,7 @@ final class DeleteYaMarketProductsSettingsHandler extends AbstractHandler
             return $this->validatorCollection->getErrorUniqid();
         }
 
-        $this->entityManager->flush();
+        $this->flush();
 
         /* Отправляем сообщение в шину */
         $this->messageDispatch->dispatch(

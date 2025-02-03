@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -83,26 +83,25 @@ final readonly class UpdateYaMarketCardByChangeOrderStatus
             foreach($EditOrderDTO->getProduct() as $product)
             {
                 /** Получаем идентификаторы обновляемой продукции для получения констант  */
-                $ProductIdentifier = $this->currentProductIdentifier
+                $CurrentProductIdentifier = $this->currentProductIdentifier
                     ->forEvent($product->getProduct())
                     ->forOffer($product->getOffer())
                     ->forVariation($product->getVariation())
                     ->forModification($product->getModification())
                     ->find();
 
-                if($ProductIdentifier === false)
+                if($CurrentProductIdentifier === false)
                 {
                     continue;
                 }
 
                 $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
                     $profile,
-                    $ProductIdentifier['id'],
-                    $ProductIdentifier['offer_const'],
-                    $ProductIdentifier['variation_const'],
-                    $ProductIdentifier['modification_const']
+                    $CurrentProductIdentifier->getProduct(),
+                    $CurrentProductIdentifier->getOfferConst(),
+                    $CurrentProductIdentifier->getVariationConst(),
+                    $CurrentProductIdentifier->getModificationConst()
                 );
-
 
                 /** Добавляем в очередь обновление остатков через транспорт профиля */
 

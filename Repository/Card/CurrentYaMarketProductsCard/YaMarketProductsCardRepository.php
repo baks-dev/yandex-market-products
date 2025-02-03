@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -262,7 +262,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
         }
 
 
-        if($this->modificationConst)
+        if($this->variationConst)
         {
             $dbal
                 ->addSelect('product_variation.const AS variation_const')
@@ -392,11 +392,26 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
                 'product_variation',
                 DeliveryPackageProductParameter::class,
                 'product_package',
-                '
-                    product_package.product = product.id AND
-                    product_package.offer = product_offer.const AND
-                    product_package.variation = product_variation.const AND
-                    product_package.modification = product_modification.const
+                'product_package.product = product.id  AND 
+                    
+                    (
+                        (product_offer.const IS NOT NULL AND product_package.offer = product_offer.const) OR 
+                        (product_offer.const IS NULL AND product_package.offer IS NULL)
+                    )
+                    
+                    AND
+                     
+                    (
+                        (product_variation.const IS NOT NULL AND product_package.variation = product_variation.const) OR 
+                        (product_variation.const IS NULL AND product_package.variation IS NULL)
+                    )
+                     
+                   AND
+                   
+                   (
+                        (product_modification.const IS NOT NULL AND product_package.modification = product_modification.const) OR 
+                        (product_modification.const IS NULL AND product_package.modification IS NULL)
+                   )
                 '
             );
 
@@ -945,11 +960,26 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
                 'card_market',
                 DeliveryPackageProductParameter::class,
                 'product_package',
-                '
-                    product_package.product = card_market.product AND
-                    product_package.offer = card_market.offer AND
-                    product_package.variation = card_market.variation AND
-                    product_package.modification = card_market.modification
+                'product_package.product = card_market.product AND 
+                    
+                    (
+                        (card_market.offer IS NOT NULL AND product_package.offer = card_market.offer) OR 
+                        (card_market.offer IS NULL AND product_package.offer IS NULL)
+                    )
+                    
+                    AND
+                     
+                    (
+                        (card_market.variation IS NOT NULL AND product_package.variation = card_market.variation) OR 
+                        (card_market.variation IS NULL AND product_package.variation IS NULL)
+                    )
+                     
+                   AND
+                   
+                   (
+                        (card_market.modification IS NOT NULL AND product_package.modification = card_market.modification) OR 
+                        (card_market.modification IS NULL AND product_package.modification IS NULL)
+                   )
                 '
             );
 

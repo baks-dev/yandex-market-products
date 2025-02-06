@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,10 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Tariffs;
 
-use BaksDev\Reference\Currency\Type\Currencies\RUR;
-use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use BaksDev\Yandex\Market\Products\Api\AllShops\YandexMarketShopDTO;
-use DomainException;
+use DateInterval;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionProperty;
@@ -48,7 +46,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
     private int $category;
 
     /** Цена товара в рублях. */
-    private float $price;
+    private Money $price;
 
     /** Длина товара в сантиметрах. */
     private int|float $length;
@@ -75,12 +73,12 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
     public function price(Money|int|float $price): self
     {
-        if($price instanceof Money)
+        if(false === ($price instanceof Money))
         {
-            $price = $price->getValue();
+            $price = new Money($price);
         }
 
-        $this->price = (float) $price;
+        $this->price = $price;
 
         return $this;
     }
@@ -119,7 +117,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
      * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/tariffs/calculateTariffs
      *
      */
-    public function calc(): float
+    public function calc(): Money|false
     {
         $reflect = new ReflectionClass($this);
         $properties = $reflect->getProperties(ReflectionProperty::IS_PRIVATE);
@@ -136,61 +134,86 @@ final class YandexMarketCalculatorRequest extends YandexMarket
             }
         }
 
-        $response = $this->TokenHttpClient()
-            ->request(
-                'POST',
-                '/tariffs/calculate',
-                ['json' =>
-                    [
-                        "parameters" => [
-                            "campaignId" => $this->getCompany(),
-                            "frequency" => "DAILY"
-                        ],
-                        "offers" => [
-                            [
-                                "categoryId" => $this->category,
-                                "price" => $this->price,
-                                "length" => $this->length,
-                                "width" => $this->width,
-                                "height" => $this->height,
-                                "weight" => $this->weight
+        $key = md5(
+            $this->getCompany().
+            $this->category.
+            $this->price.
+            $this->length.
+            $this->width.
+            $this->height.
+            $this->weight.
+            self::class
+        );
+
+        $cache = new FilesystemAdapter();
+
+        $content = $cache->get($key, function(ItemInterface $item): array|false {
+
+            $item->expiresAfter(DateInterval::createFromDateString('1 day'));
+
+            $response = $this->TokenHttpClient()
+                ->request(
+                    'POST',
+                    '/tariffs/calculate',
+                    ['json' =>
+                        [
+                            "parameters" => [
+                                "campaignId" => $this->getCompany(),
+                                "frequency" => "DAILY"
+                            ],
+                            "offers" => [
+                                [
+                                    "categoryId" => $this->category,
+                                    "price" => $this->price->getValue(),
+                                    "length" => $this->length,
+                                    "width" => $this->width,
+                                    "height" => $this->height,
+                                    "weight" => $this->weight
+                                ]
                             ]
                         ]
-                    ]
-                ],
-            );
+                    ],
+                );
 
-        $content = $response->toArray(false);
+            $content = $response->toArray(false);
 
-        if($response->getStatusCode() !== 200)
-        {
-            foreach($content['errors'] as $error)
+            if($response->getStatusCode() !== 200)
             {
-                $this->logger->critical($error['code'].': '.$error['message'], [self::class.':'.__LINE__]);
+                $item->expiresAfter(DateInterval::createFromDateString('50 seconds'));
+
+                $this->logger->critical(
+                    'yandex-market-products: Ошибка при получении стоимости услуг',
+                    [$content, self::class.':'.__LINE__]
+                );
+
+                return false;
             }
 
-            throw new DomainException(
-                message: 'Ошибка '.self::class,
-                code: $response->getStatusCode()
-            );
+            return $content;
+        });
+
+        if(false === $content)
+        {
+            return false;
         }
 
         /** Суммируем все затраты (услуги)  */
         $tariffs = current($content['result']['offers'])['tariffs'];
 
         $totalAmount = array_reduce($tariffs, static function($carry, $item) {
-            return $item['amount'] * 100 + $carry;
+            return $item['amount'] + $carry;
         }, 0);
 
-        /** Суммируем стоимость товара и услуг  */
-        $price = ($this->price * 100) + $totalAmount;
 
-        /** Наценка стоимости */
-        $price += $this->getPercent($price);
+        $totalAmount = new Money($totalAmount);
 
-        /** Округляем стоимость до десяток */
-        $price = ceil($price / 1000) * 10;
+        /** Суммируем стоимость товара и услуг */
+        $this->price->add($totalAmount);
 
-        return $price;
+        /** Применяем торговую наценку */
+        $trade = $this->getPercent();
+        $this->price->applyString($trade);
+
+        return $this->price;
     }
 }

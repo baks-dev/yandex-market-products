@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate;
 
 use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
@@ -36,11 +37,9 @@ use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCar
 use BaksDev\Yandex\Market\Products\Api\Products\Price\YaMarketProductUpdatePriceRequest;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
-use DateInterval;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Contracts\Cache\ItemInterface;
 
 #[AsMessageHandler]
 final readonly class YaMarketProductsPriceUpdate
@@ -54,6 +53,7 @@ final readonly class YaMarketProductsPriceUpdate
         private AppLockInterface $appLock,
         private AppCacheInterface $appCache,
         private MessageDispatchInterface $messageDispatch,
+        private DeduplicatorInterface $deduplicator,
     ) {}
 
     /**
@@ -96,64 +96,57 @@ final readonly class YaMarketProductsPriceUpdate
         }
 
 
-        /** Кешируем на сутки результат калькуляции услуг с одинаковыми параметрами */
-        $cache = $this->appCache->init('yandex-market-products');
+        $Deduplicator = $this->deduplicator
+            ->namespace('yandex-market-products')
+            ->expiresAfter('1 day')
+            ->deduplication([
+                $message->getProfile(),
+                $Card,
+                self::class
+            ]);
 
-        $cacheKey = implode('', [
-            $message->getProfile(),
-            $Card['market_category'],
-            $Card['product_price'],
-            $Card['width'],
-            $Card['height'],
-            $Card['length'],
-            $Card['weight'],
-        ]);
+        if($Deduplicator->isExecuted())
+        {
+            return;
+        }
 
-        $Money = new Money($Card['product_price'], true);
-        $Currency = new Currency($Card['product_currency']);
+        $Deduplicator->save();
+
+
+
+
 
         /**
          * Делаем расчет стоимости реализации товара
          * Стоимости товара + Стоимость услуг YaMarket + Торговая наценка
          */
 
-        $marketCalculator = $cache->get($cacheKey, function(ItemInterface $item) use ($Card, $Money, $message): float {
-
-            /** Лимит: 100 запросов в минуту, добавляем лок */
-            $this->appLock
-                ->createLock([$message->getProfile(), self::class])
-                ->lifetime((60 / 90))
-                ->waitAllTime();
-
-            $item->expiresAfter(DateInterval::createFromDateString('1 day'));
-
-            /** Добавляем к стоимости товара стоимость услуг YaMarket
-             * + Торговая наценка (%)
-             */
-            return $this->marketCalculatorRequest
-                ->profile($message->getProfile())
-                ->category($Card['market_category'])
-                ->price($Money)
-                ->width(($Card['width'] / 10))
-                ->height(($Card['height'] / 10))
-                ->length(($Card['length'] / 10))
-                ->weight(($Card['weight'] / 100))
-                ->calc();
-        });
+        /** Лимит: 100 запросов в минуту, добавляем лок */
+        $this->appLock
+            ->createLock([$message->getProfile(), self::class])
+            ->lifetime((60 / 90))
+            ->waitAllTime();
 
 
         /**
-         * Проверяем изменение цены в карточке если добавлена ранее
+         * Добавляем к стоимости товара стоимость услуг YaMarket
+         * + Торговая наценка (%)
          */
 
-        $Price = new Money($marketCalculator);
+        $Money = new Money($Card['product_price'], true);
 
-        $MarketProduct = $this->yandexMarketProductRequest
+        $Price = $this->marketCalculatorRequest
             ->profile($message->getProfile())
-            ->article($Card['article'])
-            ->find();
+            ->category($Card['market_category'])
+            ->price($Money)
+            ->width(($Card['width'] / 10))
+            ->height(($Card['height'] / 10))
+            ->length(($Card['length'] / 10))
+            ->weight(($Card['weight'] / 100))
+            ->calc();
 
-        if(false === $MarketProduct)
+
+        if(false === $Price)
         {
             $this->messageDispatch
                 ->dispatch(
@@ -170,6 +163,16 @@ final readonly class YaMarketProductsPriceUpdate
         }
 
 
+        /**
+         * Проверяем изменение цены в карточке если добавлена ранее
+         */
+
+        $MarketProduct = $this->yandexMarketProductRequest
+            ->profile($message->getProfile())
+            ->article($Card['article'])
+            ->find();
+
+
         if($MarketProduct->valid())
         {
             /** @var YaMarketProductDTO $YandexMarketProductDTO */
@@ -180,6 +183,9 @@ final readonly class YaMarketProductsPriceUpdate
                 return;
             }
         }
+
+
+        $Currency = new Currency($Card['product_currency']);
 
         $this->marketProductPriceRequest
             ->profile($message->getProfile())

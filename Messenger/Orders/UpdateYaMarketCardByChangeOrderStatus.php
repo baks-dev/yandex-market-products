@@ -67,7 +67,7 @@ final readonly class UpdateYaMarketCardByChangeOrderStatus
 
 
         /** Получаем событие заказа */
-        $OrderEvent = $this->currentOrderEvent->forOrder($message->getId())->execute();
+        $OrderEvent = $this->currentOrderEvent->forOrder($message->getId())->find();
 
         if($OrderEvent === false)
         {

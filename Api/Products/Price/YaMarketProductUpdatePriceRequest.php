@@ -69,11 +69,9 @@ final class YaMarketProductUpdatePriceRequest extends YandexMarket
      */
     public function update(): bool
     {
-        /**
-         * Выполнять операции запроса ТОЛЬКО в PROD окружении
-         */
         if($this->isExecuteEnvironment() === false)
         {
+            $this->logger->critical('Запрос может быть выполнен только в PROD окружении', [self::class.':'.__LINE__]);
             return true;
         }
 

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ final class AdultYaMarketProductProperty implements YaMarketProductPropertyInter
      * Параметр включает для товара пометку 18+.
      * Устанавливайте ее только для товаров, которые относятся к удовлетворению сексуальных потребностей.
      */
-    public const PARAM = 'adult';
+    public const string PARAM = 'adult';
 
     public function getIndex(): string
     {

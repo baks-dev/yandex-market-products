@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ final class OfferYaMarketProductProperty implements YaMarketProductPropertyInter
      * Уже заданный SKU нельзя освободить и использовать заново для другого товара. Каждый товар должен получать новый идентификатор, до того никогда не использовавшийся в вашем каталоге.
      *
      */
-    public const PARAM = 'offerId';
+    public const string PARAM = 'offerId';
 
     public function getIndex(): string
     {

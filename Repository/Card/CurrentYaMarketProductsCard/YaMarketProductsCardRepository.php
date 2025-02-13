@@ -209,7 +209,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 
         $dbal
             ->addSelect('product.id AS product_uid')
-            ->from(Product::class, 'product',)
+            ->from(Product::class, 'product')
             ->where('product.id = :product')
             ->setParameter('product', $this->product, ProductUid::TYPE);
 
@@ -226,12 +226,14 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
             );
 
 
+        $dbal
+            ->addSelect('product_offer.const AS offer_const')
+            ->addSelect('product_offer.value AS product_offer_value')
+            ->addSelect('product_offer.postfix AS product_offer_postfix');
+
         if($this->offerConst)
         {
             $dbal
-                ->addSelect('product_offer.const AS offer_const')
-                ->addSelect('product_offer.value AS product_offer_value')
-                ->addSelect('product_offer.postfix AS product_offer_postfix')
                 ->join(
                     'product',
                     ProductOffer::class,
@@ -248,26 +250,25 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
         }
         else
         {
-            $dbal
-                ->addSelect('product_offer.const AS offer_const')
-                ->addSelect('product_offer.value AS product_offer_value')
-                ->addSelect('product_offer.postfix AS product_offer_postfix')
-                ->join(
-                    'product',
-                    ProductOffer::class,
-                    'product_offer',
-                    'product_offer.event = product.event AND 
+            $dbal->join(
+                'product',
+                ProductOffer::class,
+                'product_offer',
+                'product_offer.event = product.event AND 
                     product_offer.const = IS NULL'
-                );
+            );
         }
 
+
+        $dbal
+            ->addSelect('product_variation.const AS variation_const')
+            ->addSelect('product_variation.value AS product_variation_value')
+            ->addSelect('product_variation.postfix AS product_variation_postfix');
 
         if($this->variationConst)
         {
             $dbal
-                ->addSelect('product_variation.const AS variation_const')
-                ->addSelect('product_variation.value AS product_variation_value')
-                ->addSelect('product_variation.postfix AS product_variation_postfix')
+
                 ->join(
                     'product_offer',
                     ProductVariation::class,
@@ -286,9 +287,6 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
         else
         {
             $dbal
-                ->addSelect('product_variation.const AS variation_const')
-                ->addSelect('product_variation.value AS product_variation_value')
-                ->addSelect('product_variation.postfix AS product_variation_postfix')
                 ->leftJoin(
                     'product_offer',
                     ProductVariation::class,
@@ -301,12 +299,14 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
         }
 
 
+        $dbal
+            ->addSelect('product_modification.const AS modification_const')
+            ->addSelect('product_modification.value AS product_modification_value')
+            ->addSelect('product_modification.postfix AS product_modification_postfix');
+
         if($this->modificationConst)
         {
             $dbal
-                ->addSelect('product_modification.const AS modification_const')
-                ->addSelect('product_modification.value AS product_modification_value')
-                ->addSelect('product_modification.postfix AS product_modification_postfix')
                 ->join(
                     'product_variation',
                     ProductModification::class,
@@ -324,9 +324,6 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
         else
         {
             $dbal
-                ->addSelect('product_modification.const AS modification_const')
-                ->addSelect('product_modification.value AS product_modification_value')
-                ->addSelect('product_modification.postfix AS product_modification_postfix')
                 ->leftJoin(
                     'product_variation',
                     ProductModification::class,
@@ -381,7 +378,6 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
                 'category_trans',
                 'category_trans.event = category.event AND category_trans.local = :local'
             );
-
 
         $dbal
             ->addSelect('product_package.length') // Длина упаковки в см.
@@ -799,6 +795,18 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
                 product_offer.article, 
                 product_info.article
             ) AS article
+		');
+
+        /** Штрихкод продукта */
+
+        $dbal->addSelect('
+            COALESCE(
+                product_modification.barcode, 
+                product_variation.barcode, 
+                product_offer.barcode, 
+                product_info.barcode,
+                NULL
+            ) AS barcode
 		');
 
         $dbal->allGroupByExclude();

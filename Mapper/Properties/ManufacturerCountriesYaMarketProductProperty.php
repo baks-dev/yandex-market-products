@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ final class ManufacturerCountriesYaMarketProductProperty implements YaMarketProd
      * Записывайте названия стран так, как они записаны в списке.
      * Example: Россия
      */
-    public const PARAM = 'manufacturerCountries';
+    public const string PARAM = 'manufacturerCountries';
 
 
     public function __construct(

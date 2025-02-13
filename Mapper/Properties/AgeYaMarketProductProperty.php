@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ final class AgeYaMarketProductProperty implements YaMarketProductPropertyInterfa
      * Возрастное ограничение можно задавать в годах (с нуля, с 6, 12, 16 или 18)
      * или в месяцах (любое число от 0 до 12).
      */
-    public const PARAM = 'age';
+    public const string PARAM = 'age';
 
 
     public function getIndex(): string

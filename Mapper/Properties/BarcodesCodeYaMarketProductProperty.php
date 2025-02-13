@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ final class BarcodesCodeYaMarketProductProperty implements YaMarketProductProper
      *
      * Внутренние штрихкоды, начинающиеся на 2 или 02, и коды формата Code 128 не являются GTIN.
      */
-    public const PARAM = 'barcodes';
+    public const string PARAM = 'barcodes';
 
     public function getIndex(): string
     {
@@ -89,6 +89,10 @@ final class BarcodesCodeYaMarketProductProperty implements YaMarketProductProper
 
     public function getData(array $data): mixed
     {
+        if(!empty($data['barcode']))
+        {
+            return $data['barcode'];
+        }
 
         $return_value = match (true)
         {

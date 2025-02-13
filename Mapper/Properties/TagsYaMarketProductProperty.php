@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ final class TagsYaMarketProductProperty implements YaMarketProductPropertyInterf
      *
      * Максимальная длина тега 20 символов. У одного товара может быть максимум 10 тегов. Всего можно создать не больше 50 разных тегов.
      */
-    public const PARAM = 'tags';
+    public const string PARAM = 'tags';
 
     public function getIndex(): string
     {

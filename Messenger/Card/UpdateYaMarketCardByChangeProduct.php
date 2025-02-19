@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,26 +25,24 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
-use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Messenger\ProductMessage;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
-use BaksDev\Yandex\Market\Products\Repository\Card\ProductYaMarketCard\ProductsYaMarketCardInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
-final class UpdateYaMarketCardByChangeProduct
+/**
+ * Обновляем карточку YandexMarket при изменении системной карточки
+ */
+#[AsMessageHandler(priority: 10)]
+final readonly class UpdateYaMarketCardByChangeProduct
 {
     public function __construct(
-        private readonly AllProductsIdentifierInterface $allProductsIdentifier,
-        private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
-        private readonly MessageDispatchInterface $messageDispatch,
+        private AllProductsIdentifierInterface $allProductsIdentifier,
+        private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+        private MessageDispatchInterface $messageDispatch,
     ) {}
 
-    /**
-     * Обновляем информацию YandexMarket при изменении системной карточки
-     */
     public function __invoke(ProductMessage $message): void
     {
 

@@ -37,8 +37,11 @@ use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMark
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
-final readonly class UpdateYaMarketCardByChangeOrderStatus
+/**
+ * Обновляем остатки YandexMarket при изменении статусов заказов
+ */
+#[AsMessageHandler(priority: 90)]
+final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
 {
     public function __construct(
         private CurrentOrderEventInterface $currentOrderEvent,
@@ -47,9 +50,7 @@ final readonly class UpdateYaMarketCardByChangeOrderStatus
         private MessageDispatchInterface $messageDispatch,
     ) {}
 
-    /**
-     * Обновляем остатки YandexMarket при изменении статусов заказов
-     */
+
     public function __invoke(OrderMessage $message): void
     {
         /**  Получаем активные токены профилей пользователя */

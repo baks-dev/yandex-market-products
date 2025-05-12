@@ -1,6 +1,5 @@
-{% trans_default_domain 'avito-products.admin' %}
+{% trans_default_domain 'yandex-market-products.admin' %}
 
-{# {{ dd(form) }} #}
 <div class="card w-100 border-light">
     <div class="card-header border-light bg-body">
         <div class="card-title">
@@ -27,8 +26,8 @@
                         {% set img_host =  image.vars.data.cdn == true  ? CDN_HOST : '' %}
                         {% set dir = '/upload' %}
 
-                        {# Название таблицы из аттрибутов AvitoProductImage #}
-                        {% set img_table = '/avito_product_images/' %}
+                        {# Название таблицы из аттрибутов YandexMarketProductImage #}
+                        {% set img_table = '/ya_market_product_images/' %}
                         {% set img_dir = image.vars.data.name %}
                         {% set img_file = (img_host is empty ? '/image.' : '/small.') ~ image.vars.data.ext %}
                         {% set image_path = img_host ~ dir ~ img_table ~ img_dir ~ img_file %}

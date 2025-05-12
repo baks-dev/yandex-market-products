@@ -23,13 +23,8 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Repository\Card\AllYaMarketProductsCard;
+namespace BaksDev\Yandex\Market\Products\Repository\AllProductsWithYandexMarketImage;
 
-use BaksDev\Avito\Board\Entity\AvitoBoard;
-use BaksDev\Avito\Board\Entity\Event\AvitoBoardEvent;
-use BaksDev\Avito\Products\Entity\AvitoProduct;
-use BaksDev\Avito\Products\Entity\Images\AvitoProductImage;
-use BaksDev\Avito\Products\Forms\AvitoFilter\AvitoProductsFilterDTO;
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Paginator\PaginatorInterface;
@@ -55,23 +50,20 @@ use BaksDev\Products\Product\Entity\Offers\Variation\Price\ProductVariationPrice
 use BaksDev\Products\Product\Entity\Offers\Variation\ProductVariation;
 use BaksDev\Products\Product\Entity\Photo\ProductPhoto;
 use BaksDev\Products\Product\Entity\Product;
+use BaksDev\Products\Product\Entity\ProductInvariable;
 use BaksDev\Products\Product\Entity\Property\ProductProperty;
 use BaksDev\Products\Product\Entity\Trans\ProductTrans;
 use BaksDev\Products\Product\Forms\ProductFilter\Admin\ProductFilterDTO;
 use BaksDev\Products\Product\Forms\ProductFilter\Admin\Property\ProductFilterPropertyDTO;
+use BaksDev\Yandex\Market\Products\Entity\Images\YandexMarketProductImage;
+use BaksDev\Yandex\Market\Products\Entity\YandexMarketProduct;
+use BaksDev\Yandex\Market\Products\Forms\YandexMarketFilter\YandexMarketProductsFilterDTO;
 
-
-interface AllYaMarketProductsCardInterface
-{
-    public function findPaginator(): PaginatorInterface;
-}
-
-final class AllYaMarketProductsCard implements AllYaMarketProductsCardInterface
+final class AllProductsWithYandexMarketImagesRepository implements AllProductsWithYandexMarketImagesInterface
 {
     private ?ProductFilterDTO $filter = null;
 
-    private ?AvitoProductsFilterDTO $avitoProductsFilter = null;
-
+    private ?YandexMarketProductsFilterDTO $yandexMarketProductsFilter = null;
     private ?SearchDTO $search = null;
 
     public function __construct(
@@ -92,13 +84,13 @@ final class AllYaMarketProductsCard implements AllYaMarketProductsCardInterface
         return $this;
     }
 
-    public function filterAvitoProducts(AvitoProductsFilterDTO $avitoProductsFilter): self
+    public function filterYandexMarketProducts(YandexMarketProductsFilterDTO $yandexMarketProductsFilter): self
     {
-        $this->avitoProductsFilter = $avitoProductsFilter;
+        $this->yandexMarketProductsFilter = $yandexMarketProductsFilter;
         return $this;
     }
 
-    public function findPaginator(): PaginatorInterface
+    public function findAll(): PaginatorInterface
     {
         $dbal = $this->DBALQueryBuilder
             ->createQueryBuilder(self::class)
@@ -130,7 +122,7 @@ final class AllYaMarketProductsCard implements AllYaMarketProductsCardInterface
         /** Название продукта */
         $dbal
             ->addSelect('product_trans.name AS product_name')
-            ->leftJoin(
+            ->join(
                 'product_event',
                 ProductTrans::class,
                 'product_trans',
@@ -141,7 +133,7 @@ final class AllYaMarketProductsCard implements AllYaMarketProductsCardInterface
 
         /** Здесь основной артикул товара */
         $dbal
-            ->leftJoin(
+            ->join(
                 'product_event',
                 ProductInfo::class,
                 'product_info',
@@ -345,60 +337,80 @@ final class AllYaMarketProductsCard implements AllYaMarketProductsCardInterface
             ) AS product_image_cdn'
         );
 
-
-        /** Продукт Авито */
+        /**
+         * Product Invariable
+         */
         $dbal
-            ->addSelect('avito_product.id as avito_product_id')
-            ->leftJoin(
+            ->addSelect('product_invariable.id AS invariable')
+            ->join(
                 'product_modification',
-                AvitoProduct::class,
-                'avito_product',
+                ProductInvariable::class,
+                'product_invariable',
                 '
-                avito_product.product = product.id AND 
-                (avito_product.offer IS NULL OR avito_product.offer = product_offer.const) AND 
-                (avito_product.variation IS NULL OR avito_product.variation = product_variation.const) AND 
-                (avito_product.modification IS NULL OR avito_product.modification = product_modification.const)
-            '
+                    product_invariable.product = product.id AND
+                    (
+                        (product_offer.const IS NOT NULL AND product_invariable.offer = product_offer.const) OR
+                        (product_offer.const IS NULL AND product_invariable.offer IS NULL)
+                    )
+                    AND
+                    (
+                        (product_variation.const IS NOT NULL AND product_invariable.variation = product_variation.const) OR
+                        (product_variation.const IS NULL AND product_invariable.variation IS NULL)
+                    )
+                   AND
+                   (
+                        (product_modification.const IS NOT NULL AND product_invariable.modification = product_modification.const) OR
+                        (product_modification.const IS NULL AND product_invariable.modification IS NULL)
+                   )
+            ');
+
+        /** Продукт Яндекс Маркет */
+        $dbal
+            ->addSelect('ya_market_product.id as ya_market_product_id')
+            ->leftJoin(
+                'product_invariable',
+                YandexMarketProduct::class,
+                'ya_market_product',
+                'ya_market_product.invariable = product_invariable.id'
             );
 
-        /** Изображения Авито */
         $dbal->leftJoin(
-            'avito_product',
-            AvitoProductImage::class,
-            'avito_product_images',
+            'ya_market_product',
+            YandexMarketProductImage::class,
+            'ya_market_product_images',
             '
-                avito_product_images.avito = avito_product.id AND
-                avito_product_images.root = true'
+                ya_market_product_images.market = ya_market_product.id AND
+                ya_market_product_images.root = true
+            '
         );
 
         $dbal->addSelect(
             "
             CASE
-                WHEN avito_product_images.name IS NOT NULL THEN
-                    CONCAT ( '/upload/".$dbal->table(AvitoProductImage::class)."' , '/', avito_product_images.name)
+                WHEN ya_market_product_images.name IS NOT NULL THEN
+                    CONCAT ( '/upload/".$dbal->table(YandexMarketProductImage::class)."' , '/', ya_market_product_images.name)
                 ELSE NULL 
-            END as avito_product_image
+            END as ya_market_product_image
             "
         );
 
         /** Расширение изображения */
         $dbal->addSelect('
 			CASE
-			   WHEN avito_product_images.name IS NOT NULL THEN
-					avito_product_images.ext
+			   WHEN ya_market_product_images.name IS NOT NULL THEN
+					ya_market_product_images.ext
 			   ELSE NULL
-			END AS avito_product_image_ext
+			END AS ya_market_product_image_ext
 		');
 
         /** Флаг загрузки файла CDN */
         $dbal->addSelect('
 			CASE
-			   WHEN avito_product_images.name IS NOT NULL THEN
-					avito_product_images.cdn
+			   WHEN ya_market_product_images.name IS NOT NULL THEN
+					ya_market_product_images.cdn
 			   ELSE NULL
-			END AS avito_product_image_cdn
+			END AS ya_market_product_image_cdn
 		');
-
 
         /**
          * Категория
@@ -449,31 +461,6 @@ final class AllYaMarketProductsCard implements AllYaMarketProductsCardInterface
                     category_trans.local = :local'
             );
 
-        /** Avito mapper */
-        /**
-         * Только те продукты, для которых создан маппер
-         */
-        $dbal
-            ->addSelect('avito_board.id AS avito_board_mapper_category_id')
-            ->join(
-                'product_category',
-                AvitoBoard::class,
-                'avito_board',
-                'avito_board.id = product_category.category'
-            );
-
-        /**
-         * Название категории в Авито из активного события маппера. Для каждой карточки
-         */
-        $dbal
-            ->addSelect('avito_board_event.avito AS avito_board_avito_category')
-            ->join(
-                'avito_board',
-                AvitoBoardEvent::class,
-                'avito_board_event',
-                'avito_board_event.id = avito_board.event'
-            );
-
         /**
          * Фильтр по свойства продукта
          */
@@ -495,28 +482,31 @@ final class AllYaMarketProductsCard implements AllYaMarketProductsCardInterface
 
                     $dbal->setParameter($property->getType().'_const', $property->getConst());
                     $dbal->setParameter($property->getType().'_value', $property->getValue());
+                    $dbal->setParameter($property->getType().'_value', $property->getValue());
                 }
             }
         }
 
-
-        if($this->avitoProductsFilter->getExists() !== null)
+        if($this->yandexMarketProductsFilter->getExists() !== null)
         {
-            if($this->avitoProductsFilter->getExists() === true)
+            if($this->yandexMarketProductsFilter->getExists() === true)
             {
-                $dbal->andWhere('avito_product_images.name IS NOT NULL');
+                $dbal->andWhere('ya_market_images.name IS NOT NULL');
             }
             else
             {
-                $dbal->andWhere('avito_product_images.name IS NULL');
+                $dbal->andWhere('ya_market_images.name IS NULL');
             }
         }
-
 
         if($this->search?->getQuery())
         {
             /** Поиск по модификации */
-            $result = $this->elasticGetIndex ? $this->elasticGetIndex->handle(ProductModification::class, $this->search->getQuery(), 1) : false;
+            $result = $this->elasticGetIndex ? $this->elasticGetIndex->handle(
+                ProductModification::class,
+                $this->search->getQuery(),
+                1
+            ) : false;
 
             if($result)
             {
@@ -561,10 +551,8 @@ final class AllYaMarketProductsCard implements AllYaMarketProductsCardInterface
                 ->addSearchLike('product_offer.article')
                 ->addSearchLike('product_modification.article')
                 ->addSearchLike('product_variation.article');
-
         }
 
-        return $this->paginator->fetchAllAssociative($dbal);
+        return $this->paginator->fetchAllHydrate($dbal, AllProductsWithYandexMarketImagesResult::class);
     }
-
 }

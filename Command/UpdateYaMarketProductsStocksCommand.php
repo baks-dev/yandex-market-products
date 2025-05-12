@@ -141,7 +141,6 @@ class UpdateYaMarketProductsStocksCommand extends Command
             return;
         }
 
-
         foreach($products as $product)
         {
             $card = $this->marketProductsCard
@@ -177,6 +176,11 @@ class UpdateYaMarketProductsStocksCommand extends Command
             $this->messageDispatch->dispatch($YaMarketProductsStocksMessage);
 
             $this->io->text(sprintf('Обновили артикул %s', $card['article']));
+
+            if($card['article'] === $article)
+            {
+                break;
+            }
         }
     }
 }

@@ -181,7 +181,10 @@ class UpdateYaMarketProductsCardsCommand extends Command
 
             $this->io->text(sprintf('Обновили артикул %s', $card['article']));
 
-
+            if($card['article'] === $article)
+            {
+                break;
+            }
         }
     }
 }

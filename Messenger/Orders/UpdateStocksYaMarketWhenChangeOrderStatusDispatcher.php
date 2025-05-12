@@ -32,6 +32,7 @@ use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface
 use BaksDev\Orders\Order\UseCase\Admin\Edit\EditOrderDTO;
 use BaksDev\Orders\Order\UseCase\Admin\Edit\Products\OrderProductDTO;
 use BaksDev\Products\Product\Repository\CurrentProductIdentifier\CurrentProductIdentifierInterface;
+use BaksDev\Products\Product\Repository\CurrentProductIdentifier\CurrentProductIdentifierResult;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
@@ -91,7 +92,7 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
                     ->forModification($product->getModification())
                     ->find();
 
-                if($CurrentProductIdentifier === false)
+                if(false === ($CurrentProductIdentifier instanceof CurrentProductIdentifierResult))
                 {
                     continue;
                 }

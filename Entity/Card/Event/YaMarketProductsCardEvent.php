@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ class YaMarketProductsCardEvent extends EntityEvent
     /**
      * Модификатор
      */
-    #[ORM\OneToOne(targetEntity: YaMarketProductsCardModify::class, mappedBy: 'event', cascade: ['all'])]
+    #[ORM\OneToOne(targetEntity: YaMarketProductsCardModify::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private YaMarketProductsCardModify $modify;
 
 
@@ -72,7 +72,7 @@ class YaMarketProductsCardEvent extends EntityEvent
      * Свойства карточки Маркет
      */
     #[Assert\Valid]
-    #[ORM\OneToMany(targetEntity: YaMarketProductsCardProperty::class, mappedBy: 'event', cascade: ['all'])]
+    #[ORM\OneToMany(targetEntity: YaMarketProductsCardProperty::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private Collection $property;
 
 
@@ -80,13 +80,13 @@ class YaMarketProductsCardEvent extends EntityEvent
      * Параметры продукции категории Маркет
      */
     #[Assert\Valid]
-    #[ORM\OneToMany(targetEntity: YaMarketProductsCardParameters::class, mappedBy: 'event', cascade: ['all'])]
+    #[ORM\OneToMany(targetEntity: YaMarketProductsCardParameters::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private Collection $parameters;
 
     /**
      * Информация о продукции
      */
-    #[ORM\OneToOne(targetEntity: YaMarketProductsCardMarket::class, mappedBy: 'event', cascade: ['all'])]
+    #[ORM\OneToOne(targetEntity: YaMarketProductsCardMarket::class, mappedBy: 'event', cascade: ['all'], fetch: 'EAGER')]
     private ?YaMarketProductsCardMarket $market = null;
 
 

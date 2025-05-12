@@ -141,7 +141,6 @@ class UpdateYaMarketProductsPriceCommand extends Command
             return;
         }
 
-
         foreach($products as $product)
         {
             $card = $this->marketProductsCard
@@ -150,7 +149,6 @@ class UpdateYaMarketProductsPriceCommand extends Command
                 ->forVariationConst($product['variation_const'])
                 ->forModificationConst($product['modification_const'])
                 ->find();
-
 
             /**
              * Если передан артикул - применяем фильтр по вхождению
@@ -178,6 +176,11 @@ class UpdateYaMarketProductsPriceCommand extends Command
             $this->messageDispatch->dispatch($YaMarketProductsStocksMessage);
 
             $this->io->text(sprintf('Обновили артикул %s', $card['article']));
+
+            if($card['article'] === $article)
+            {
+                break;
+            }
         }
     }
 }

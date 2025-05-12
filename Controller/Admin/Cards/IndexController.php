@@ -29,7 +29,7 @@ use BaksDev\Core\Form\Search\SearchForm;
 use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
 use BaksDev\Products\Product\Forms\ProductFilter\Admin\ProductFilterDTO;
 use BaksDev\Products\Product\Forms\ProductFilter\Admin\ProductFilterForm;
-use BaksDev\Yandex\Market\Products\Repository\Card\PaginatorYaMarketProductsCard\PaginatorYaMarketProductsCardInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\AllYaMarketProductsCard\AllYaMarketProductsCardInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -40,10 +40,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class IndexController extends AbstractController
 {
     /** Карточки товаров Yandex Market  */
-    #[Route('/admin/ya/market/product/cards/{page<\d+>}', name: 'admin.card.index', methods: ['GET', 'POST'])]
+    #[Route('/admin/yandex/products/{page<\d+>}', name: 'admin.products.index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
-        PaginatorYaMarketProductsCardInterface $paginatorYaMarketProductsCard,
+        AllYaMarketProductsCardInterface $paginatorYaMarketProductsCard,
         int $page = 0,
     ): Response
     {
@@ -63,12 +63,14 @@ final class IndexController extends AbstractController
         /**
          * Фильтр продукции по ТП
          */
-        $filter = new ProductFilterDTO($request);
-        $filterForm = $this->createForm(ProductFilterForm::class, $filter, [
-            'action' => $this->generateUrl('yandex-market-products:admin.card.index'),
-        ]);
-        $filterForm->handleRequest($request);
-        !$filterForm->isSubmitted() ?: $this->redirectToReferer();
+        $filter = new ProductFilterDTO();
+        $filterForm = $this
+            ->createForm(
+                type: ProductFilterForm::class,
+                data: $filter,
+                options: ['action' => $this->generateUrl('yandex-market-products:admin.card.index'),]
+            )
+            ->handleRequest($request);
 
 
         /* Получаем список карточек */

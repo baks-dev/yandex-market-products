@@ -151,6 +151,10 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
+            /** Присваиваем торговую наценку для расчета стоимости услуг */
+            $trade = $this->getPercent();
+            $this->price->applyString($trade);
+
             $response = $this->TokenHttpClient()
                 ->request(
                     'POST',
@@ -205,14 +209,10 @@ final class YandexMarketCalculatorRequest extends YandexMarket
         }, 0);
 
 
-        $totalAmount = new Money($totalAmount);
-
         /** Суммируем стоимость товара и услуг */
+        $totalAmount = new Money($totalAmount);
         $this->price->add($totalAmount);
 
-        /** Применяем торговую наценку */
-        $trade = $this->getPercent();
-        $this->price->applyString($trade);
 
         return $this->price;
     }

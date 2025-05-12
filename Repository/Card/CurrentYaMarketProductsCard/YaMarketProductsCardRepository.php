@@ -255,7 +255,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
                 ProductOffer::class,
                 'product_offer',
                 'product_offer.event = product.event AND 
-                    product_offer.const = IS NULL'
+                    product_offer.const IS NULL'
             );
         }
 

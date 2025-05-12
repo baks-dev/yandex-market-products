@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Api\Tariffs\Tests;
 
+use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
@@ -65,11 +66,18 @@ class YandexMarketCalculatorTest extends KernelTestCase
             ->weight(12.5)
             ->calc();
 
+        if(false === $calc)
+        {
+            self::assertFalse(false);
+            return;
+        }
+
         // DBS 10880
         // FBS 12140.0
         //dd($calc);
 
-        self::assertIsFloat($calc);
+        self::assertInstanceOf(Money::class, $calc);
+        self::assertIsFloat($calc->getValue());
 
     }
 

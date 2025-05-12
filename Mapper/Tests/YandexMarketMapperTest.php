@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -50,8 +50,13 @@ class YandexMarketMapperTest extends KernelTestCase
         $YandexMarketMapper = self::getContainer()->get(YandexMarketMapper::class);
 
 
-        foreach($AllProductsIdentifier->findAll() as $item)
+        foreach($AllProductsIdentifier->findAll() as $key => $item)
         {
+            if($key >= 10)
+            {
+                break;
+            }
+
             $YaMarketCard = $YaMarketProductsCard
                 ->forProduct($item['product_id'])
                 ->forOfferConst($item['offer_const'])

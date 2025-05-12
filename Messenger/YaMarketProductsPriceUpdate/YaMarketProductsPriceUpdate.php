@@ -112,10 +112,6 @@ final readonly class YaMarketProductsPriceUpdate
 
         $Deduplicator->save();
 
-
-
-
-
         /**
          * Делаем расчет стоимости реализации товара
          * Стоимости товара + Стоимость услуг YaMarket + Торговая наценка

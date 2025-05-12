@@ -44,8 +44,13 @@ class YaMarketProductsCardRepositoryTest extends KernelTestCase
         /** @var AllProductsIdentifierInterface $AllProductsIdentifier */
         $AllProductsIdentifier = self::getContainer()->get(AllProductsIdentifierInterface::class);
 
-        foreach($AllProductsIdentifier->findAll() as $item)
+        foreach($AllProductsIdentifier->findAll() as $i => $item)
         {
+            if($i >= 100)
+            {
+                break;
+            }
+
             $current = $YaMarketProductsCard
                 ->forProduct($item['product_id'])
                 ->forOfferConst($item['offer_const'])

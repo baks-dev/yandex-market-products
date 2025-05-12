@@ -30,12 +30,13 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Stocks\Entity\Stock\Event\ProductStockEvent;
 use BaksDev\Products\Stocks\Entity\Stock\Products\ProductStockProduct;
 use BaksDev\Products\Stocks\Messenger\ProductStockMessage;
-use BaksDev\Products\Stocks\Repository\ProductStocksById\ProductStocksByIdInterface;
+use BaksDev\Products\Stocks\Repository\ProductStocksEvent\ProductStocksEventInterface;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusIncoming;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
@@ -45,10 +46,10 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class UpdateStocksYaMarketByIncoming
 {
     public function __construct(
-        private ProductStocksByIdInterface $productStocks,
-        private EntityManagerInterface $entityManager,
+        #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
         private MessageDispatchInterface $messageDispatch,
         private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+        private ProductStocksEventInterface $ProductStocksEventRepository,
     ) {}
 
 
@@ -69,13 +70,11 @@ final readonly class UpdateStocksYaMarketByIncoming
         }
 
         /** Получаем статус заявки */
-        $ProductStockEvent = $this->entityManager
-            ->getRepository(ProductStockEvent::class)
-            ->find($message->getEvent());
+        $ProductStockEvent = $this->ProductStocksEventRepository
+            ->forEvent($message->getEvent())
+            ->find();
 
-        $this->entityManager->clear();
-
-        if(!$ProductStockEvent)
+        if(false === ($ProductStockEvent instanceof ProductStockEvent))
         {
             return;
         }
@@ -83,16 +82,21 @@ final readonly class UpdateStocksYaMarketByIncoming
         /**
          * Если Статус заявки не является Incoming «Приход на склад»
          */
-        if(false === $ProductStockEvent->getStatus()->equals(ProductStockStatusIncoming::class))
+        if(false === $ProductStockEvent->equalsProductStockStatus(ProductStockStatusIncoming::class))
         {
             return;
         }
 
         // Получаем всю продукцию в ордере со статусом Incoming
-        $products = $this->productStocks->getProductsIncomingStocks($message->getId());
+        $products = $ProductStockEvent->getProduct();
 
-        if(empty($products))
+        if($products->isEmpty())
         {
+            $this->logger->warning(
+                'Заявка не имеет продукции в коллекции',
+                [self::class.':'.__LINE__, var_export($message, true)]
+            );
+
             return;
         }
 

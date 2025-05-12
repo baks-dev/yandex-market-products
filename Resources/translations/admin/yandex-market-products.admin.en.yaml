@@ -1,0 +1,26 @@
+page:
+  index: 'Product settings for Yandex Market'
+  new: 'Add products for Yandex Market'
+  edit: 'Edit products for Yandex Market'
+  delete: 'Delete products for Yandex Market'
+
+breadcrumb:
+  index: 'Product settings for Yandex Market'
+  new: 'Add products for Yandex Market'
+  edit: 'Edit products for Yandex Market'
+  delete: 'Delete products for Yandex Market'
+
+success:
+  new: 'Product settings for Yandex Market have been successfully added'
+  edit: 'Product settings for Yandex Market have been successfully updated'
+  delete: 'Product settings for Yandex Market were successfully deleted'
+  restore: 'Product settings for Yandex Market have been successfully restored'
+
+danger:
+  new: '%s: Error adding product settings for Yandex Market'
+  edit: '%s: Error when updating product settings for Yandex Market'
+  delete: '%s: Error updating product settings for Yandex Market'
+  restore: '%s: Error while restoring product settings for Yandex Market'
+form:
+  delete:
+    h4: 'Are you sure you want to delete product settings for Yandex Market?'

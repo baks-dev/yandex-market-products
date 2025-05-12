@@ -1,12 +1,27 @@
 # Role
+ROLE_YA_MARKET_PRODUCTS:
+  header: 'Yandex Market products settings'
+  name: 'Yandex Market product settings'
+  desc: 'Yandex Market product settings'
 
+# Rules
+ROLE_YA_MARKET_PRODUCTS_INDEX:
+  name: 'Yandex Market products settings'
+  desc: 'Yandex Market products settings'
+
+ROLE_YA_MARKET_PRODUCTS_EDIT:
+  name: 'Edit'
+  desc: ''
+
+
+# Role
 ROLE_YA_MARKET_PRODUCTS_SETTING:
   header: 'Yandex Market'
   name: 'Yandex Market property relationships'
   desc: 'Yandex Market data correlation settings'
 
-# Rules
 
+# Rules
 ROLE_YA_MARKET_PRODUCTS_SETTING_INDEX:
   name: 'View'
   desc: ''
@@ -24,12 +39,14 @@ ROLE_YA_MARKET_PRODUCTS_SETTING_DELETE:
   desc: ''
 
 
-
+# Role
 ROLE_YA_MARKET_PRODUCTS_CARD:
   header: 'Yandex Market'
   name: 'Product cards'
   desc: 'Yandex Market product cards'
 
+
+# Rules
 ROLE_YA_MARKET_PRODUCTS_CARD_INDEX:
   name: 'View'
   desc: ''
@@ -45,7 +62,6 @@ ROLE_YA_MARKET_PRODUCTS_CARD_EDIT:
 ROLE_YA_MARKET_PRODUCTS_CARD_DELETE:
   name: 'Delete'
   desc: ''
-
 
 ROLE_YA_MARKET_PRODUCTS_CARD_GET:
   name: 'Get new'

@@ -1,20 +1,20 @@
-{% trans_default_domain 'avito-products.admin' %}
+{% trans_default_domain 'yandex-market-products.admin' %}
 
 <div class="modal-dialog modal-dialog-centered " style="max-width: 850px;">
 
     {% if product %}
 
-        {% set arr_property = product.category_section_field|json_decode %}
+        {% set arr_property = product.getCategorySectionField()|json_decode %}
 
         {{ form_start(form) }}
 
         <div class="modal-content p-3 border-bottom border-5 border-primary">
 
             {# Заголовок модального окна #}
-            {{ include('@avito-products/admin/products/edit/pc/_header.html.twig') }}
+            {{ include('@yandex-market-products/admin/products/edit/pc/header.html.twig') }}
 
             {# Табы #}
-            <ul class="nav nav-pills gap-3 mb-3 mt-3" id="nav-avito-product">
+            <ul class="nav nav-pills gap-3 mb-3 mt-3" id="nav-yandex-market-product">
 
                 <li class="nav-item" role="presentation">
                     <button class="btn fw-bolder nav-link active"
@@ -25,27 +25,10 @@
 
                             id="tab_images-tab"
                             data-bs-target="#tab_images"
-                            aria-controls="nav-avito-product"
+                            aria-controls="nav-yandex-market-product"
                     >
                         <small class="text-uppercase px-3">
                             Изображения
-                        </small>
-                    </button>
-                </li>
-
-                <li class="nav-item">
-                    <button class="btn fw-bolder nav-link"
-                            data-bs-toggle="tab"
-                            type="button"
-                            role="tab"
-                            aria-selected="true"
-
-                            id="tab_description-tab"
-                            data-bs-target="#tab_description"
-                            aria-controls="nav-avito-product"
-                    >
-                        <small class="text-uppercase px-3">
-                            Шаблон описания
                         </small>
                     </button>
                 </li>
@@ -56,15 +39,7 @@
 
                 {# Изображения #}
                 <div class="tab-pane fade show active" id="tab_images" role="tabpanel">
-                    {#            {{ include('@avito-products/admin/products/edit/pc/_images.html.twig', {avitoImages: product.avito_product_images|json_decode} ) }} #}
-                    {{ include('@avito-products/admin/products/edit/pc/_images.html.twig') }}
-                </div>
-
-                {# Описание #}
-                <div class="tab-pane fade show" id="tab_description" role="tabpanel">
-                    {{ form_row(form.description, {
-                        attr: { class: 'ckeditor'}
-                    }) }}
+                    {{ include('@yandex-market-products/admin/products/edit/pc/images.html.twig') }}
                 </div>
 
             </div>
@@ -81,7 +56,7 @@
                     </button>
 
                     {# Сохранить #}
-                    {{ form_widget(form.avito_product, { label:
+                    {{ form_widget(form.yandex_market_product, { label:
                         '<span>'~ 'btn.save'|trans({}, 'core.btn') ~'</span>
                          <span class="spinner-border spinner-border-sm vertical-middle d-none"></span>'}) }}
                 </div>
@@ -91,7 +66,7 @@
 
         {# Прототип формы для изображения #}
         <div id="prototype.gallery.image"
-             data-prototype="{{ include(_self|replace({ "content.html.twig": "_prototype.image.html.twig" }))|e('html_attr') }}">
+             data-prototype="{{ include(_self|replace({ "content.html.twig": "prototype.image.html.twig" }))|e('html_attr') }}">
         </div>
 
         {{ form_end(form) }}

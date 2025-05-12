@@ -1,3 +1,4 @@
+<?php
 /*
  *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
@@ -20,3 +21,8 @@
  *  THE SOFTWARE.
  */
 
+declare(strict_types=1);
+
+namespace BaksDev\Yandex\Market\Products\Entity;
+
+interface YandexMarketProductInterface { }

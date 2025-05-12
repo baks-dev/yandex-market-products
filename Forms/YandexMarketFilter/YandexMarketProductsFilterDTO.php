@@ -1,3 +1,4 @@
+<?php
 /*
  *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
@@ -20,3 +21,28 @@
  *  THE SOFTWARE.
  */
 
+declare(strict_types=1);
+
+namespace BaksDev\Yandex\Market\Products\Forms\YandexMarketFilter;
+
+final class YandexMarketProductsFilterDTO
+{
+    /**
+     * Флаг
+     */
+    private null|bool $exists = null;
+
+    /**
+     * Exists
+     */
+    public function getExists(): ?bool
+    {
+        return $this->exists;
+    }
+
+    public function setExists(?bool $exists): self
+    {
+        $this->exists = $exists;
+        return $this;
+    }
+}

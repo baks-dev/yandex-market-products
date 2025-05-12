@@ -1,3 +1,4 @@
+<?php
 /*
  *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
@@ -20,3 +21,27 @@
  *  THE SOFTWARE.
  */
 
+declare(strict_types=1);
+
+namespace BaksDev\Yandex\Market\Products\Security\Index;
+
+use BaksDev\Users\Profile\Group\Security\RoleInterface;
+use BaksDev\Users\Profile\Group\Security\VoterInterface;
+use BaksDev\Yandex\Market\Products\Security\Card\Role;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+
+#[AutoconfigureTag('baks.security.voter')]
+final class VoterIndex implements VoterInterface
+{
+    public const string VOTER = 'INDEX';
+
+    public static function getVoter(): string
+    {
+        return Role::ROLE.'_'.self::VOTER;
+    }
+
+    public function equals(RoleInterface $role): bool
+    {
+        return $role->getRole() === Role::ROLE;
+    }
+}

@@ -1,3 +1,4 @@
+<?php
 /*
  *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
@@ -20,3 +21,26 @@
  *  THE SOFTWARE.
  */
 
+declare(strict_types=1);
+
+namespace BaksDev\Yandex\Market\Products\Messenger;
+
+use BaksDev\Yandex\Market\Products\Type\Id\YandexMarketProductUid;
+
+final class YandexMarketProductMessage
+{
+    /**
+     * Внутренний (системный) идентификатор продукта YandexMarket
+     */
+    private YandexMarketProductUid $id;
+
+    public function __construct(YandexMarketProductUid $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId(): YandexMarketProductUid
+    {
+        return $this->id;
+    }
+}

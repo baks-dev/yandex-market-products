@@ -1,3 +1,4 @@
+<?php
 /*
  *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
@@ -20,3 +21,50 @@
  *  THE SOFTWARE.
  */
 
+declare(strict_types=1);
+
+namespace BaksDev\Yandex\Market\Products\Type\Id;
+
+use BaksDev\Core\Type\UidType\Uid;
+use Symfony\Component\Uid\AbstractUid;
+
+final class YandexMarketProductUid extends Uid
+{
+    /**
+     * Тестовый идентификатор
+     */
+    public const string TEST = '01968062-50ae-7810-b6a6-c5c46d57be9b';
+
+    public const string TYPE = 'yandex_market_product';
+
+    public function __construct(
+        AbstractUid|string|null $value = null,
+        private readonly mixed $attr = null,
+        private readonly mixed $option = null,
+        private readonly mixed $property = null,
+        private readonly mixed $characteristic = null,
+    )
+    {
+        parent::__construct($value);
+    }
+
+    public function getAttr(): mixed
+    {
+        return $this->attr;
+    }
+
+    public function getOption(): mixed
+    {
+        return $this->option;
+    }
+
+    public function getProperty(): mixed
+    {
+        return $this->property;
+    }
+
+    public function getCharacteristic(): mixed
+    {
+        return $this->characteristic;
+    }
+}

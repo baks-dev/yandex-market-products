@@ -1,3 +1,4 @@
+<?php
 /*
  *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
@@ -20,3 +21,21 @@
  *  THE SOFTWARE.
  */
 
+declare(strict_types=1);
+
+namespace BaksDev\Yandex\Market\Products\Type\Id;
+
+use BaksDev\Core\Type\UidType\UidType;
+
+final class YandexMarketProductType extends UidType
+{
+    public function getClassType(): string
+    {
+        return YandexMarketProductUid::class;
+    }
+
+    public function getName(): string
+    {
+        return YandexMarketProductUid::TYPE;
+    }
+}

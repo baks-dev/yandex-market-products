@@ -1,4 +1,29 @@
 # Роль
+ROLE_YA_MARKET_PRODUCTS:
+  header: 'Настройки продукта Яндекс Маркет'
+  name: 'Настройки продукта Яндекс Маркет'
+  desc: 'Настройки продукта Яндекс Маркет'
+
+
+# Правила
+ROLE_YA_MARKET_PRODUCTS_INDEX:
+  name: 'Настройки продукта Яндекс Маркет'
+  desc: 'Настройки продукта Яндекс Маркет'
+
+ROLE_YA_MARKET_PRODUCTS_NEW:
+  name: 'Добавить'
+  desc: ''
+
+ROLE_YA_MARKET_PRODUCTS_EDIT:
+  name: 'Редактировать'
+  desc: ''
+
+ROLE_YA_MARKET_PRODUCTS_DELETE:
+  name: 'Удалить'
+  desc: ''
+
+
+# Роль
 
 ROLE_YA_MARKET_PRODUCTS_SETTING:
   header: 'Yandex Market'

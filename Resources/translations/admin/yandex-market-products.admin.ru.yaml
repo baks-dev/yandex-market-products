@@ -1,0 +1,26 @@
+page:
+  index: 'Настройка продукции для Yandex Market'
+  new: 'Добавить продукцию для Yandex Market'
+  edit: 'Редактировать продукцию для Yandex Market'
+  delete: 'Удалить продукцию для Yandex Market'
+
+breadcrumb:
+  index: 'Настройки продукции для Yandex Market'
+  new: 'Добавить продукцию для Yandex Market'
+  edit: 'Редактировать продукцию для Yandex Market'
+  delete: 'Удалить продукцию для Yandex Market'
+
+success:
+  new: 'Настройки продукции для Yandex Market успешно добавлены'
+  edit: 'Настройки продукции для Yandex Market успешно обновлены'
+  delete: 'Настройки продукции для Yandex Market успешно удалены'
+  restore: 'Настройки продукции для Yandex Market успешно восстановлены'
+
+danger:
+  new: '%s: Ошибка при добавлении настройки продукции для Yandex Market'
+  edit: '%s: Ошибка при обновлении настройки продукции для Yandex Market'
+  delete: '%s: Ошибка при обновлении настройки продукции для Yandex Market'
+  restore: '%s: Ошибка при восстановлении настройки продукции для Yandex Market'
+form:
+  delete:
+    h4: 'Вы уверены, что желаете удалить настройки продукции для Yandex Market?'

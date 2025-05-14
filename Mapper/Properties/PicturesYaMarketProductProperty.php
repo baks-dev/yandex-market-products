@@ -94,11 +94,6 @@ final class PicturesYaMarketProductProperty implements YaMarketProductPropertyIn
 
     public function getData(array $data): ?array
     {
-        if(isset($data['yandex_market_product_images']))
-        {
-            return $this->transform($data['yandex_market_product_images']);
-        }
-
         if(isset($data['product_images']))
         {
             return $this->transform($data['product_images']);

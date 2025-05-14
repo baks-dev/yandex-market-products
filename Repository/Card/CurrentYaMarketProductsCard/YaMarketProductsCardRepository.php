@@ -47,6 +47,7 @@ use BaksDev\Products\Product\Entity\Offers\Variation\Quantity\ProductVariationQu
 use BaksDev\Products\Product\Entity\Photo\ProductPhoto;
 use BaksDev\Products\Product\Entity\Price\ProductPrice;
 use BaksDev\Products\Product\Entity\Product;
+use BaksDev\Products\Product\Entity\ProductInvariable;
 use BaksDev\Products\Product\Entity\Property\ProductProperty;
 use BaksDev\Products\Product\Entity\Trans\ProductTrans;
 use BaksDev\Products\Product\Type\Id\ProductUid;
@@ -55,10 +56,12 @@ use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst
 use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
 use BaksDev\Yandex\Market\Products\Entity\Card\Market\YaMarketProductsCardMarket;
 use BaksDev\Yandex\Market\Products\Entity\Card\YaMarketProductsCard;
+use BaksDev\Yandex\Market\Products\Entity\Images\YandexMarketProductImage;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Parameters\YaMarketProductsSettingsParameters;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Property\YaMarketProductsSettingsProperty;
 use BaksDev\Yandex\Market\Products\Entity\Settings\YaMarketProductsSettings;
+use BaksDev\Yandex\Market\Products\Entity\YandexMarketProduct;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use InvalidArgumentException;
 
@@ -613,10 +616,63 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 			'
         );
 
+        /**
+         * Product Invariable
+         */
+        $dbal->leftJoin(
+            'product_modification',
+            ProductInvariable::class,
+            'product_invariable',
+            '
+                   product_invariable.product = product.id AND
+                   (
+                       (product_offer.const IS NOT NULL AND product_invariable.offer = product_offer.const) OR
+                       (product_offer.const IS NULL AND product_invariable.offer IS NULL)
+                   )
+                   AND
+                   (
+                       (product_variation.const IS NOT NULL AND product_invariable.variation = product_variation.const) OR
+                       (product_variation.const IS NULL AND product_invariable.variation IS NULL)
+                   )
+                  AND
+                  (
+                       (product_modification.const IS NOT NULL AND product_invariable.modification = product_modification.const) OR
+                       (product_modification.const IS NULL AND product_invariable.modification IS NULL)
+                  )
+           ');
+
+        /** Продукт Яндекс Маркет */
+        $dbal
+            ->leftJoin(
+                'product_invariable',
+                YandexMarketProduct::class,
+                'ya_market_product',
+                'ya_market_product.invariable = product_invariable.id'
+            );
+
+        $dbal->leftJoin(
+            'ya_market_product',
+            YandexMarketProductImage::class,
+            'ya_market_product_images',
+            '
+                ya_market_product_images.market = ya_market_product.id AND
+                ya_market_product_images.root = true
+            '
+        );
+
         $dbal->addSelect(
             "JSON_AGG
 		( DISTINCT
 				CASE 
+				
+				WHEN ya_market_product_images.ext IS NOT NULL 
+				THEN JSONB_BUILD_OBJECT
+					(
+						'product_img_root', ya_market_product_images.root,
+						'product_img', CONCAT ( '/upload/".$dbal->table(YandexMarketProductImage::class)."' , '/', ya_market_product_images.name),
+						'product_img_ext', ya_market_product_images.ext,
+						'product_img_cdn', ya_market_product_images.cdn
+					)
 				
 				WHEN product_offer_images.ext IS NOT NULL 
 				THEN JSONB_BUILD_OBJECT
@@ -1198,20 +1254,71 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 			'
         );
 
+        /**
+         * Product Invariable
+         */
+        $dbal->leftJoin(
+            'product_modification',
+            ProductInvariable::class,
+            'product_invariable',
+            '
+                   product_invariable.product = product.id AND
+                   (
+                       (product_offer.const IS NOT NULL AND product_invariable.offer = product_offer.const) OR
+                       (product_offer.const IS NULL AND product_invariable.offer IS NULL)
+                   )
+                   AND
+                   (
+                       (product_variation.const IS NOT NULL AND product_invariable.variation = product_variation.const) OR
+                       (product_variation.const IS NULL AND product_invariable.variation IS NULL)
+                   )
+                  AND
+                  (
+                       (product_modification.const IS NOT NULL AND product_invariable.modification = product_modification.const) OR
+                       (product_modification.const IS NULL AND product_invariable.modification IS NULL)
+                  )
+           ');
+
+        /** Продукт Яндекс Маркет */
+        $dbal
+            ->leftJoin(
+                'product_invariable',
+                YandexMarketProduct::class,
+                'ya_market_product',
+                'ya_market_product.invariable = product_invariable.id'
+            );
+
+        $dbal->leftJoin(
+            'ya_market_product',
+            YandexMarketProductImage::class,
+            'ya_market_product_images',
+            '
+                ya_market_product_images.market = ya_market_product.id AND
+                ya_market_product_images.root = true
+            '
+        );
+
         $dbal->addSelect(
             "JSON_AGG
 		( DISTINCT
-				CASE 
+				CASE
 				
-				WHEN product_offer_images.ext IS NOT NULL 
+				WHEN ya_market_product_images.ext IS NOT NULL
+				THEN JSONB_BUILD_OBJECT
+					(
+						'product_img_root', ya_market_product_images.root,
+						'product_img', CONCAT ( '/upload/".$dbal->table(YandexMarketProductImage::class)."' , '/', ya_market_product_images.name),
+						'product_img_ext', ya_market_product_images.ext,
+						'product_img_cdn', ya_market_product_images.cdn
+					)
+				
+				WHEN product_offer_images.ext IS NOT NULL
 				THEN JSONB_BUILD_OBJECT
 					(
 						'product_img_root', product_offer_images.root,
 						'product_img', CONCAT ( '/upload/".$dbal->table(ProductOfferImage::class)."' , '/', product_offer_images.name),
 						'product_img_ext', product_offer_images.ext,
 						'product_img_cdn', product_offer_images.cdn
-						
-
 					) 
 					
 				WHEN product_variation_image.ext IS NOT NULL 
@@ -1245,7 +1352,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 						
 					)
 					
-			
+					
 				END
 
 				 

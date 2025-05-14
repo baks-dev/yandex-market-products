@@ -21,14 +21,9 @@
                class="pe-3 modal-link disabled"
             >
                 {# Обложка #}
-                {% set image_path = '/assets/img/blank.svg' %}
-
-                {% if item.getProductImageExt() is defined and item.getProductImageExt() is not null %}
-                    {% set img_host =  item.getProductImageCdn() == true  ? CDN_HOST : '' %}
-                    {% set img_dir = item.getProductImage() %}
-                    {% set img_file = (img_host is empty ? '/image.' : '/small.') ~ item.getProductImageExt() %}
-                    {% set image_path = img_host ~ img_dir ~ img_file %}
-                {% endif %}
+                {% set img_host =  item.getProductImageCdn() %}
+                {% set img_dir = item.getProductImage() %}
+                {% set image_path = cdn_image_path(img_dir, item.getProductImageExt(), img_host, 'min') %}
 
                 <div class="icon rounded-3 bg-contain lazy p-1" style="width: 50px; height: 50px; cursor: unset;"
                      data-bg="{{ image_path }}">
@@ -83,16 +78,8 @@
     </td>
 
     <td class="text-center">
-        {# Обложка #}
-        {% set image_path = '/assets/img/blank.svg' %}
-
-        {% if item.getYandexMarketProductImageExt() is defined and item.getYandexMarketProductImageExt() is not null %}
-            {% set img_host =  item.getYandexMarketProductImageCdn() == true  ? CDN_HOST : '' %}
-            {% set img_dir = item.getYandexMarketProductImage() %}
-            {% set img_file = (img_host is empty ? '/image.' : '/small.') ~ item.getYandexMarketProductImageExt() %}
-            {% set image_path = img_host ~ img_dir ~ img_file %}
-        {% endif %}
-
+        {% set img_dir = item.getYandexMarketProductImage() %}
+        {% set image_path = cdn_image_path(img_dir, item.getYandexMarketProductImageExt(), item.getYandexMarketProductImageCdn(), 'min') %}
 
         <button data-href="{{ path('yandex-market-products:admin.products.edit', {
             invariable: item.getInvariable()

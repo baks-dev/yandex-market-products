@@ -19,19 +19,7 @@
                 <div class="item-collection-photo">
 
                     {# Обложка #}
-                    {% set image_path = '/assets/img/blank.svg' %}
-
-                    {% if image.vars.data.ext is defined and image.vars.data.ext is not null %}
-
-                        {% set img_host =  image.vars.data.cdn == true  ? CDN_HOST : '' %}
-                        {% set dir = '/upload' %}
-
-                        {# Название таблицы из аттрибутов YandexMarketProductImage #}
-                        {% set img_table = '/ya_market_product_images/' %}
-                        {% set img_dir = image.vars.data.name %}
-                        {% set img_file = (img_host is empty ? '/image.' : '/small.') ~ image.vars.data.ext %}
-                        {% set image_path = img_host ~ dir ~ img_table ~ img_dir ~ img_file %}
-                    {% endif %}
+                    {% set image_path = cdn_image_path('/upload/ya_market_product_images/'~image.vars.data.name, image.vars.data.ext, image.vars.data.cdn) %}
 
                     <label class="icon rounded-1 bg-contain lazy position-relative image-input"
                            style="width: 150px; height: 200px;"

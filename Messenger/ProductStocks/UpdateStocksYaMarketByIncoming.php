@@ -30,7 +30,6 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Stocks\Entity\Stock\Event\ProductStockEvent;
 use BaksDev\Products\Stocks\Entity\Stock\Products\ProductStockProduct;
 use BaksDev\Products\Stocks\Messenger\ProductStockMessage;
-use BaksDev\Products\Stocks\Repository\ProductStocksById\ProductStocksByIdInterface;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusIncoming;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
@@ -45,7 +44,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class UpdateStocksYaMarketByIncoming
 {
     public function __construct(
-        private ProductStocksByIdInterface $productStocks,
         private EntityManagerInterface $entityManager,
         private MessageDispatchInterface $messageDispatch,
         private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,

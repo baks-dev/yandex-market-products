@@ -100,14 +100,14 @@ class NewEditController extends AbstractController
             return $this->redirectToRoute('yandex-market-products:admin.products.index');
         }
 
-        $yandexMarketProductHeader = $productDetailByInvariable
+        $yandexMarketProduct = $productDetailByInvariable
             ->invariable($invariable)
             ->find()
             ->current();
 
         return $this->render([
             'form' => $form->createView(),
-            'product' => $yandexMarketProductHeader,
+            'product' => $yandexMarketProduct,
         ]);
     }
 }

@@ -1,17 +1,17 @@
 <?php
 /*
  *  Copyright 2025.  Baks.dev <admin@baks.dev>
- *
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,29 +46,29 @@ final readonly class AllProductsWithYandexMarketImagesResult
         private bool $category_active,
         private string $category_name,
         private string $product_name,
-        private ?string $product_offer_id = null,
-        private ?string $product_offer_value = null,
-        private ?string $product_offer_const = null,
-        private ?string $product_offer_postfix = null,
-        private ?string $product_offer_reference = null,
-        private ?string $product_variation_id = null,
-        private ?string $product_variation_value = null,
-        private ?string $product_variation_const = null,
-        private ?string $product_variation_postfix = null,
-        private ?string $product_variation_reference = null,
-        private ?string $product_modification_id = null,
-        private ?string $product_modification_value = null,
-        private ?string $product_modification_const = null,
-        private ?string $product_modification_postfix = null,
-        private ?string $product_modification_reference = null,
-        private ?string $product_article = null,
-        private ?string $product_image = null,
-        private ?string $product_image_ext = null,
-        private ?bool $product_image_cdn = null,
-        private ?string $ya_market_product_id = null,
-        private ?string $ya_market_product_image = null,
-        private ?string $ya_market_product_image_ext = null,
-        private ?bool $ya_market_product_image_cdn = null,
+        private string $product_article,
+        private ?string $product_offer_id,
+        private ?string $product_offer_value,
+        private ?string $product_offer_const,
+        private ?string $product_offer_postfix,
+        private ?string $product_offer_reference,
+        private ?string $product_variation_id,
+        private ?string $product_variation_value,
+        private ?string $product_variation_const,
+        private ?string $product_variation_postfix,
+        private ?string $product_variation_reference,
+        private ?string $product_modification_id,
+        private ?string $product_modification_value,
+        private ?string $product_modification_const,
+        private ?string $product_modification_postfix,
+        private ?string $product_modification_reference,
+        private ?string $product_image,
+        private ?string $product_image_ext,
+        private ?bool $product_image_cdn,
+        private ?string $ya_market_product_id,
+        private ?string $ya_market_product_image,
+        private ?string $ya_market_product_image_ext,
+        private ?bool $ya_market_product_image_cdn,
     ) {}
 
     public function getId(): ProductUid
@@ -166,7 +166,7 @@ final readonly class AllProductsWithYandexMarketImagesResult
         return $this->product_modification_reference;
     }
 
-    public function getProductArticle(): ?string
+    public function getProductArticle(): string
     {
         return $this->product_article;
     }

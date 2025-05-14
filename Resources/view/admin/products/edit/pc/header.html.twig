@@ -28,14 +28,9 @@
 
         {# Обложка  #}
         <div>
-            {% set image_path = '/assets/img/blank.svg' %}
-
-            {% if product.getProductImageExt() is defined and product.getProductImageExt() is not null %}
-                {% set img_host =  product.getProductImageCdn() == true  ? CDN_HOST : '' %}
-                {% set img_dir = product.getProductImage() %}
-                {% set img_file = (img_host is empty ? '/image.' : '/small.') ~ product.getProductImageExt() %}
-                {% set image_path = img_host ~ img_dir ~ img_file %}
-            {% endif %}
+            {% set img_host = product.getProductImageCdn() %}
+            {% set img_dir = product.getProductImage() %}
+            {% set image_path = cdn_image_path(img_dir, product.getProductImageExt(), img_host, 'min') %}
 
             <div class="icon rounded-3 bg-contain lazy p-1" style="width: 50px; height: 50px;"
                  data-bg="{{ image_path }}">

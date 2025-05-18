@@ -89,7 +89,7 @@ final readonly class YaMarketProductsPriceUpdate
         {
             $this->logger->warning(
                 sprintf('Параметры упаковки товара %s не найдены!', $Card['article']),
-                [self::class.':'.__LINE__]
+                [self::class.':'.__LINE__],
             );
 
             return;
@@ -102,7 +102,7 @@ final readonly class YaMarketProductsPriceUpdate
             ->deduplication([
                 $message->getProfile(),
                 $Card,
-                self::class
+                self::class,
             ]);
 
         if($Deduplicator->isExecuted())
@@ -131,14 +131,19 @@ final readonly class YaMarketProductsPriceUpdate
 
         $Money = new Money($Card['product_price'], true);
 
+        $width = (int) $Card['width'];
+        $height = (int) $Card['height'];
+        $length = (int) $Card['length'];
+        $weight = (int) $Card['weight'];
+
         $Price = $this->marketCalculatorRequest
             ->profile($message->getProfile())
             ->category($Card['market_category'])
             ->price($Money)
-            ->width(($Card['width'] / 10))
-            ->height(($Card['height'] / 10))
-            ->length(($Card['length'] / 10))
-            ->weight(($Card['weight'] / 100))
+            ->width(($width * 0.1))
+            ->height(($height * 0.1))
+            ->length(($length * 0.1))
+            ->weight(($weight * 0.01))
             ->calc();
 
 
@@ -147,12 +152,12 @@ final readonly class YaMarketProductsPriceUpdate
             $this->messageDispatch
                 ->dispatch(
                     $message,
-                    stamps: [new MessageDelay('1 minutes')]
+                    stamps: [new MessageDelay('1 minutes')],
                 );
 
             $this->logger->critical(
                 sprintf('yandex-market-products: Пробуем обновит стоимость %s через 1 минуту', $Card['article']),
-                [self::class.':'.__LINE__]
+                [self::class.':'.__LINE__],
             );
 
             return;
@@ -196,9 +201,9 @@ final readonly class YaMarketProductsPriceUpdate
                 $Card['article'],
                 $Money->getValue(), // стоимость в карточке
                 $Price->getValue(), // новая стоимость на маркетплейс
-                $Currency->getCurrencyValueUpper()
+                $Currency->getCurrencyValueUpper(),
             ),
-            [self::class.':'.__LINE__]
+            [self::class.':'.__LINE__],
         );
 
     }

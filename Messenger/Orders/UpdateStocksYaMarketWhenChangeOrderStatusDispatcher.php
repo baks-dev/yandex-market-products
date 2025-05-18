@@ -45,7 +45,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
 {
     public function __construct(
-        private CurrentOrderEventInterface $currentOrderEvent,
+        private CurrentOrderEventInterface $CurrentOrderEvent,
         private CurrentProductIdentifierInterface $currentProductIdentifier,
         private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private MessageDispatchInterface $messageDispatch,
@@ -69,7 +69,9 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
 
 
         /** Получаем событие заказа */
-        $OrderEvent = $this->currentOrderEvent->forOrder($message->getId())->find();
+        $OrderEvent = $this->CurrentOrderEvent
+            ->forOrder($message->getId())
+            ->find();
 
         if($OrderEvent === false)
         {

@@ -77,7 +77,7 @@ final readonly class YaMarketProductsCardUpdate
         /** Лимит: 600 запросов в минуту на расчет и обновление цен, добавляем лок на 0.6 сек */
         $lock = $this->appLock
             ->createLock([$message->getProfile(), YaMarketProductsPriceUpdate::class])
-            ->lifetime((60 / 100))
+            ->lifetime((60 * 0.01))
             ->waitAllTime();
 
 

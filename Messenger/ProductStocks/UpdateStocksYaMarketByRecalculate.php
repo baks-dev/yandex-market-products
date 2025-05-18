@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -32,17 +32,18 @@ use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMark
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+/**
+ * Отправляем сообщение на обновление остатков при обновлении складского учета
+ */
 #[AsMessageHandler(priority: 0)]
-final class UpdateStocksYaMarketByRecalculate
+final readonly class UpdateStocksYaMarketByRecalculate
 {
     public function __construct(
-        private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
-        private readonly MessageDispatchInterface $messageDispatch
+        private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
+        private MessageDispatchInterface $messageDispatch
     ) {}
 
-    /**
-     * Отправляем сообщение на обновление остатков при обновлении складского учета
-     */
+
     public function __invoke(RecalculateProductMessage $product): void
     {
         /**  Получаем активные токены профилей пользователя */

@@ -37,6 +37,8 @@ final class Role implements RoleInterface, MenuAdminInterface
 {
     public const string ROLE = 'ROLE_YA_MARKET_PRODUCTS';
 
+    public const string KEY = 'zZsHyXNty';
+
     public function getRole(): string
     {
         return self::ROLE;
@@ -50,6 +52,14 @@ final class Role implements RoleInterface, MenuAdminInterface
     public function getPath(): string
     {
         return 'yandex-market-products:admin.products.index';
+    }
+
+    /**
+     * Метод возвращает ключ раздела (для меню телеграм)
+     */
+    public function getPathKey(): string
+    {
+        return self::KEY;
     }
 
     /**

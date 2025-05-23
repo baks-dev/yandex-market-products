@@ -102,8 +102,7 @@ class NewEditController extends AbstractController
 
         $yandexMarketProduct = $productDetailByInvariable
             ->invariable($invariable)
-            ->find()
-            ->current();
+            ->find();
 
         return $this->render([
             'form' => $form->createView(),

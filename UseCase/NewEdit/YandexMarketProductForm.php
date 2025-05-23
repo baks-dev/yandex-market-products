@@ -27,6 +27,7 @@ namespace BaksDev\Yandex\Market\Products\UseCase\NewEdit;
 
 use BaksDev\Core\Twig\TemplateExtension;
 use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByInvariableInterface;
+use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByInvariableResult;
 use BaksDev\Users\Profile\UserProfile\Repository\UserProfileTokenStorage\UserProfileTokenStorageInterface;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductImagesForm;
 use Exception;
@@ -44,9 +45,6 @@ final class YandexMarketProductForm extends AbstractType
 {
     public function __construct(
         private readonly ProductDetailByInvariableInterface $productDetailByInvariable,
-        private readonly UserProfileTokenStorageInterface $userProfileTokenStorage,
-        private readonly TemplateExtension $templateExtension,
-        private readonly Environment $environment,
     ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -72,17 +70,13 @@ final class YandexMarketProductForm extends AbstractType
 
                 $product = $this->productDetailByInvariable
                     ->invariable($dto->getInvariable())
-                    ->find()
-                    ->current();
+                    ->find();
 
-                if(null === $product)
+                if(false === ($product instanceof ProductDetailByInvariableResult))
                 {
                     throw new Exception('Продукт не найден');
                 }
-
-                /** Получаем ID текущего профиля пользователя для составления пути для шаблона */
-                $userProfile = $this->userProfileTokenStorage->getProfileCurrent();
-            }
+            },
         );
 
         /** Сохранить */
@@ -92,8 +86,8 @@ final class YandexMarketProductForm extends AbstractType
             [
                 'label' => 'Save',
                 'label_html' => true,
-                'attr' => ['class' => 'btn-primary']
-            ]
+                'attr' => ['class' => 'btn-primary'],
+            ],
         );
     }
 

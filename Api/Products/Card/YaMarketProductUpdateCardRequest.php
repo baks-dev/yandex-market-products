@@ -64,7 +64,10 @@ final class YaMarketProductUpdateCardRequest extends YandexMarket
         {
             foreach($content['errors'] as $error)
             {
-                $this->logger->critical(sprintf('yandex-market-products: %s (%s)', $error['code'], $error['message']), [self::class.':'.__LINE__]);
+                $this->logger->critical(sprintf('yandex-market-products: %s (%s)',
+                    $error['code'],
+                    $error['message']),
+                    [self::class.':'.__LINE__, $card]);
             }
 
             return false;

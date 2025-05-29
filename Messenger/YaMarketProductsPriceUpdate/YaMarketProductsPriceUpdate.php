@@ -96,21 +96,21 @@ final readonly class YaMarketProductsPriceUpdate
         }
 
 
-        $Deduplicator = $this->deduplicator
-            ->namespace('yandex-market-products')
-            ->expiresAfter('1 day')
-            ->deduplication([
-                $message->getProfile(),
-                $Card,
-                self::class,
-            ]);
-
-        if($Deduplicator->isExecuted())
-        {
-            return;
-        }
-
-        $Deduplicator->save();
+        //        $Deduplicator = $this->deduplicator
+        //            ->namespace('yandex-market-products')
+        //            ->expiresAfter('1 day')
+        //            ->deduplication([
+        //                $message->getProfile(),
+        //                $Card,
+        //                self::class,
+        //            ]);
+        //
+        //        if($Deduplicator->isExecuted())
+        //        {
+        //            return;
+        //        }
+        //
+        //        $Deduplicator->save();
 
         /**
          * Делаем расчет стоимости реализации товара
@@ -118,10 +118,12 @@ final readonly class YaMarketProductsPriceUpdate
          */
 
         /** Лимит: 100 запросов в минуту, добавляем лок */
-        $this->appLock
-            ->createLock([$message->getProfile(), self::class])
-            ->lifetime((60 / 90))
-            ->waitAllTime();
+        usleep(600000);
+
+        //        $this->appLock
+        //            ->createLock([$message->getProfile(), self::class])
+        //            ->lifetime((60 / 90))
+        //            ->waitAllTime();
 
 
         /**
@@ -188,12 +190,25 @@ final readonly class YaMarketProductsPriceUpdate
 
         $Currency = new Currency($Card['product_currency']);
 
-        $this->marketProductPriceRequest
+        $update = $this->marketProductPriceRequest
             ->profile($message->getProfile())
             ->article($Card['article'])
             ->price($Price)
             ->currency($Currency)
             ->update();
+
+        if(false === $update)
+        {
+            $this->messageDispatch->dispatch(
+                $message,
+                [new MessageDelay('1 minute')],
+                'yandex-market-products-low',
+            );
+
+            $this->logger->critical(sprintf('%s: Пробуем обновить стоимость продукта через 1 минуту', $Card['article']));
+
+            return;
+        }
 
         $this->logger->info(
             sprintf(
@@ -202,8 +217,7 @@ final readonly class YaMarketProductsPriceUpdate
                 $Money->getValue(), // стоимость в карточке
                 $Price->getValue(), // новая стоимость на маркетплейс
                 $Currency->getCurrencyValueUpper(),
-            ),
-            [self::class.':'.__LINE__],
+            ), [self::class.':'.__LINE__],
         );
 
     }

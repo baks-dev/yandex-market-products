@@ -65,7 +65,7 @@ final readonly class AllProductsWithYandexMarketImagesResult
         private ?string $product_image,
         private ?string $product_image_ext,
         private ?bool $product_image_cdn,
-        private ?string $ya_market_product_id,
+        //private ?string $ya_market_product_id,
         private ?string $ya_market_product_image,
         private ?string $ya_market_product_image_ext,
         private ?bool $ya_market_product_image_cdn,

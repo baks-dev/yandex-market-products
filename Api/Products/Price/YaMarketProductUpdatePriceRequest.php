@@ -29,7 +29,6 @@ use BaksDev\Reference\Currency\Type\Currencies\RUR;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Api\YandexMarket;
-use DomainException;
 use InvalidArgumentException;
 
 final class YaMarketProductUpdatePriceRequest extends YandexMarket
@@ -90,20 +89,22 @@ final class YaMarketProductUpdatePriceRequest extends YandexMarket
             $this->currency = new Currency(RUR::class);
         }
 
+
         $response = $this->TokenHttpClient()
             ->request(
                 'POST',
-                sprintf('/businesses/%s/offer-prices/updates', $this->getBusiness()),
+                //sprintf('/businesses/%s/offer-prices/updates', $this->getBusiness()),
+                sprintf('/campaigns/%s/offer-prices/updates', $this->getCompany()),
                 ['json' =>
                     ['offers' =>
                         [[
                             'offerId' => $this->article,
                             'price' => [
                                 'value' => $this->price->getRoundValue(),
-                                'currencyId' => $this->currency->getCurrencyValueUpper()
-                            ]
-                        ]]
-                    ]
+                                'currencyId' => str_replace('RUR', 'RUB', $this->currency->getCurrencyValueUpper()),
+                            ],
+                        ]],
+                    ],
                 ],
             );
 
@@ -111,15 +112,21 @@ final class YaMarketProductUpdatePriceRequest extends YandexMarket
 
         if($response->getStatusCode() !== 200)
         {
-            foreach($content['errors'] as $error)
-            {
-                $this->logger->critical($error['code'].': '.$error['message'], [self::class.':'.__LINE__]);
-            }
 
-            throw new DomainException(
-                message: 'Ошибка '.self::class,
-                code: $response->getStatusCode()
+            $this->logger->critical(
+                sprintf(
+                    'yandex-market-products: Ошибка %s обновления стоимости продукта',
+                    $response->getStatusCode(),
+                ),
+                [
+                    self::class.':'.__LINE__,
+                    $this->article,
+                    $this->price->getRoundValue(),
+                    $content,
+                ],
             );
+
+            return false;
         }
 
         return true;

@@ -55,8 +55,9 @@ use BaksDev\Products\Product\Entity\Property\ProductProperty;
 use BaksDev\Products\Product\Entity\Trans\ProductTrans;
 use BaksDev\Products\Product\Forms\ProductFilter\Admin\ProductFilterDTO;
 use BaksDev\Products\Product\Forms\ProductFilter\Admin\Property\ProductFilterPropertyDTO;
-use BaksDev\Yandex\Market\Products\Entity\Images\YandexMarketProductImage;
-use BaksDev\Yandex\Market\Products\Entity\YandexMarketProduct;
+use BaksDev\Users\Profile\UserProfile\Repository\UserProfileTokenStorage\UserProfileTokenStorageInterface;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Yandex\Market\Products\Entity\Custom\Images\YandexMarketProductCustomImage;
 use BaksDev\Yandex\Market\Products\Forms\YandexMarketFilter\YandexMarketProductsFilterDTO;
 
 final class AllProductsWithYandexMarketImagesRepository implements AllProductsWithYandexMarketImagesInterface
@@ -69,7 +70,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
     public function __construct(
         private readonly DBALQueryBuilder $DBALQueryBuilder,
         private readonly PaginatorInterface $paginator,
-        private readonly ?ElasticGetIndex $elasticGetIndex = null,
+        private readonly UserProfileTokenStorageInterface $UserProfileTokenStorage,
     ) {}
 
     public function search(SearchDTO $search): self
@@ -108,7 +109,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             'product',
             ProductEvent::class,
             'product_event',
-            'product_event.id = product.event'
+            'product_event.id = product.event',
         );
 
         /** Только активные продукты */
@@ -119,7 +120,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_active',
                 '
                     product_active.event = product.event AND
-                    product_active.active IS TRUE'
+                    product_active.active IS TRUE',
             );
 
         /** Название продукта */
@@ -131,7 +132,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_trans',
                 '
                     product_trans.event = product_event.id AND 
-                    product_trans.local = :local'
+                    product_trans.local = :local',
             );
 
         /** Здесь основной артикул товара */
@@ -140,7 +141,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_event',
                 ProductInfo::class,
                 'product_info',
-                'product_info.product = product.id'
+                'product_info.product = product.id',
             );
 
         /**
@@ -155,7 +156,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_event',
                 ProductOffer::class,
                 'product_offer',
-                'product_offer.event = product_event.id'
+                'product_offer.event = product_event.id',
             );
 
 
@@ -171,7 +172,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             'product_offer',
             ProductOfferPrice::class,
             'product_offer_price',
-            'product_offer_price.offer = product_offer.id'
+            'product_offer_price.offer = product_offer.id',
         );
 
         /** ТИП торгового предложения */
@@ -181,7 +182,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_offer',
                 CategoryProductOffers::class,
                 'category_offer',
-                'category_offer.id = product_offer.category_offer'
+                'category_offer.id = product_offer.category_offer',
             );
 
         /**
@@ -196,7 +197,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_offer',
                 ProductVariation::class,
                 'product_variation',
-                'product_variation.offer = product_offer.id'
+                'product_variation.offer = product_offer.id',
             );
 
         /** ФИЛЬТР по множественным вариантам */
@@ -212,7 +213,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             'product_variation',
             ProductVariationPrice::class,
             'product_variation_price',
-            'product_variation_price.variation = product_variation.id'
+            'product_variation_price.variation = product_variation.id',
         );
 
         /** ТИП множественного варианта торгового предложения */
@@ -222,7 +223,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_variation',
                 CategoryProductVariation::class,
                 'category_offer_variation',
-                'category_offer_variation.id = product_variation.category_variation'
+                'category_offer_variation.id = product_variation.category_variation',
             );
 
         /**
@@ -237,7 +238,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_variation',
                 ProductModification::class,
                 'product_modification',
-                'product_modification.variation = product_variation.id '
+                'product_modification.variation = product_variation.id ',
             );
 
         /** ФИЛЬТР по модификациям множественного варианта */
@@ -252,7 +253,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             'product_modification',
             ProductModificationPrice::class,
             'product_modification_price',
-            'product_modification_price.modification = product_modification.id'
+            'product_modification_price.modification = product_modification.id',
         );
 
         /** ТИП модификации множественного варианта */
@@ -261,7 +262,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             'product_modification',
             CategoryProductModification::class,
             'category_offer_modification',
-            'category_offer_modification.id = product_modification.category_modification'
+            'category_offer_modification.id = product_modification.category_modification',
         );
 
         /**
@@ -285,7 +286,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             'product_photo',
             '
                 product_photo.event = product_event.id AND
-                product_photo.root = true'
+                product_photo.root = true',
         );
 
         $dbal->leftJoin(
@@ -294,7 +295,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             'product_variation_image',
             '
                 product_variation_image.variation = product_variation.id AND
-                product_variation_image.root = true'
+                product_variation_image.root = true',
         );
 
         $dbal->leftJoin(
@@ -303,7 +304,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             'product_offer_images',
             '
                 product_offer_images.offer = product_offer.id AND
-                product_offer_images.root = true'
+                product_offer_images.root = true',
         );
 
         $dbal->addSelect(
@@ -317,7 +318,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
 					CONCAT ( '/upload/".$dbal->table(ProductPhoto::class)."' , '/', product_photo.name)
 			   ELSE NULL
 			END AS product_image
-		"
+		",
         );
 
         /** Расширение изображения */
@@ -327,7 +328,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 product_variation_image.ext,
                 product_offer_images.ext,
                 product_photo.ext
-            ) AS product_image_ext'
+            ) AS product_image_ext',
         );
 
         /** Флаг загрузки файла CDN */
@@ -337,7 +338,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 product_variation_image.cdn,
                 product_offer_images.cdn,
                 product_photo.cdn
-            ) AS product_image_cdn'
+            ) AS product_image_cdn',
         );
 
         /**
@@ -367,34 +368,40 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                    )
             ');
 
-        /** Продукт Яндекс Маркет */
-        $dbal
-            ->addSelect('ya_market_product.id as ya_market_product_id')
-            ->leftJoin(
-                'product_invariable',
-                YandexMarketProduct::class,
-                'ya_market_product',
-                'ya_market_product.invariable = product_invariable.id'
-            );
+        /**
+         * Продукт Яндекс Маркет
+         */
+
+        //        $dbal
+        //            ->addSelect('ya_market_product.id as ya_market_product_id')
+        //            ->leftJoin(
+        //                'product_invariable',
+        //                YandexMarketProductCustom::class,
+        //                'ya_market_product',
+        //                'ya_market_product.invariable = product_invariable.id AND ya_market_product.profile = :profile',
+        //            )
+        //        ;
+
+
+
 
         $dbal->leftJoin(
-            'ya_market_product',
-            YandexMarketProductImage::class,
+            'product_invariable',
+            YandexMarketProductCustomImage::class,
             'ya_market_product_images',
             '
-                ya_market_product_images.market = ya_market_product.id AND
+                ya_market_product_images.invariable = product_invariable.id AND
                 ya_market_product_images.root = true
-            '
-        );
+            ');
 
         $dbal->addSelect(
             "
             CASE
                 WHEN ya_market_product_images.name IS NOT NULL THEN
-                    CONCAT ( '/upload/".$dbal->table(YandexMarketProductImage::class)."' , '/', ya_market_product_images.name)
+                    CONCAT ( '/upload/".$dbal->table(YandexMarketProductCustomImage::class)."' , '/', ya_market_product_images.name)
                 ELSE NULL 
             END as ya_market_product_image
-            "
+            ",
         );
 
         /** Расширение изображения */
@@ -425,7 +432,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_category',
                 '
                     product_category.event = product_event.id AND 
-                    product_category.root = true'
+                    product_category.root = true',
             );
 
         if($this->filter?->getCategory())
@@ -438,7 +445,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             'product_category',
             CategoryProduct::class,
             'category',
-            'category.id = product_category.category'
+            'category.id = product_category.category',
         );
 
         /** Только активные разделы */
@@ -450,7 +457,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'category_info',
                 '
                     category.event = category_info.event AND
-                    category_info.active IS TRUE'
+                    category_info.active IS TRUE',
             );
 
         $dbal
@@ -461,7 +468,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'category_trans',
                 '
                     category_trans.event = category.event AND 
-                    category_trans.local = :local'
+                    category_trans.local = :local',
             );
 
         /**
@@ -480,7 +487,7 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                         'product_property_'.$property->getType(),
                         'product_property_'.$property->getType().'.event = product.event AND
                         product_property_'.$property->getType().'.field = :'.$property->getType().'_const AND
-                        product_property_'.$property->getType().'.value = :'.$property->getType().'_value'
+                        product_property_'.$property->getType().'.value = :'.$property->getType().'_value',
                     );
 
                     $dbal->setParameter($property->getType().'_const', $property->getConst());
@@ -490,60 +497,59 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
             }
         }
 
-        if($this->yandexMarketProductsFilter->getExists() !== null)
+
+        if($this->yandexMarketProductsFilter->getExists() === true)
         {
-            if($this->yandexMarketProductsFilter->getExists() === true)
-            {
-                $dbal->andWhere('ya_market_images.name IS NOT NULL');
-            }
-            else
-            {
-                $dbal->andWhere('ya_market_images.name IS NULL');
-            }
+            $dbal->andWhere('ya_market_product_images.name IS NOT NULL');
+        }
+
+        if($this->yandexMarketProductsFilter->getExists() === false)
+        {
+            $dbal->andWhere('ya_market_product_images.name IS NULL');
         }
 
         if($this->search?->getQuery())
         {
             /** Поиск по модификации */
-            $result = $this->elasticGetIndex ? $this->elasticGetIndex->handle(
-                ProductModification::class,
-                $this->search->getQuery(),
-                1
-            ) : false;
-
-            if($result)
-            {
-                $counter = $result['hits']['total']['value'];
-
-                if($counter)
-                {
-                    /** Идентификаторы */
-                    $data = array_column($result['hits']['hits'], "_source");
-
-                    $dbal
-                        ->createSearchQueryBuilder($this->search)
-                        ->addSearchInArray('product_modification.id', array_column($data, "id"));
-
-                    return $this->paginator->fetchAllAssociative($dbal);
-                }
-
-                /** Поиск по продукции */
-                $result = $this->elasticGetIndex->handle(Product::class, $this->search->getQuery(), 1);
-
-                $counter = $result['hits']['total']['value'];
-
-                if($counter)
-                {
-                    /** Идентификаторы */
-                    $data = array_column($result['hits']['hits'], "_source");
-
-                    $dbal
-                        ->createSearchQueryBuilder($this->search)
-                        ->addSearchInArray('product.id', array_column($data, "id"));
-
-                    return $this->paginator->fetchAllAssociative($dbal);
-                }
-            }
+            //            $result = $this->elasticGetIndex ? $this->elasticGetIndex->handle(
+            //                ProductModification::class,
+            //                $this->search->getQuery(),
+            //                1,
+            //            ) : false;
+            //
+            //            if($result)
+            //            {
+            //                $counter = $result['hits']['total']['value'];
+            //
+            //                if($counter)
+            //                {
+            //                    /** Идентификаторы */
+            //                    $data = array_column($result['hits']['hits'], "_source");
+            //
+            //                    $dbal
+            //                        ->createSearchQueryBuilder($this->search)
+            //                        ->addSearchInArray('product_modification.id', array_column($data, "id"));
+            //
+            //                    return $this->paginator->fetchAllAssociative($dbal);
+            //                }
+            //
+            //                /** Поиск по продукции */
+            //                $result = $this->elasticGetIndex->handle(Product::class, $this->search->getQuery(), 1);
+            //
+            //                $counter = $result['hits']['total']['value'];
+            //
+            //                if($counter)
+            //                {
+            //                    /** Идентификаторы */
+            //                    $data = array_column($result['hits']['hits'], "_source");
+            //
+            //                    $dbal
+            //                        ->createSearchQueryBuilder($this->search)
+            //                        ->addSearchInArray('product.id', array_column($data, "id"));
+            //
+            //                    return $this->paginator->fetchAllAssociative($dbal);
+            //                }
+            //            }
 
             $dbal
                 ->createSearchQueryBuilder($this->search)

@@ -108,7 +108,7 @@ class UpdateYaMarketProductsStocksCommand extends Command
 
             foreach($profiles as $profile)
             {
-                if($profile->getAttr() === $questions[$profileName])
+                if($profile->getAttr() === $profileName)
                 {
                     /* Присваиваем профиль пользователя */
                     $UserProfileUid = $profile;
@@ -158,6 +158,8 @@ class UpdateYaMarketProductsStocksCommand extends Command
                 /** Пропускаем обновление, если соответствие не найдено */
                 if($card === false || stripos($card['article'], $article) === false)
                 {
+                    $this->io->writeln(sprintf('<fg=gray>... %s</>', $card['article']));
+
                     continue;
                 }
             }

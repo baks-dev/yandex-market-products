@@ -56,12 +56,12 @@ use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst
 use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
 use BaksDev\Yandex\Market\Products\Entity\Card\Market\YaMarketProductsCardMarket;
 use BaksDev\Yandex\Market\Products\Entity\Card\YaMarketProductsCard;
-use BaksDev\Yandex\Market\Products\Entity\Images\YandexMarketProductImage;
+use BaksDev\Yandex\Market\Products\Entity\Custom\Images\YandexMarketProductCustomImage;
+use BaksDev\Yandex\Market\Products\Entity\Custom\YandexMarketProductCustom;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Parameters\YaMarketProductsSettingsParameters;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Property\YaMarketProductsSettingsProperty;
 use BaksDev\Yandex\Market\Products\Entity\Settings\YaMarketProductsSettings;
-use BaksDev\Yandex\Market\Products\Entity\YandexMarketProduct;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
 use InvalidArgumentException;
 
@@ -645,14 +645,14 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
         $dbal
             ->leftJoin(
                 'product_invariable',
-                YandexMarketProduct::class,
+                YandexMarketProductCustom::class,
                 'ya_market_product',
                 'ya_market_product.invariable = product_invariable.id'
             );
 
         $dbal->leftJoin(
             'ya_market_product',
-            YandexMarketProductImage::class,
+            YandexMarketProductCustomImage::class,
             'ya_market_product_images',
             '
                 ya_market_product_images.market = ya_market_product.id AND
@@ -669,7 +669,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 				THEN JSONB_BUILD_OBJECT
 					(
 						'product_img_root', ya_market_product_images.root,
-						'product_img', CONCAT ( '/upload/".$dbal->table(YandexMarketProductImage::class)."' , '/', ya_market_product_images.name),
+						'product_img', CONCAT ( '/upload/".$dbal->table(YandexMarketProductCustomImage::class)."' , '/', ya_market_product_images.name),
 						'product_img_ext', ya_market_product_images.ext,
 						'product_img_cdn', ya_market_product_images.cdn
 					)
@@ -1283,14 +1283,14 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
         $dbal
             ->leftJoin(
                 'product_invariable',
-                YandexMarketProduct::class,
+                YandexMarketProductCustom::class,
                 'ya_market_product',
                 'ya_market_product.invariable = product_invariable.id'
             );
 
         $dbal->leftJoin(
             'ya_market_product',
-            YandexMarketProductImage::class,
+            YandexMarketProductCustomImage::class,
             'ya_market_product_images',
             '
                 ya_market_product_images.market = ya_market_product.id AND
@@ -1307,7 +1307,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
 				THEN JSONB_BUILD_OBJECT
 					(
 						'product_img_root', ya_market_product_images.root,
-						'product_img', CONCAT ( '/upload/".$dbal->table(YandexMarketProductImage::class)."' , '/', ya_market_product_images.name),
+						'product_img', CONCAT ( '/upload/".$dbal->table(YandexMarketProductCustomImage::class)."' , '/', ya_market_product_images.name),
 						'product_img_ext', ya_market_product_images.ext,
 						'product_img_cdn', ya_market_product_images.cdn
 					)

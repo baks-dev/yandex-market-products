@@ -32,6 +32,7 @@ use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\Y
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -108,7 +109,7 @@ class UpdateYaMarketProductsCardsCommand extends Command
 
             foreach($profiles as $profile)
             {
-                if($profile->getAttr() === $questions[$profileName])
+                if($profile->getAttr() === $profileName)
                 {
                     /* Присваиваем профиль пользователя */
                     $UserProfileUid = $profile;
@@ -164,6 +165,8 @@ class UpdateYaMarketProductsCardsCommand extends Command
                 /** Пропускаем обновление, если соответствие не найдено */
                 if(stripos($card['article'], $article) === false)
                 {
+                    $this->io->writeln(sprintf('<fg=gray>... %s</>', $card['article']));
+
                     continue;
                 }
             }

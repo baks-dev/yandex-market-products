@@ -25,22 +25,25 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger;
 
-use BaksDev\Yandex\Market\Products\Type\Id\YandexMarketProductUid;
+use BaksDev\Products\Product\Type\Invariable\ProductInvariableUid;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 
 final class YandexMarketProductMessage
 {
     /**
      * Внутренний (системный) идентификатор продукта YandexMarket
      */
-    private YandexMarketProductUid $id;
+    private string $invariable;
 
-    public function __construct(YandexMarketProductUid $id)
+    public function __construct(
+        ProductInvariableUid $invariable
+    )
     {
-        $this->id = $id;
+        $this->invariable = (string) $invariable;
     }
 
-    public function getId(): YandexMarketProductUid
+    public function getInvariable(): ProductInvariableUid
     {
-        return $this->id;
+        return new ProductInvariableUid($this->invariable);
     }
 }

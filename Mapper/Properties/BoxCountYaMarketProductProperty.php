@@ -91,7 +91,6 @@ final class BoxCountYaMarketProductProperty implements YaMarketProductPropertyIn
 
     public function getData(array $data): mixed
     {
-
         if(isset($data['product_propertys']))
         {
             $property = json_decode($data['product_propertys']);
@@ -102,10 +101,17 @@ final class BoxCountYaMarketProductProperty implements YaMarketProductPropertyIn
 
             if($filter && $filter->value)
             {
-                return $filter->value;
+                $value = (int) $filter->value;
+
+                /**
+                 * Для товаров, занимающих одно место, не передавайте этот параметр.
+                 *
+                 * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/business-assortment/updateOfferMappings#updateofferdto
+                 */
+                return $value > 1 ? $filter->value : null;
             }
         }
 
-        return 1;
+        return null;
     }
 }

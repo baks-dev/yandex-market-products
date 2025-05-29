@@ -91,7 +91,7 @@ final class BarcodesCodeYaMarketProductProperty implements YaMarketProductProper
     {
         if(!empty($data['barcode']))
         {
-            return $data['barcode'];
+            return [$data['barcode']];
         }
 
         $return_value = match (true)

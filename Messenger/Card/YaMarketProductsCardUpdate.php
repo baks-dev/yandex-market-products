@@ -30,7 +30,6 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YaMarketProductUpdateCardRequest;
 use BaksDev\Yandex\Market\Products\Mapper\YandexMarketMapper;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
-use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceUpdate;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
 use Psr\Log\LoggerInterface;
@@ -46,7 +45,6 @@ final readonly class YaMarketProductsCardUpdate
         private YaMarketProductsCardInterface $marketProductsCard,
         private YandexMarketMapper $yandexMarketMapper,
         private MessageDispatchInterface $messageDispatch,
-        private AppLockInterface $appLock,
     ) {}
 
     /**
@@ -74,11 +72,13 @@ final readonly class YaMarketProductsCardUpdate
             return;
         }
 
-        /** Лимит: 600 запросов в минуту на расчет и обновление цен, добавляем лок на 0.6 сек */
-        $lock = $this->appLock
+        ///** Лимит: 600 запросов в минуту на расчет и обновление цен, добавляем лок на 0.6 сек */
+        // usleep(600000);
+
+        /*$lock = $this->appLock
             ->createLock([$message->getProfile(), YaMarketProductsPriceUpdate::class])
             ->lifetime((60 * 0.01))
-            ->waitAllTime();
+            ->waitAllTime();*/
 
 
         /** Гидрируем карточку на свойства запроса */
@@ -112,7 +112,7 @@ final readonly class YaMarketProductsCardUpdate
 
         $this->logger->info(sprintf('Обновили карточку товара %s', $request['offerId']));
 
-        $lock->release();
+        //$lock->release();
 
     }
 }

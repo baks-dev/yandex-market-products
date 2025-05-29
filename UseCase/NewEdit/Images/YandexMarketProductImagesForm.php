@@ -54,7 +54,7 @@ final class YandexMarketProductImagesForm extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => YandexMarketProductImagesDTO::class,
+            'data_class' => YandexMarketProductCustomImagesDTO::class,
         ]);
     }
 }

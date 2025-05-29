@@ -158,6 +158,8 @@ class UpdateYaMarketProductsPriceCommand extends Command
                 /** Пропускаем обновление, если соответствие не найдено */
                 if($card === false || stripos($card['article'], $article) === false)
                 {
+                    $this->io->writeln(sprintf('<fg=gray>... %s</>', $card['article']));
+
                     continue;
                 }
             }

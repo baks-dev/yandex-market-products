@@ -27,11 +27,11 @@ namespace BaksDev\Yandex\Market\Products\UseCase\NewEdit\Tests;
 
 use BaksDev\Core\BaksDevCoreBundle;
 use BaksDev\Products\Product\Type\Invariable\ProductInvariableUid;
-use BaksDev\Yandex\Market\Products\Entity\YandexMarketProduct;
+use BaksDev\Yandex\Market\Products\Entity\Custom\YandexMarketProductCustom;
 use BaksDev\Yandex\Market\Products\Type\Id\YandexMarketProductUid;
-use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductImagesDTO;
-use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketProductDTO;
-use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketProductHandler;
+use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductCustomImagesDTO;
+use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductDTO;
+use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
@@ -73,15 +73,15 @@ final class YandexMarketProductEditTest extends KernelTestCase
 
         $em = $container->get(EntityManagerInterface::class);
 
-        /** @var YandexMarketProduct $product */
+        /** @var YandexMarketProductCustom $product */
         $product = $em
-            ->getRepository(YandexMarketProduct::class)
+            ->getRepository(YandexMarketProductCustom::class)
             ->find(YandexMarketProductUid::TEST);
 
         self::assertNotNull($product);
 
-        $editDTO = new YandexMarketProductDTO();
-        $imageDTO = new YandexMarketProductImagesDTO();
+        $editDTO = new YandexMarketCustomProductDTO();
+        $imageDTO = new YandexMarketProductCustomImagesDTO();
         $imageDTO->setFile($filePhoto);
 
         $editDTO->getImages()->add($imageDTO);
@@ -92,10 +92,10 @@ final class YandexMarketProductEditTest extends KernelTestCase
 
         self::assertNotEmpty($editDTO->getImages());
 
-        /** @var YandexMarketProductHandler $handler */
-        $handler = $container->get(YandexMarketProductHandler::class);
+        /** @var YandexMarketCustomProductHandler $handler */
+        $handler = $container->get(YandexMarketCustomProductHandler::class);
         $editYandexMarketProduct = $handler->handle($editDTO);
-        self::assertTrue($editYandexMarketProduct instanceof YandexMarketProduct);
+        self::assertTrue($editYandexMarketProduct instanceof YandexMarketProductCustom);
         self::assertTrue($editYandexMarketProduct->getImages()->current()->getName() === 'photo1');
     }
 }

@@ -27,13 +27,13 @@ namespace BaksDev\Yandex\Market\Products\UseCase\NewEdit\Tests;
 
 use BaksDev\Core\BaksDevCoreBundle;
 use BaksDev\Products\Product\Type\Invariable\ProductInvariableUid;
-use BaksDev\Yandex\Market\Products\Entity\Images\YandexMarketProductImage;
-use BaksDev\Yandex\Market\Products\Entity\YandexMarketProduct;
+use BaksDev\Yandex\Market\Products\Entity\Custom\Images\YandexMarketProductCustomImage;
+use BaksDev\Yandex\Market\Products\Entity\Custom\YandexMarketProductCustom;
 use BaksDev\Yandex\Market\Products\Type\Id\YandexMarketProductUid;
 use BaksDev\Yandex\Market\Products\Type\Image\YandexMarketProductImageUid;
-use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductImagesDTO;
-use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketProductDTO;
-use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketProductHandler;
+use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductCustomImagesDTO;
+use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductDTO;
+use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
@@ -64,7 +64,7 @@ final class YandexMarketProductNewTest extends KernelTestCase
         $em = self::getContainer()->get(EntityManagerInterface::class);
 
         $yandexMarketProduct = $em
-            ->getRepository(YandexMarketProduct::class)
+            ->getRepository(YandexMarketProductCustom::class)
             ->findOneBy(['id' => YandexMarketProductUid::TEST]);
 
         if($yandexMarketProduct)
@@ -73,7 +73,7 @@ final class YandexMarketProductNewTest extends KernelTestCase
         }
 
         $yandexMarketProductImages = $em
-            ->getRepository(YandexMarketProductImage::class)
+            ->getRepository(YandexMarketProductCustomImage::class)
             ->findBy(['market' => YandexMarketProductImageUid::TEST]);
 
         foreach($yandexMarketProductImages as $image)
@@ -124,7 +124,7 @@ final class YandexMarketProductNewTest extends KernelTestCase
         /**
          * Тестируем YandexMarketProductImagesDTO
          */
-        $image = new YandexMarketProductImagesDTO();
+        $image = new YandexMarketProductCustomImagesDTO();
 
         $image->setFile($filePhoto);
         self::assertEquals($image->getFile(), $filePhoto);
@@ -147,7 +147,7 @@ final class YandexMarketProductNewTest extends KernelTestCase
         /**
          * Тестируем YandexMarketProductDTO
          */
-        $yandexMarketProductDTO = new YandexMarketProductDTO();
+        $yandexMarketProductDTO = new YandexMarketCustomProductDTO();
 
         $yandexMarketProductDTO->setInvariable(ProductInvariableUid::TEST);
         self::assertTrue($yandexMarketProductDTO->getInvariable()->equals(ProductInvariableUid::TEST));
@@ -156,9 +156,9 @@ final class YandexMarketProductNewTest extends KernelTestCase
 
         $container = self::getContainer();
 
-        /** @var YandexMarketProductHandler $handler */
-        $handler = $container->get(YandexMarketProductHandler::class);
+        /** @var YandexMarketCustomProductHandler $handler */
+        $handler = $container->get(YandexMarketCustomProductHandler::class);
         $newYandexMarketProduct = $handler->handle($yandexMarketProductDTO);
-        self::assertTrue($newYandexMarketProduct instanceof YandexMarketProduct);
+        self::assertTrue($newYandexMarketProduct instanceof YandexMarketProductCustom);
     }
 }

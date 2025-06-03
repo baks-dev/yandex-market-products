@@ -655,7 +655,7 @@ final class YaMarketProductsCardRepository implements YaMarketProductsCardInterf
             YandexMarketProductCustomImage::class,
             'ya_market_product_images',
             '
-                ya_market_product_images.market = ya_market_product.id AND
+                ya_market_product_images.invariable = ya_market_product.invariable AND
                 ya_market_product_images.root = true
             '
         );

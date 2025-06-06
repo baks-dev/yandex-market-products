@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties\Collection;
 
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.ya.product.property')]
@@ -36,7 +37,7 @@ interface YaMarketProductPropertyInterface
     /**
      * Метод возвращает результат, присваиваемый к значению
      */
-    public function getData(array $data): mixed;
+    public function getData(CurrentYaMarketProductCardResult $data): mixed;
 
     /**
      * Возвращает значение по умолчанию
@@ -71,5 +72,5 @@ interface YaMarketProductPropertyInterface
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool;
+    public static function equals(string $value): bool;
 }

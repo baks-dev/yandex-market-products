@@ -25,7 +25,13 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
+use BaksDev\Core\Type\UidType\Uid;
+use BaksDev\Products\Product\Type\Id\ProductUid;
+use BaksDev\Products\Product\Type\Offers\ConstId\ProductOfferConst;
+use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst;
+use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Uid\UuidV7;
 
@@ -71,9 +77,9 @@ final class BarcodesCodeYaMarketProductProperty implements YaMarketProductProper
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -87,20 +93,21 @@ final class BarcodesCodeYaMarketProductProperty implements YaMarketProductProper
         return false;
     }
 
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): mixed
     {
-        if(!empty($data['barcode']))
+        if($data->getBarcode() !== false)
         {
-            return [$data['barcode']];
+            return [$data->getBarcode()];
         }
 
+        /** @var UuidV7 $return_value */
         $return_value = match (true)
         {
-            isset($data['modification_const']) => new UuidV7($data['modification_const']),
-            isset($data['variation_const']) => new UuidV7($data['variation_const']),
-            isset($data['offer_const']) => new UuidV7($data['offer_const']),
-            isset($data['product_const']) => new UuidV7($data['product_const']),
-            default => null,
+            $data->getModificationConst() instanceof ProductModificationConst => $data->getModificationConst(),
+            $data->getVariationConst() instanceof ProductVariationConst => $data->getVariationConst(),
+            $data->getOfferConst() instanceof ProductOfferConst => $data->getOfferConst(),
+            $data->getProductId() instanceof ProductUid => $data->getProductId(),
+            default => false,
         };
 
         if($return_value)

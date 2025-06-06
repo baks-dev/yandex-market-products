@@ -51,6 +51,11 @@ final class YaMarketProductUpdateCardRequest extends YandexMarket
             return true;
         }
 
+        if($this->isCard() === false)
+        {
+            return true;
+        }
+
         $response = $this->TokenHttpClient()
             ->request(
                 'POST',

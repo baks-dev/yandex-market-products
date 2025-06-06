@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -47,31 +47,33 @@ final class YaMarketProductsCardMessage
     /**
      * Постоянный уникальный идентификатор ТП
      */
-    private string|null $offerConst;
+    private string|false $offerConst;
 
     /**
      * Постоянный уникальный идентификатор варианта
      */
-    private string|null $variationConst;
+    private string|false $variationConst;
 
     /**
      * Постоянный уникальный идентификатор модификации
      */
-    private string|null $modificationConst;
+    private string|false $modificationConst;
 
     public function __construct(
         UserProfileUid|string $profile,
         Product|ProductUid|string $product,
-        ProductOfferConst|string|null $offerConst,
-        ProductVariationConst|string|null $variationConst,
-        ProductModificationConst|string|null $modificationConst
+
+        ProductOfferConst|string|null|false $offerConst,
+        ProductVariationConst|string|null|false $variationConst,
+        ProductModificationConst|string|null|false $modificationConst
     )
     {
         $this->profile = (string) $profile;
         $this->product = (string) $product;
-        $this->offerConst = (string) $offerConst;
-        $this->variationConst = (string) $variationConst;
-        $this->modificationConst = (string) $modificationConst;
+
+        $this->offerConst = $offerConst ? (string) $offerConst : false;
+        $this->variationConst = $variationConst ? (string) $variationConst : false;
+        $this->modificationConst = $modificationConst ? (string) $modificationConst : false;
     }
 
     /**
@@ -93,25 +95,25 @@ final class YaMarketProductsCardMessage
     /**
      * OfferConst
      */
-    public function getOfferConst(): ?ProductOfferConst
+    public function getOfferConst(): ProductOfferConst|false
     {
-        return $this->offerConst ? new ProductOfferConst($this->offerConst) : null;
+        return $this->offerConst ? new ProductOfferConst($this->offerConst) : false;
     }
 
     /**
      * VariationConst
      */
-    public function getVariationConst(): ?ProductVariationConst
+    public function getVariationConst(): ProductVariationConst|false
     {
-        return $this->variationConst ? new ProductVariationConst($this->variationConst) : null;
+        return $this->variationConst ? new ProductVariationConst($this->variationConst) : false;
     }
 
     /**
      * ModificationConst
      */
-    public function getModificationConst(): ?ProductModificationConst
+    public function getModificationConst(): ProductModificationConst|false
     {
-        return $this->modificationConst ? new ProductModificationConst($this->modificationConst) : null;
+        return $this->modificationConst ? new ProductModificationConst($this->modificationConst) : false;
     }
 
 

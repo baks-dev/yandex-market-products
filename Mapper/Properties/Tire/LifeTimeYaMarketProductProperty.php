@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties\Tire;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductProperty;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
@@ -72,9 +73,9 @@ final class LifeTimeYaMarketProductProperty implements YaMarketProductPropertyIn
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -88,9 +89,9 @@ final class LifeTimeYaMarketProductProperty implements YaMarketProductPropertyIn
         return true;
     }
 
-    public function getData(array $data): ?array
+    public function getData(CurrentYaMarketProductCardResult $data): ?array
     {
-        if(!isset($data['market_category']) || $data['market_category'] !== YaMarketProductProperty::CATEGORY_TIRE)
+        if($data->getMarketCategory() !== YaMarketProductProperty::CATEGORY_TIRE)
         {
             return null;
         }

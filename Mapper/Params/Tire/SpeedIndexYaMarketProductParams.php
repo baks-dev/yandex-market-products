@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Params\Tire;
 
 use BaksDev\Yandex\Market\Products\Mapper\Params\YaMarketProductParamsInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -85,11 +86,11 @@ final class SpeedIndexYaMarketProductParams implements YaMarketProductParamsInte
         return false;
     }
 
-    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
+    public function getData(CurrentYaMarketProductCardResult $data, ?TranslatorInterface $translator = null): array|null
     {
-        if($data['product_modification_postfix'])
+        if($data->getProductModificationPostfix())
         {
-            $cleaned_str = preg_replace('/[^a-zA-Z]/u', '', $data['product_modification_postfix']);
+            $cleaned_str = preg_replace('/[^a-zA-Z]/u', '', $data->getProductModificationPostfix());
 
             /** Преобразуем русские символы в латиницу */
             $cleaned_str = str_replace(

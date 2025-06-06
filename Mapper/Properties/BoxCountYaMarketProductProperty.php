@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.ya.product.property')]
@@ -34,7 +35,8 @@ final class BoxCountYaMarketProductProperty implements YaMarketProductPropertyIn
     /**
      * Количество грузовых мест.
      *
-     * Параметр используется, если товар представляет собой несколько коробок, упаковок и так далее. Например, кондиционер занимает два места — внешний и внутренний блоки в двух коробках.
+     * Параметр используется, если товар представляет собой несколько коробок, упаковок и так далее. Например,
+     * кондиционер занимает два места — внешний и внутренний блоки в двух коробках.
      *
      * Для товаров, занимающих одно место, не передавайте этот параметр.
      */
@@ -73,9 +75,9 @@ final class BoxCountYaMarketProductProperty implements YaMarketProductPropertyIn
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -89,28 +91,31 @@ final class BoxCountYaMarketProductProperty implements YaMarketProductPropertyIn
         return true;
     }
 
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): mixed
     {
-        if(isset($data['product_propertys']))
+        if(false === $data->getProductProperties())
         {
-            $property = json_decode($data['product_propertys']);
-
-            $filter = current(array_filter($property, function($element) {
-                return self::equals($element->type);
-            }));
-
-            if($filter && $filter->value)
-            {
-                $value = (int) $filter->value;
-
-                /**
-                 * Для товаров, занимающих одно место, не передавайте этот параметр.
-                 *
-                 * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/business-assortment/updateOfferMappings#updateofferdto
-                 */
-                return $value > 1 ? $filter->value : null;
-            }
+            return null;
         }
+
+        $filter = array_filter($data->getProductProperties(), static function($element) {
+            return self::equals($element->type);
+        });
+
+        $filter = current($filter);
+
+        if($filter && $filter->value)
+        {
+            $value = (int) $filter->value;
+
+            /**
+             * Для товаров, занимающих одно место, не передавайте этот параметр.
+             *
+             * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/business-assortment/updateOfferMappings#updateofferdto
+             */
+            return $value > 1 ? $filter->value : null;
+        }
+
 
         return null;
     }

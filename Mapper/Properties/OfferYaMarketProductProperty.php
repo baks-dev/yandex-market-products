@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.ya.product.property')]
@@ -39,7 +40,8 @@ final class OfferYaMarketProductProperty implements YaMarketProductPropertyInter
      * Правила использования SKU:
      * У каждого товара SKU должен быть свой.
      * SKU товара нельзя менять — можно только удалить товар и добавить заново с новым SKU.
-     * Уже заданный SKU нельзя освободить и использовать заново для другого товара. Каждый товар должен получать новый идентификатор, до того никогда не использовавшийся в вашем каталоге.
+     * Уже заданный SKU нельзя освободить и использовать заново для другого товара. Каждый товар должен получать новый
+     * идентификатор, до того никогда не использовавшийся в вашем каталоге.
      *
      */
     public const string PARAM = 'offerId';
@@ -75,9 +77,9 @@ final class OfferYaMarketProductProperty implements YaMarketProductPropertyInter
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
     public function isSetting(): bool
@@ -90,9 +92,8 @@ final class OfferYaMarketProductProperty implements YaMarketProductPropertyInter
         return false;
     }
 
-
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): ?string
     {
-        return $data['article'] ?? null;
+        return $data->getArticle() ?: null;
     }
 }

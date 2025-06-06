@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
-use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Uid\UuidV7;
 
@@ -39,9 +39,9 @@ final class VendorCodeYaMarketProductProperty implements YaMarketProductProperty
      */
     public const string PARAM = 'vendorCode';
 
-    public function __construct(
-        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
-    ) {}
+    //    public function __construct(
+    //        private readonly ?CurrentYaMarketProductCardInterface $yaMarketProductsCard = null
+    //    ) {}
 
     public function getIndex(): string
     {
@@ -74,9 +74,9 @@ final class VendorCodeYaMarketProductProperty implements YaMarketProductProperty
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -90,20 +90,22 @@ final class VendorCodeYaMarketProductProperty implements YaMarketProductProperty
         return true;
     }
 
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): mixed
     {
-        if(isset($data['product_propertys']))
+        if(false === $data->getProductProperties())
         {
-            $property = json_decode($data['product_propertys']);
+            return null;
+        }
 
-            $filter = current(array_filter($property, function($element) {
-                return self::equals($element->type);
-            }));
+        $filter = array_filter($data->getProductProperties(), function($element) {
+            return self::equals($element->type);
+        });
 
-            if($filter && $filter->value)
-            {
-                return $filter->value;
-            }
+        $filter = current($filter);
+
+        if($filter && $filter->value)
+        {
+            return $filter->value;
         }
 
         return null;

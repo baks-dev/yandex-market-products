@@ -26,13 +26,15 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.ya.product.property')]
 final class CustomsCommodityCodeYaMarketProductProperty implements YaMarketProductPropertyInterface
 {
     /**
-     * Код товара в единой Товарной номенклатуре внешнеэкономической деятельности (ТН ВЭД) — 10 или 14 цифр без пробелов.
+     * Код товара в единой Товарной номенклатуре внешнеэкономической деятельности (ТН ВЭД) — 10 или 14 цифр без
+     * пробелов.
      *
      * Обязательно укажите, если он есть.
      *
@@ -40,9 +42,6 @@ final class CustomsCommodityCodeYaMarketProductProperty implements YaMarketProdu
      */
     public const string PARAM = 'customsCommodityCode';
 
-    //    public function __construct(
-    //        private readonly ?YaMarketProductsCardInterface $yaMarketProductsCard = null
-    //    ) {}
 
     public function getIndex(): string
     {
@@ -75,9 +74,9 @@ final class CustomsCommodityCodeYaMarketProductProperty implements YaMarketProdu
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -91,27 +90,22 @@ final class CustomsCommodityCodeYaMarketProductProperty implements YaMarketProdu
         return true;
     }
 
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): mixed
     {
-
-
-        //if($this->yaMarketProductsCard)
+        if(false === $data->getProductProperties())
         {
-            //$data = $card instanceof YaMarketProductsCardUid ? $this->yaMarketProductsCard->findByCard($card) : $card;
+            return null;
+        }
 
-            if(isset($data['product_propertys']))
-            {
-                $property = json_decode($data['product_propertys']);
+        $filter = array_filter($data->getProductProperties(), static function($element) {
+            return self::equals($element->type);
+        });
 
-                $filter = current(array_filter($property, function($element) {
-                    return self::equals($element->type);
-                }));
+        $filter = current($filter);
 
-                if($filter && $filter->value)
-                {
-                    return $filter->value;
-                }
-            }
+        if($filter && $filter->value)
+        {
+            return $filter->value;
         }
 
         return null;

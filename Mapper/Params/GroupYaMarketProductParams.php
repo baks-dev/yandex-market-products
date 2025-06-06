@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Mapper\Params;
 
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -85,20 +86,18 @@ final class GroupYaMarketProductParams implements YaMarketProductParamsInterface
         return false;
     }
 
-    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
+    public function getData(CurrentYaMarketProductCardResult $data, ?TranslatorInterface $translator = null): array|null
     {
-
-        /** Объединяем карточки по главному артикулу продукции */
-
-        if(!empty($data['product_card']))
+        if(false === $data->getGroupCard())
         {
-            return [
-                'parameterId' => $this::ID,
-                'name' => $this->getName(),
-                'value' => $data['product_card']
-            ];
+            return null;
         }
 
-        return null;
+        /** Объединяем карточки по главному артикулу продукции */
+        return [
+            'parameterId' => $this::ID,
+            'name' => $this->getName(),
+            'value' => $data['product_card'],
+        ];
     }
 }

@@ -28,6 +28,7 @@ namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 use BaksDev\Yandex\Market\Products\Mapper\Params\YaMarketProductParamsCollection;
 use BaksDev\Yandex\Market\Products\Mapper\Params\YaMarketProductParamsInterface;
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Uid\UuidV7;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -77,9 +78,9 @@ final class ParameterValuesYaMarketProductProperty implements YaMarketProductPro
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
     public function isSetting(): bool
@@ -92,10 +93,9 @@ final class ParameterValuesYaMarketProductProperty implements YaMarketProductPro
         return false;
     }
 
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): mixed
     {
-
-        if(!isset($data['market_category']))
+        if(false === $data->getMarketCategory())
         {
             return null;
         }
@@ -110,8 +110,8 @@ final class ParameterValuesYaMarketProductProperty implements YaMarketProductPro
 
             if(
                 is_array($parameter) &&
-                !empty($parameter['parameterId']) &&
-                isset($parameter['value'])
+                isset($parameter['value']) === true &&
+                empty($parameter['parameterId']) === false
             )
             {
                 $params[] = $parameter;

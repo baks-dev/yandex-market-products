@@ -56,13 +56,11 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
     {
         /**  Получаем активные токены профилей пользователя */
 
-        $profiles = $this
-            ->allProfileYaMarketToken
+        $profiles = $this->allProfileYaMarketToken
             ->onlyActiveToken()
             ->findAll();
 
-
-        if($profiles->valid() === false)
+        if(false === $profiles || false === $profiles->valid())
         {
             return;
         }
@@ -81,7 +79,7 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
         $EditOrderDTO = new EditOrderDTO();
         $OrderEvent->getDto($EditOrderDTO);
 
-        foreach($profiles as $profile)
+        foreach($profiles as $UserProfileUid)
         {
             /** @var OrderProductDTO $product */
             foreach($EditOrderDTO->getProduct() as $product)
@@ -100,11 +98,11 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
                 }
 
                 $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
-                    $profile,
+                    $UserProfileUid,
                     $CurrentProductIdentifier->getProduct(),
                     $CurrentProductIdentifier->getOfferConst(),
                     $CurrentProductIdentifier->getVariationConst(),
-                    $CurrentProductIdentifier->getModificationConst()
+                    $CurrentProductIdentifier->getModificationConst(),
                 );
 
                 /** Добавляем в очередь обновление остатков через транспорт профиля */
@@ -112,7 +110,7 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
                 $this->messageDispatch->dispatch(
                     message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
                     stamps: [new MessageDelay('3 seconds')],
-                    transport: (string) $profile
+                    transport: (string) $UserProfileUid,
                 );
             }
         }

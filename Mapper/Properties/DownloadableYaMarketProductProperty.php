@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
-use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardUid;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.ya.product.property')]
@@ -70,9 +70,9 @@ final class DownloadableYaMarketProductProperty implements YaMarketProductProper
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -86,20 +86,22 @@ final class DownloadableYaMarketProductProperty implements YaMarketProductProper
         return true;
     }
 
-    public function getData(YaMarketProductsCardUid|array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): mixed
     {
-        if(isset($data['product_propertys']))
+        if(false === $data->getProductProperties())
         {
-            $property = json_decode($data['product_propertys']);
+            return null;
+        }
 
-            $filter = current(array_filter($property, function($element) {
-                return self::equals($element->type);
-            }));
+        $filter = array_filter($data->getProductProperties(), static function($element) {
+            return self::equals($element->type);
+        });
 
-            if($filter && $filter->value)
-            {
-                return $filter->value;
-            }
+        $filter = current($filter);
+
+        if($filter && $filter->value)
+        {
+            return $filter->value;
         }
 
         return null;

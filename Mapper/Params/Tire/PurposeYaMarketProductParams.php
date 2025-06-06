@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Params\Tire;
 
 use BaksDev\Yandex\Market\Products\Mapper\Params\YaMarketProductParamsInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -85,48 +86,49 @@ final class PurposeYaMarketProductParams implements YaMarketProductParamsInterfa
         return false;
     }
 
-    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
+    public function getData(CurrentYaMarketProductCardResult $data, ?TranslatorInterface $translator = null): mixed
     {
-        if(isset($data['product_params']))
+        if(false === $data->getProductParams())
         {
-            $product_params = json_decode($data['product_params'], false, 512, JSON_THROW_ON_ERROR);
+            return null;
+        }
 
-            foreach($product_params as $product_param)
+        foreach($data->getProductParams() as $product_param)
+        {
+            if($this->equals($product_param->name))
             {
-                if($this->equals($product_param->name))
+                if(empty($product_param->value) || $product_param->value === 'false')
                 {
-                    if(!$product_param->value || $product_param->value === 'false')
-                    {
-                        return null;
-                    }
+                    return null;
+                }
 
-                    $return_index = match ($product_param->value)
+                $return_index = match ($product_param->value)
+                {
+                    'jeep' => 37167510, // для внедорожника
+                    'bus', 'truck' => 37167361, // для коммерческого транспорта
+                    'passenger' => 37167939, // для легкового автомобиля
+                    default => false,
+                };
+
+                if($return_index)
+                {
+                    $return_name = match ($return_index)
                     {
-                        'jeep' => 37167510, // для внедорожника
-                        'bus', 'truck' => 37167361, // для коммерческого транспорта
-                        'passenger' => 37167939, // для легкового автомобиля
-                        default => null,
+                        37167510 => 'для внедорожника',
+                        37167361 => 'для коммерческого транспорта',
+                        37167939 => 'для легкового автомобиля',
                     };
 
-                    if($return_index)
-                    {
-                        $return_name = match ($return_index)
-                        {
-                            37167510 => 'для внедорожника',
-                            37167361 => 'для коммерческого транспорта',
-                            37167939 => 'для легкового автомобиля',
-                        };
-
-                        return [
-                            'parameterId' => $this::ID,
-                            'name' => $this->getName(),
-                            'valueId' => $return_index,
-                            'value' => $return_name
-                        ];
-                    }
+                    return [
+                        'parameterId' => $this::ID,
+                        'name' => $this->getName(),
+                        'valueId' => $return_index,
+                        'value' => $return_name,
+                    ];
                 }
             }
         }
+
 
         return null;
     }

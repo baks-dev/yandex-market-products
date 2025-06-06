@@ -26,7 +26,11 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\Tests;
 
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
-use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
+use BaksDev\Products\Product\Type\Id\ProductUid;
+use BaksDev\Products\Product\Type\Offers\ConstId\ProductOfferConst;
+use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst;
+use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -38,19 +42,26 @@ class YaMarketProductsCardRepositoryTest extends KernelTestCase
 {
     public function testUseCase(): void
     {
-        /** @var YaMarketProductsCardInterface $YaMarketProductsCard */
-        $YaMarketProductsCard = self::getContainer()->get(YaMarketProductsCardInterface::class);
+        /** @var CurrentYaMarketProductCardInterface $YaMarketProductsCard */
+        $YaMarketProductsCard = self::getContainer()->get(CurrentYaMarketProductCardInterface::class);
 
         /** @var AllProductsIdentifierInterface $AllProductsIdentifier */
         $AllProductsIdentifier = self::getContainer()->get(AllProductsIdentifierInterface::class);
 
-        foreach($AllProductsIdentifier->findAll() as $i => $item)
+        foreach($AllProductsIdentifier->findAllArray() as $i => $item)
         {
             if($i >= 100)
             {
-                break;
+                //break;
             }
 
+            $item['product_id'] = new ProductUid('01878a9e-26ff-7f71-bb70-6cb19c044cd6');
+            $item['offer_const'] = new ProductOfferConst('01878a9e-25db-76e0-9ed8-2b4155abda46');
+            $item['variation_const'] = new ProductVariationConst('01878a9e-25df-7cc3-9fca-8e9e3e61d099');
+            $item['modification_const'] = new ProductModificationConst('01878a9e-25e1-7a55-92e1-11d4210d077c');
+
+
+            /** Если не указана настройка соотношений - карточки не найдет */
             $current = $YaMarketProductsCard
                 ->forProduct($item['product_id'])
                 ->forOfferConst($item['offer_const'])
@@ -58,10 +69,12 @@ class YaMarketProductsCardRepositoryTest extends KernelTestCase
                 ->forModificationConst($item['modification_const'])
                 ->find();
 
+
             if($current === false)
             {
                 continue;
             }
+
 
             $array_keys = [
                 "product_uid",
@@ -83,7 +96,7 @@ class YaMarketProductsCardRepositoryTest extends KernelTestCase
                 "height",
                 "weight",
                 "market_category",
-                "product_propertys",
+                "product_properties",
                 "product_params",
                 "product_images",
                 "product_price",

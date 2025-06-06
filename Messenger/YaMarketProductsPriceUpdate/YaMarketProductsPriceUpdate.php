@@ -36,11 +36,16 @@ use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductDTO;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCardRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Price\YaMarketProductUpdatePriceRequest;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
-use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
+use BaksDev\Yandex\Market\Repository\YaMarketTokensByProfile\YaMarketTokensByProfileInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+/**
+ * Обновляем базовую цену товара на Yandex Market
+ */
 #[AsMessageHandler]
 final readonly class YaMarketProductsPriceUpdate
 {
@@ -49,176 +54,137 @@ final readonly class YaMarketProductsPriceUpdate
         private YandexMarketCalculatorRequest $marketCalculatorRequest,
         private YaMarketProductFindCardRequest $yandexMarketProductRequest,
         private YaMarketProductUpdatePriceRequest $marketProductPriceRequest,
-        private YaMarketProductsCardInterface $marketProductsCard,
-        private AppLockInterface $appLock,
-        private AppCacheInterface $appCache,
+        private CurrentYaMarketProductCardInterface $marketProductsCard,
         private MessageDispatchInterface $messageDispatch,
-        private DeduplicatorInterface $deduplicator,
+        private YaMarketTokensByProfileInterface $YaMarketTokensByProfile,
     ) {}
 
-    /**
-     * Обновляем базовую цену товара на Yandex Market
-     */
+
     public function __invoke(YaMarketProductsPriceMessage $message): void
     {
 
-        $Card = $this->marketProductsCard
+        /** Получаем все токены профиля */
+
+        $tokensByProfile = $this->YaMarketTokensByProfile->findAll($message->getProfile());
+
+        if(false === $tokensByProfile || false === $tokensByProfile->valid())
+        {
+            return;
+        }
+
+        $CurrentYaMarketProductCardResult = $this->marketProductsCard
             ->forProduct($message->getProduct())
             ->forOfferConst($message->getOfferConst())
             ->forVariationConst($message->getVariationConst())
             ->forModificationConst($message->getModificationConst())
             ->find();
 
-        if($Card === false)
+        if(false === ($CurrentYaMarketProductCardResult instanceof CurrentYaMarketProductCardResult))
         {
             return;
         }
 
-        /** Не обновляем базовую стоимость карточки без цены */
-        if(empty($Card['product_price']))
+        /** Не обновляем базовую стоимость карточки без обязательных параметров */
+        if(false === $CurrentYaMarketProductCardResult->isCredentials())
         {
             return;
         }
-
-        if(
-            empty($Card['width']) ||
-            empty($Card['height']) ||
-            empty($Card['length']) ||
-            empty($Card['weight'])
-        )
-        {
-            $this->logger->warning(
-                sprintf('Параметры упаковки товара %s не найдены!', $Card['article']),
-                [self::class.':'.__LINE__],
-            );
-
-            return;
-        }
-
-
-        //        $Deduplicator = $this->deduplicator
-        //            ->namespace('yandex-market-products')
-        //            ->expiresAfter('1 day')
-        //            ->deduplication([
-        //                $message->getProfile(),
-        //                $Card,
-        //                self::class,
-        //            ]);
-        //
-        //        if($Deduplicator->isExecuted())
-        //        {
-        //            return;
-        //        }
-        //
-        //        $Deduplicator->save();
-
-        /**
-         * Делаем расчет стоимости реализации товара
-         * Стоимости товара + Стоимость услуг YaMarket + Торговая наценка
-         */
 
         /** Лимит: 100 запросов в минуту, добавляем лок */
         usleep(600000);
 
-        //        $this->appLock
-        //            ->createLock([$message->getProfile(), self::class])
-        //            ->lifetime((60 / 90))
-        //            ->waitAllTime();
-
-
-        /**
-         * Добавляем к стоимости товара стоимость услуг YaMarket
-         * + Торговая наценка (%)
-         */
-
-        $Money = new Money($Card['product_price'], true);
-
-        $width = (int) $Card['width'];
-        $height = (int) $Card['height'];
-        $length = (int) $Card['length'];
-        $weight = (int) $Card['weight'];
-
-        $Price = $this->marketCalculatorRequest
-            ->profile($message->getProfile())
-            ->category($Card['market_category'])
-            ->price($Money)
-            ->width(($width * 0.1))
-            ->height(($height * 0.1))
-            ->length(($length * 0.1))
-            ->weight(($weight * 0.01))
-            ->calc();
-
-
-        if(false === $Price)
+        foreach($tokensByProfile as $YaMarketTokenUid)
         {
-            $this->messageDispatch
-                ->dispatch(
-                    $message,
+            /**
+             * Добавляем к стоимости товара стоимость услуг YaMarket
+             * Стоимости товара + Стоимость услуг YaMarket + Торговая наценка
+             */
+
+            $Price = $this->marketCalculatorRequest
+                ->forTokenIdentifier($YaMarketTokenUid)
+                ->category($CurrentYaMarketProductCardResult->getMarketCategory())
+                ->price($CurrentYaMarketProductCardResult->getProductPrice())
+                ->width($CurrentYaMarketProductCardResult->getWidth())
+                ->height($CurrentYaMarketProductCardResult->getHeight())
+                ->length($CurrentYaMarketProductCardResult->getLength())
+                ->weight($CurrentYaMarketProductCardResult->getWeight())
+                ->calc();
+
+            if(false === $Price)
+            {
+                $this->messageDispatch->dispatch(
+                    message: $message,
                     stamps: [new MessageDelay('1 minutes')],
+                    transport: $message->getProfile().'-low',
                 );
 
-            $this->logger->critical(
-                sprintf('yandex-market-products: Пробуем обновит стоимость %s через 1 минуту', $Card['article']),
-                [self::class.':'.__LINE__],
-            );
+                $this->logger->critical(
+                    sprintf(
+                        'yandex-market-products: Пробуем обновит стоимость %s через 1 минуту',
+                        $CurrentYaMarketProductCardResult->getArticle(),
+                    ),
+                    [self::class.':'.__LINE__],
+                );
 
-            return;
-        }
-
-
-        /**
-         * Проверяем изменение цены в карточке если добавлена ранее
-         */
-
-        $MarketProduct = $this->yandexMarketProductRequest
-            ->profile($message->getProfile())
-            ->article($Card['article'])
-            ->find();
-
-
-        if($MarketProduct->valid())
-        {
-            /** @var YaMarketProductDTO $YandexMarketProductDTO */
-            $YandexMarketProductDTO = $MarketProduct->current();
-
-            if(true === $YandexMarketProductDTO->getPrice()->equals($Price))
-            {
                 return;
             }
-        }
 
 
-        $Currency = new Currency($Card['product_currency']);
+            /**
+             * Проверяем изменение цены в карточке если добавлена ранее
+             */
 
-        $update = $this->marketProductPriceRequest
-            ->profile($message->getProfile())
-            ->article($Card['article'])
-            ->price($Price)
-            ->currency($Currency)
-            ->update();
+            $MarketProduct = $this->yandexMarketProductRequest
+                ->forTokenIdentifier($YaMarketTokenUid)
+                ->article($CurrentYaMarketProductCardResult->getArticle())
+                ->find();
 
-        if(false === $update)
-        {
-            $this->messageDispatch->dispatch(
-                $message,
-                [new MessageDelay('1 minute')],
-                'yandex-market-products-low',
+
+            if($MarketProduct->valid())
+            {
+                /** @var YaMarketProductDTO $YandexMarketProductDTO */
+                $YandexMarketProductDTO = $MarketProduct->current();
+
+                /** Не обновляем, если стоимость не изменилась */
+                if(true === $YandexMarketProductDTO->getPrice()->equals($Price))
+                {
+                    return;
+                }
+            }
+
+            $update = $this->marketProductPriceRequest
+                ->forTokenIdentifier($YaMarketTokenUid)
+                ->article($CurrentYaMarketProductCardResult->getArticle())
+                ->currency($CurrentYaMarketProductCardResult->getProductCurrency())
+                ->price($Price)
+                ->update();
+
+            if(false === $update)
+            {
+                $this->messageDispatch->dispatch(
+                    message: $message,
+                    stamps: [new MessageDelay('1 minute')],
+                    transport: $message->getProfile().'-low',
+                );
+
+                $this->logger->critical(sprintf(
+                    '%s: Пробуем обновить стоимость продукта через 1 минуту',
+                    $CurrentYaMarketProductCardResult->getArticle(),
+                ));
+
+                return;
+            }
+
+            $this->logger->info(
+                sprintf(
+                    'Обновили стоимость товара %s (%s) : %s => %s',
+                    $CurrentYaMarketProductCardResult->getArticle(),
+                    $CurrentYaMarketProductCardResult->getProductPrice(), // стоимость в карточке
+                    $Price->getValue(), // новая стоимость на маркетплейс
+                    $CurrentYaMarketProductCardResult->getProductCurrency(),
+                ), [self::class.':'.__LINE__, (string) $YaMarketTokenUid],
             );
-
-            $this->logger->critical(sprintf('%s: Пробуем обновить стоимость продукта через 1 минуту', $Card['article']));
-
-            return;
         }
-
-        $this->logger->info(
-            sprintf(
-                'Обновили стоимость товара %s (%s) : %s => %s',
-                $Card['article'],
-                $Money->getValue(), // стоимость в карточке
-                $Price->getValue(), // новая стоимость на маркетплейс
-                $Currency->getCurrencyValueUpper(),
-            ), [self::class.':'.__LINE__],
-        );
 
     }
 }

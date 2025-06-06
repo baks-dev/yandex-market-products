@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.ya.product.property')]
@@ -33,9 +34,11 @@ final class TagsYaMarketProductProperty implements YaMarketProductPropertyInterf
 {
     /**
      * Метки товара, используемые магазином. Покупателям теги не видны.
-     * По тегам можно группировать и фильтровать разные товары в каталоге — например, товары одной серии, коллекции или линейки.
+     * По тегам можно группировать и фильтровать разные товары в каталоге — например, товары одной серии, коллекции или
+     * линейки.
      *
-     * Максимальная длина тега 20 символов. У одного товара может быть максимум 10 тегов. Всего можно создать не больше 50 разных тегов.
+     * Максимальная длина тега 20 символов. У одного товара может быть максимум 10 тегов. Всего можно создать не больше
+     * 50 разных тегов.
      */
     public const string PARAM = 'tags';
 
@@ -70,9 +73,9 @@ final class TagsYaMarketProductProperty implements YaMarketProductPropertyInterf
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -86,13 +89,13 @@ final class TagsYaMarketProductProperty implements YaMarketProductPropertyInterf
         return false;
     }
 
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): array|null
     {
-        if(isset($data['product_card']))
+        if(false === $data->getGroupCard())
         {
-            return [$data['product_card']];
+            return null;
         }
 
-        return null;
+        return [$data->getGroupCard()];
     }
 }

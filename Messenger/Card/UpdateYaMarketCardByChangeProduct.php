@@ -38,54 +38,50 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class UpdateYaMarketCardByChangeProduct
 {
     public function __construct(
-        private AllProductsIdentifierInterface $allProductsIdentifier,
+        private AllProductsIdentifierInterface $AllProductsIdentifierReposirory,
         private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private MessageDispatchInterface $messageDispatch,
     ) {}
 
     public function __invoke(ProductMessage $message): void
     {
-
         /**  Получаем активные токены профилей пользователя */
         $profiles = $this
             ->allProfileYaMarketToken
             ->onlyActiveToken()
             ->findAll();
 
-
-        if($profiles->valid() === false)
+        if(false === $profiles || false === $profiles->valid())
         {
             return;
         }
 
+        /** Получаем идентификаторы обновляемой продукции */
+        $products = $this->AllProductsIdentifierReposirory
+            ->forProduct($message->getId())
+            ->toArray();
 
-        foreach($profiles as $profile)
+        if(false === $products)
         {
-            /** Получаем идентификаторы обновляемой продукции  */
-            $products = $this
-                ->allProductsIdentifier
-                ->forProduct($message->getId())
-                ->findAll();
+            return;
+        }
 
-            if($products === false)
-            {
-                return;
-            }
-
-            foreach($products as $product)
+        foreach($profiles as $UserProfileUid)
+        {
+            foreach($products as $ProductsIdentifierResult)
             {
                 $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
-                    $profile,
-                    $product['product_id'],
-                    $product['offer_const'],
-                    $product['variation_const'],
-                    $product['modification_const'],
+                    $UserProfileUid,
+                    $ProductsIdentifierResult->getProductId(),
+                    $ProductsIdentifierResult->getProductOfferConst(),
+                    $ProductsIdentifierResult->getProductVariationConst(),
+                    $ProductsIdentifierResult->getProductModificationConst(),
                 );
 
-                /** Транспорт async чтобы не мешать общей очереди */
+                /** Транспорт LOW чтобы не мешать общей очереди */
                 $this->messageDispatch->dispatch(
                     message: $YaMarketProductsCardMessage,
-                    transport: 'yandex-market-products'
+                    transport: (string) $UserProfileUid.'-low',
                 );
             }
         }

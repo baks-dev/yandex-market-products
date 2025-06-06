@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Params\Tire;
 
 use BaksDev\Yandex\Market\Products\Mapper\Params\YaMarketProductParamsInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -88,45 +89,46 @@ final class ProtectorDepthYaMarketProductParams implements YaMarketProductParams
         return false;
     }
 
-    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
+    public function getData(CurrentYaMarketProductCardResult $data, ?TranslatorInterface $translator = null): array|null
     {
-        if(isset($data['product_params']))
+        if(false === $data->getProductParams())
         {
-            $product_params = json_decode($data['product_params'], false, 512, JSON_THROW_ON_ERROR);
+            return null;
+        }
 
-            foreach($product_params as $product_param)
+        foreach($data->getProductParams() as $product_param)
+        {
+            if(false === empty($product_param->value) && $this->equals($product_param->name))
             {
-                if($this->equals($product_param->name))
+                if($product_param->value === 'false')
                 {
-                    if($product_param->value === 'false')
-                    {
-                        return null;
-                    }
-
-                    /**
-                     * "id": 12325084, "нм"
-                     * "id": 14744433,  "морская миля"
-                     * "id": 6,  "метр"
-                     * "id": 7, "километр"
-                     * "id": 8,  "сантиметр"
-                     * "id": 16805288, "мил"
-                     * "id": 12325073, "мкм"
-                     * "id": 6145200, "миллиметр"
-                     * "id": 13851454, "ярд"
-                     * "id": 6145203, "дюйм"
-                     * "id": 12909803, "фут"
-                     * "id": 6145202, "дециметр"
-                     */
-
-                    return [
-                        'parameterId' => $this::ID,
-                        'unitId' => 6145200, // миллиметр
-                        'name' => $this->getName(),
-                        'value' => $product_param->value
-                    ];
+                    return null;
                 }
+
+                /**
+                 * "id": 12325084, "нм"
+                 * "id": 14744433,  "морская миля"
+                 * "id": 6,  "метр"
+                 * "id": 7, "километр"
+                 * "id": 8,  "сантиметр"
+                 * "id": 16805288, "мил"
+                 * "id": 12325073, "мкм"
+                 * "id": 6145200, "миллиметр"
+                 * "id": 13851454, "ярд"
+                 * "id": 6145203, "дюйм"
+                 * "id": 12909803, "фут"
+                 * "id": 6145202, "дециметр"
+                 */
+
+                return [
+                    'parameterId' => $this::ID,
+                    'unitId' => 6145200, // миллиметр
+                    'name' => $this->getName(),
+                    'value' => $product_param->value,
+                ];
             }
         }
+
 
         return null;
     }

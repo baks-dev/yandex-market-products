@@ -32,6 +32,9 @@ use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+/**
+ * Обновляем цены при обновлении настроек токена и торговой наценки
+ */
 #[AsMessageHandler(priority: 0)]
 final readonly class UpdatePriceByYaMarketTokenHandler
 {
@@ -41,12 +44,8 @@ final readonly class UpdatePriceByYaMarketTokenHandler
         private MessageDispatchInterface $messageDispatch,
     ) {}
 
-    /**
-     * Обновляем цены при обновлении настроек кена и торговой наценки
-     */
     public function __invoke(YaMarketTokenMessage $message): void
     {
-
         /* Получаем все имеющиеся карточки в системе */
         $products = $this->allProductsIdentifier->findAll();
 
@@ -60,23 +59,23 @@ final readonly class UpdatePriceByYaMarketTokenHandler
             ->onlyActiveToken()
             ->findAll();
 
-        if(false === $profiles->valid())
+        if(false === $profiles || false === $profiles->valid())
         {
             return;
         }
 
         $profiles = iterator_to_array($profiles);
 
-        foreach($products as $product)
+        foreach($products as $ProductsIdentifierResult)
         {
-            foreach($profiles as $profile)
+            foreach($profiles as $UserProfileUid)
             {
                 $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
-                    $profile,
-                    $product['product_id'],
-                    $product['offer_const'],
-                    $product['variation_const'],
-                    $product['modification_const'],
+                    $UserProfileUid,
+                    $ProductsIdentifierResult->getProductId(),
+                    $ProductsIdentifierResult->getProductOfferConst(),
+                    $ProductsIdentifierResult->getProductVariationConst(),
+                    $ProductsIdentifierResult->getProductModificationConst(),
                 );
 
                 $YaMarketProductsPriceMessage = new YaMarketProductsPriceMessage($YaMarketProductsCardMessage);
@@ -84,7 +83,7 @@ final readonly class UpdatePriceByYaMarketTokenHandler
                 $this->messageDispatch
                     ->dispatch(
                         message: $YaMarketProductsPriceMessage,
-                        transport: 'yandex-market-products'
+                        transport: $UserProfileUid.'-low',
                     );
             }
         }

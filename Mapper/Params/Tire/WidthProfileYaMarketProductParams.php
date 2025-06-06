@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Params\Tire;
 
 use BaksDev\Yandex\Market\Products\Mapper\Params\YaMarketProductParamsInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -85,27 +86,27 @@ final class WidthProfileYaMarketProductParams implements YaMarketProductParamsIn
         return false;
     }
 
-    public function getData(array $data, ?TranslatorInterface $translator = null): mixed
+    public function getData(CurrentYaMarketProductCardResult $data, ?TranslatorInterface $translator = null): array|null
     {
-        if(isset($data['product_params']))
+        if(false === $data->getProductParams())
         {
-            $product_params = json_decode($data['product_params'], false, 512, JSON_THROW_ON_ERROR);
+            return null;
+        }
 
-            foreach($product_params as $product_param)
+        foreach($data->getProductParams() as $product_param)
+        {
+            if($this->equals($product_param->name))
             {
-                if($this->equals($product_param->name))
+                if(empty($product_param->value) || $product_param->value === 'false')
                 {
-                    if($product_param->value === 'false')
-                    {
-                        return null;
-                    }
-
-                    return [
-                        'parameterId' => $this::ID,
-                        'name' => $this->getName(),
-                        'value' => $product_param->value
-                    ];
+                    return null;
                 }
+
+                return [
+                    'parameterId' => $this::ID,
+                    'name' => $this->getName(),
+                    'value' => $product_param->value,
+                ];
             }
         }
 

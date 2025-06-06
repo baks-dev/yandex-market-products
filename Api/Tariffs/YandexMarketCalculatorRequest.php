@@ -91,19 +91,19 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
     public function width(int|float $width): self
     {
-        $this->width = $width;
+        $this->width = (int) $width;
         return $this;
     }
 
     public function height(int|float $height): self
     {
-        $this->height = $height;
+        $this->height = (int) $height;
         return $this;
     }
 
     public function weight(int|float $weight): self
     {
-        $this->weight = $weight;
+        $this->weight = (int) $weight;
         return $this;
     }
 

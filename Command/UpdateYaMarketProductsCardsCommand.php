@@ -28,7 +28,7 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
-use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -54,7 +54,7 @@ class UpdateYaMarketProductsCardsCommand extends Command
     public function __construct(
         private readonly AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private readonly AllProductsIdentifierInterface $allProductsIdentifier,
-        private readonly YaMarketProductsCardInterface $marketProductsCard,
+        private readonly CurrentYaMarketProductCardInterface $marketProductsCard,
         private readonly MessageDispatchInterface $messageDispatch
     )
     {
@@ -134,7 +134,7 @@ class UpdateYaMarketProductsCardsCommand extends Command
         $this->io->note(sprintf('Обновляем профиль %s', $profile->getAttr()));
 
         /* Получаем все имеющиеся карточки в системе */
-        $products = $this->allProductsIdentifier->findAll();
+        $products = $this->allProductsIdentifier->findAllArray();
 
         if($products === false)
         {

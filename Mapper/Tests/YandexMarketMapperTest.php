@@ -27,7 +27,7 @@ namespace BaksDev\Yandex\Market\Products\Mapper\Tests;
 
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Yandex\Market\Products\Mapper\YandexMarketMapper;
-use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -43,14 +43,14 @@ class YandexMarketMapperTest extends KernelTestCase
         /** @var AllProductsIdentifierInterface $AllProductsIdentifier */
         $AllProductsIdentifier = self::getContainer()->get(AllProductsIdentifierInterface::class);
 
-        /** @var YaMarketProductsCardInterface $YaMarketProductsCard */
-        $YaMarketProductsCard = self::getContainer()->get(YaMarketProductsCardInterface::class);
+        /** @var CurrentYaMarketProductCardInterface $YaMarketProductsCard */
+        $YaMarketProductsCard = self::getContainer()->get(CurrentYaMarketProductCardInterface::class);
 
         /** @var YandexMarketMapper $YandexMarketMapper */
         $YandexMarketMapper = self::getContainer()->get(YandexMarketMapper::class);
 
 
-        foreach($AllProductsIdentifier->findAll() as $key => $item)
+        foreach($AllProductsIdentifier->findAllArray() as $key => $item)
         {
             if($key >= 10)
             {

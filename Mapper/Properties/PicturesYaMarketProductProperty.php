@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -76,9 +77,9 @@ final class PicturesYaMarketProductProperty implements YaMarketProductPropertyIn
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
     public function isSetting(): bool
@@ -91,30 +92,22 @@ final class PicturesYaMarketProductProperty implements YaMarketProductPropertyIn
         return false;
     }
 
-
-    public function getData(array $data): ?array
+    public function getData(CurrentYaMarketProductCardResult $data): ?array
     {
-        if(isset($data['product_images']))
+        if(false === $data->getProductImages())
         {
-            return $this->transform($data['product_images']);
+            return null;
         }
 
-        return null;
-    }
-
-    /** Формируем массив элементов с ищображениями */
-    public function transform(string $images): ?array
-    {
-        $images = json_decode($images);
-
-        /* Сортируем коллекцию изображений по root */
-        usort($images, static function($item1) {
-            return ($item1->product_img_root === false) ? 1 : -1;
-        });
-
-        foreach($images as $image)
+        /**
+         * Формируем массив элементов с изображениями
+         */
+        foreach($data->getProductImages() as $image)
         {
-            $picture = 'https://'.($image->product_img_cdn ? $this->CDN_HOST : $this->HOST).$image->product_img.'/'.($image->product_img_cdn ? 'large.' : 'image.').$image->product_img_ext;
+            $picture = 'https://'.($image->product_img_cdn ? $this->CDN_HOST : $this->HOST).
+                $image->product_img.'/'.
+                ($image->product_img_cdn ? 'large.' : 'image.').
+                $image->product_img_ext;
 
             // Проверяем доступность файла изображения
             $Headers = get_headers($picture);

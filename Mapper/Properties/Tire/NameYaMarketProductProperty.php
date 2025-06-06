@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ namespace BaksDev\Yandex\Market\Products\Mapper\Properties\Tire;
 use BaksDev\Yandex\Market\Products\Mapper\Params\Tire\PurposeYaMarketProductParams;
 use BaksDev\Yandex\Market\Products\Mapper\Params\Tire\SeasonYaMarketProductParams;
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductProperty;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
@@ -71,9 +72,9 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -87,23 +88,22 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
         return true;
     }
 
-    public function getData(array $data): ?string
+    public function getData(CurrentYaMarketProductCardResult $data): ?string
     {
-        if(!isset($data['market_category']) || $data['market_category'] !== YaMarketProductProperty::CATEGORY_TIRE)
+
+        if($data->getMarketCategory() !== YaMarketProductProperty::CATEGORY_TIRE)
         {
             return null;
         }
 
         $name = '';
 
-        if(isset($data['product_params']))
+        if($data->getProductParams() !== false)
         {
-            $product_params = json_decode($data['product_params'], false, 512, JSON_THROW_ON_ERROR);
-
             /** Добавляем к названию сезонность */
             $Season = new SeasonYaMarketProductParams();
 
-            foreach($product_params as $product_param)
+            foreach($data->getProductParams() as $product_param)
             {
                 if($Season->equals($product_param->name))
                 {
@@ -160,12 +160,12 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
         }
 
 
-        if(isset($data['product_params']))
+        if($data->getProductParams() !== false)
         {
             /** Добавляем к названию назначение */
             $Purpose = new PurposeYaMarketProductParams();
 
-            foreach($product_params as $product_param)
+            foreach($data->getProductParams() as $product_param)
             {
                 if($Purpose->equals($product_param->name))
                 {

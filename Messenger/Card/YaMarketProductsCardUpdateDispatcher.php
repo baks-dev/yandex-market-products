@@ -23,12 +23,14 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
+namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
-use BaksDev\Core\Messenger\MessageDelay;
+use BaksDev\Core\Lock\AppLockInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductGetStocksRequest;
-use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductUpdateStocksRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Card\YaMarketProductUpdateCardRequest;
+use BaksDev\Yandex\Market\Products\Mapper\YandexMarketMapper;
+use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
+use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use BaksDev\Yandex\Market\Repository\YaMarketTokensByProfile\YaMarketTokensByProfileInterface;
@@ -37,26 +39,25 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final readonly class YaMarketProductsStocksUpdate
+final readonly class YaMarketProductsCardUpdateDispatcher
 {
     public function __construct(
         #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
-        private YaMarketProductGetStocksRequest $marketProductStocksGetRequest,
-        private YaMarketProductUpdateStocksRequest $marketProductStocksUpdateRequest,
+        private YaMarketProductUpdateCardRequest $marketProductUpdate,
         private CurrentYaMarketProductCardInterface $marketProductsCard,
-        private MessageDispatchInterface $messageDispatch,
+        private YandexMarketMapper $yandexMarketMapper,
         private YaMarketTokensByProfileInterface $YaMarketTokensByProfile,
+        private MessageDispatchInterface $messageDispatch,
     ) {}
 
     /**
-     * Обновляем остатки товаров Yandex Market
+     * Добавляем (обновляем) карточку товара на Yandex Market
      */
-    public function __invoke(YaMarketProductsStocksMessage $message): void
+    public function __invoke(YaMarketProductsCardMessage $message): void
     {
         /** Получаем все токены профиля */
 
-        $tokensByProfile = $this->YaMarketTokensByProfile
-            ->findAll($message->getProfile());
+        $tokensByProfile = $this->YaMarketTokensByProfile->findAll($message->getProfile());
 
         if(false === $tokensByProfile || false === $tokensByProfile->valid())
         {
@@ -75,62 +76,53 @@ final readonly class YaMarketProductsStocksUpdate
             return;
         }
 
-        /** Не обновляем базовую стоимость карточки без обязательных параметров */
+        /** Не добавляем карточку без обязательных параметров */
         if(false === $CurrentYaMarketProductCardResult->isCredentials())
         {
+            $this->logger->warning(
+                sprintf(
+                    'yandex-market-products: Не добавляем карточку  c артикулом %s без обязательных параметров',
+                    $CurrentYaMarketProductCardResult->getArticle(),
+                ),
+                [self::class.':'.__LINE__, var_export($CurrentYaMarketProductCardResult, true)],
+            );
             return;
         }
 
+        /** Гидрируем карточку на свойства запроса */
+        $request = $this->yandexMarketMapper
+            ->getData($CurrentYaMarketProductCardResult);
+
         foreach($tokensByProfile as $YaMarketTokenUid)
         {
-
-            /** Возвращает данные об остатках товаров на маркетплейсе */
-            $ProductStocks = $this->marketProductStocksGetRequest
+            $update = $this->marketProductUpdate
                 ->forTokenIdentifier($YaMarketTokenUid)
-                ->article($CurrentYaMarketProductCardResult->getArticle())
-                ->find();
+                ->update($request);
 
-            if(false === $ProductStocks)
+            if(false === $update)
             {
-                $this->messageDispatch->dispatch(
-                    message: $message,
-                    stamps: [new MessageDelay('5 seconds')],
-                    transport: $message->getProfile().'-low',
-                );
-
-                $this->logger->critical(sprintf(
-                    'Пробуем обновить остатки артикула %s через 5 секунд',
-                    $CurrentYaMarketProductCardResult->getArticle(),
-                ));
-
+                /**
+                 * Ошибка запишется в лог
+                 *
+                 * @see YaMarketProductUpdateCardRequest
+                 */
                 return;
             }
 
-            if($ProductStocks === $CurrentYaMarketProductCardResult->getProductQuantity())
-            {
-                $this->logger->info(sprintf(
-                    'Наличие соответствует %s: %s == %s',
-                    $CurrentYaMarketProductCardResult->getArticle(),
-                    $ProductStocks,
-                    $CurrentYaMarketProductCardResult->getProductQuantity(),
-                ), [$YaMarketTokenUid]);
+            /** Добавляем в очередь обновление цены  */
+            $this->messageDispatch->dispatch(
+                message: new YaMarketProductsPriceMessage($message),
+                transport: (string) $message->getProfile(),
+            );
 
-                return;
-            }
+            /** Добавляем в очередь обновление остатков  */
+            $this->messageDispatch->dispatch(
+                message: new YaMarketProductsStocksMessage($message),
+                transport: (string) $message->getProfile(),
+            );
 
-            /** Обновляем остатки товара если наличие изменилось */
-            $this->marketProductStocksUpdateRequest
-                ->forTokenIdentifier($YaMarketTokenUid)
-                ->article($CurrentYaMarketProductCardResult->getArticle())
-                ->total($CurrentYaMarketProductCardResult->getProductQuantity())
-                ->update();
+            $this->logger->info(sprintf('Обновили карточку товара %s', $request['offerId']));
 
-            $this->logger->info(sprintf(
-                'Обновили наличие %s: %s => %s',
-                $CurrentYaMarketProductCardResult->getArticle(),
-                $ProductStocks,
-                $CurrentYaMarketProductCardResult->getProductQuantity(),
-            ), [$YaMarketTokenUid]);
         }
     }
 }

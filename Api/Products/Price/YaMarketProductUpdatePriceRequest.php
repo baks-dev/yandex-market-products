@@ -89,23 +89,20 @@ final class YaMarketProductUpdatePriceRequest extends YandexMarket
             $this->currency = new Currency(RUR::class);
         }
 
+        $offers = [
+            'offerId' => $this->article,
+            'price' => [
+                'value' => $this->price->getRoundValue(),
+                'currencyId' => str_replace('RUB', 'RUR', $this->currency->getCurrencyValueUpper()),
+            ],
+        ];
 
         $response = $this->TokenHttpClient()
             ->request(
                 'POST',
                 //sprintf('/businesses/%s/offer-prices/updates', $this->getBusiness()),
                 sprintf('/campaigns/%s/offer-prices/updates', $this->getCompany()),
-                ['json' =>
-                    ['offers' =>
-                        [[
-                            'offerId' => $this->article,
-                            'price' => [
-                                'value' => $this->price->getRoundValue(),
-                                'currencyId' => str_replace('RUR', 'RUB', $this->currency->getCurrencyValueUpper()),
-                            ],
-                        ]],
-                    ],
-                ],
+                ['json' => ['offers' => [$offers]]],
             );
 
         $content = $response->toArray(false);
@@ -120,8 +117,8 @@ final class YaMarketProductUpdatePriceRequest extends YandexMarket
                 ),
                 [
                     self::class.':'.__LINE__,
-                    $this->article,
-                    $this->price->getRoundValue(),
+                    $this->getProfile(),
+                    $offers,
                     $content,
                 ],
             );

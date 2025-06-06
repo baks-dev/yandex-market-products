@@ -36,7 +36,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
  * Отправляем сообщение на обновление остатков при обновлении складского учета
  */
 #[AsMessageHandler(priority: 0)]
-final readonly class UpdateStocksYaMarketByRecalculate
+final readonly class UpdateStocksYaMarketByRecalculateDispatcher
 {
     public function __construct(
         private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
@@ -48,32 +48,31 @@ final readonly class UpdateStocksYaMarketByRecalculate
     {
         /**  Получаем активные токены профилей пользователя */
 
-        $profiles = $this
-            ->allProfileYaMarketToken
+        $profiles = $this->allProfileYaMarketToken
             ->onlyActiveToken()
             ->findAll();
-
 
         if($profiles->valid() === false)
         {
             return;
         }
 
-        foreach($profiles as $profile)
+        foreach($profiles as $UserProfileUid)
         {
             $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
-                $profile,
+                $UserProfileUid,
                 $product->getProduct(),
                 $product->getOffer(),
                 $product->getVariation(),
-                $product->getModification()
+                $product->getModification(),
             );
 
             /** Транспорт yandex-market-products чтобы не мешать общей очереди */
             $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
+
             $this->messageDispatch->dispatch(
                 $YaMarketProductsStocksMessage,
-                transport: 'yandex-market-products'
+                transport: $UserProfileUid.'-low',
             );
         }
     }

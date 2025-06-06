@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.ya.product.property')]
@@ -73,9 +74,9 @@ final class WeightDimensionsYaMarketProductProperty implements YaMarketProductPr
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
     public function isSetting(): bool
@@ -88,18 +89,19 @@ final class WeightDimensionsYaMarketProductProperty implements YaMarketProductPr
         return false;
     }
 
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): array|null
     {
-        if(isset($data['length'], $data['width'], $data['height'], $data['weight']))
+        if(false === $data->isCredentials())
         {
-            return [
-                'length' => ($data['length'] / 10),
-                'width' => ($data['width'] / 10),
-                'height' => ($data['height'] / 10),
-                'weight' => ($data['weight'] / 100),
-            ];
+            return null;
         }
 
-        return null;
+        return [
+            'length' => $data->getLength(),
+            'width' => $data->getWidth(),
+            'height' => $data->getHeight(),
+            'weight' => $data->getWeight(),
+        ];
+
     }
 }

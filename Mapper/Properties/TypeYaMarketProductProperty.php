@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.ya.product.property')]
@@ -68,7 +69,7 @@ final class TypeYaMarketProductProperty implements YaMarketProductPropertyInterf
             'BOOK',
             'AUDIOBOOK',
             'ARTIST_TITLE',
-            'ON_DEMAND'
+            'ON_DEMAND',
         ];
     }
 
@@ -84,9 +85,9 @@ final class TypeYaMarketProductProperty implements YaMarketProductPropertyInterf
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -100,24 +101,24 @@ final class TypeYaMarketProductProperty implements YaMarketProductPropertyInterf
         return true;
     }
 
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): mixed
     {
 
-
-        if(isset($data['product_propertys']))
+        if(false === $data->getProductProperties())
         {
-            $property = json_decode($data['product_propertys']);
-
-            $filter = current(array_filter($property, function($element) {
-                return self::equals($element->type);
-            }));
-
-            if($filter && $filter->value)
-            {
-                return $filter->value;
-            }
+            return null;
         }
 
+        $filter = array_filter($data->getProductProperties(), function($element) {
+            return self::equals($element->type);
+        });
+
+        $filter = current($filter);
+
+        if($filter && $filter->value)
+        {
+            return $filter->value;
+        }
 
         return null;
     }

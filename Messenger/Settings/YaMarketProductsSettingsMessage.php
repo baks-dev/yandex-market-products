@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -33,17 +33,17 @@ final class YaMarketProductsSettingsMessage
     /**
      * Идентификатор
      */
-    private CategoryProductUid $id;
+    private string $id;
 
     /**
      * Идентификатор события
      */
-    private YaMarketProductsSettingsEventUid $event;
+    private string $event;
 
     /**
      * Идентификатор предыдущего события
      */
-    private ?YaMarketProductsSettingsEventUid $last;
+    private ?string $last;
 
 
     public function __construct(
@@ -52,9 +52,9 @@ final class YaMarketProductsSettingsMessage
         ?YaMarketProductsSettingsEventUid $last = null,
     )
     {
-        $this->last = $last;
-        $this->id = $id;
-        $this->event = $event;
+        $this->id = (string) $id;
+        $this->event = (string) $event;
+        $this->last = $last ? (string) $last : null;
     }
 
 
@@ -63,7 +63,7 @@ final class YaMarketProductsSettingsMessage
      */
     public function getId(): CategoryProductUid
     {
-        return $this->id;
+        return new CategoryProductUid($this->id);
     }
 
 
@@ -72,7 +72,7 @@ final class YaMarketProductsSettingsMessage
      */
     public function getEvent(): YaMarketProductsSettingsEventUid
     {
-        return $this->event;
+        return new YaMarketProductsSettingsEventUid($this->event);
     }
 
 
@@ -81,6 +81,6 @@ final class YaMarketProductsSettingsMessage
      */
     public function getLast(): ?YaMarketProductsSettingsEventUid
     {
-        return $this->last;
+        return $this->last ? new YaMarketProductsSettingsEventUid($this->last) : null;
     }
 }

@@ -43,7 +43,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
  * Обновляет складские остатки YaMarket при поступлении продукции на склад
  */
 #[AsMessageHandler(priority: 10)]
-final readonly class UpdateStocksYaMarketByIncoming
+final readonly class UpdateStocksYaMarketByIncomingDispatcher
 {
     public function __construct(
         #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
@@ -57,13 +57,11 @@ final readonly class UpdateStocksYaMarketByIncoming
     {
         /**  Получаем активные токены профилей пользователя */
 
-        $profiles = $this
-            ->allProfileYaMarketToken
+        $profiles = $this->allProfileYaMarketToken
             ->onlyActiveToken()
             ->findAll();
 
-
-        if($profiles->valid() === false)
+        if(false === $profiles || false === $profiles->valid())
         {
             return;
         }
@@ -94,17 +92,17 @@ final readonly class UpdateStocksYaMarketByIncoming
             return;
         }
 
-        foreach($profiles as $profile)
+        foreach($profiles as $UserProfileUid)
         {
-            /** @var ProductStockProduct $product */
-            foreach($products as $product)
+
+            foreach($products as $ProductStockProduct)
             {
                 $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
-                    $profile,
-                    $product->getProduct(),
-                    $product->getOffer(),
-                    $product->getVariation(),
-                    $product->getModification(),
+                    $UserProfileUid,
+                    $ProductStockProduct->getProduct(),
+                    $ProductStockProduct->getOffer(),
+                    $ProductStockProduct->getVariation(),
+                    $ProductStockProduct->getModification(),
                 );
 
                 /** Транспорт yandex-market-products чтобы не мешать общей очереди */
@@ -113,7 +111,7 @@ final readonly class UpdateStocksYaMarketByIncoming
                 $this->messageDispatch->dispatch(
                     $YaMarketProductsStocksMessage,
                     stamps: [new MessageDelay('5 seconds')], // задержка 5 сек для обновления карточки
-                    transport: 'yandex-market-products',
+                    transport: $UserProfileUid.'-low',
                 );
 
             }

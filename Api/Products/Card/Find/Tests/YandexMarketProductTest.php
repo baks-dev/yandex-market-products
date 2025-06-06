@@ -28,7 +28,7 @@ namespace BaksDev\Yandex\Market\Products\Api\Products\Card\Find\Tests;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCardRequest;
-use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\YaMarketProductsCardInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
@@ -59,14 +59,14 @@ final class YandexMarketProductTest extends KernelTestCase
         /** @var AllProductsIdentifierInterface $AllProductsIdentifier */
         $AllProductsIdentifier = self::getContainer()->get(AllProductsIdentifierInterface::class);
 
-        /** @var YaMarketProductsCardInterface $YaMarketProductsCard */
-        $YaMarketProductsCard = self::getContainer()->get(YaMarketProductsCardInterface::class);
+        /** @var CurrentYaMarketProductCardInterface $YaMarketProductsCard */
+        $YaMarketProductsCard = self::getContainer()->get(CurrentYaMarketProductCardInterface::class);
 
         /** @var YaMarketProductFindCardRequest $FindProductYandexMarketRequest */
         $FindProductYandexMarketRequest = self::getContainer()->get(YaMarketProductFindCardRequest::class);
         $FindProductYandexMarketRequest->TokenHttpClient(self::$Authorization);
 
-        foreach($AllProductsIdentifier->findAll() as $i => $product)
+        foreach($AllProductsIdentifier->findAllArray() as $i => $product)
         {
             if($i >= 100)
             {

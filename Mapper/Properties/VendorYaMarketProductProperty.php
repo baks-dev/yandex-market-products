@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Properties;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductPropertyInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.ya.product.property')]
@@ -68,9 +69,9 @@ final class VendorYaMarketProductProperty implements YaMarketProductPropertyInte
     /**
      * Проверяет, относится ли статус к данному объекту
      */
-    public static function equals(string $status): bool
+    public static function equals(string $value): bool
     {
-        return self::PARAM === $status;
+        return self::PARAM === $value;
     }
 
 
@@ -84,27 +85,29 @@ final class VendorYaMarketProductProperty implements YaMarketProductPropertyInte
         return true;
     }
 
-    public function getData(array $data): mixed
+    public function getData(CurrentYaMarketProductCardResult $data): mixed
     {
-        if(isset($data['product_propertys']))
+        if(false === $data->getProductProperties())
         {
-            $property = json_decode($data['product_propertys']);
-
-            $filter = current(array_filter($property, static function($element) {
-                return self::equals($element->type);
-            }));
-
-            if($filter && $filter->value)
-            {
-                return $filter->value;
-            }
+            return null;
         }
 
-        if(isset($data['category_name']))
+        $filter = array_filter($data->getProductProperties(), static function($element) {
+            return self::equals($element->type);
+        });
+
+        $filter = current($filter);
+
+        if($filter && $filter->value)
         {
-            return $data['category_name'];
+            return $filter->value;
         }
 
+        /** Если не найден параметр - возвращаем название категории */
+        if($data->getCategoryName())
+        {
+            return $data->getCategoryName();
+        }
 
         return null;
     }

@@ -127,7 +127,7 @@ final readonly class YaMarketProductsPriceUpdate
                     [self::class.':'.__LINE__],
                 );
 
-                return;
+                continue;
             }
 
             /**
@@ -165,7 +165,7 @@ final readonly class YaMarketProductsPriceUpdate
                     $CurrentYaMarketProductCardResult->getArticle(),
                 ));
 
-                return;
+                continue;
             }
 
             $this->logger->info(

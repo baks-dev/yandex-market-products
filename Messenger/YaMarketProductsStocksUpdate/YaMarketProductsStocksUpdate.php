@@ -102,7 +102,7 @@ final readonly class YaMarketProductsStocksUpdate
                     $CurrentYaMarketProductCardResult->getArticle(),
                 ));
 
-                return;
+                continue;
             }
 
             /**
@@ -119,7 +119,7 @@ final readonly class YaMarketProductsStocksUpdate
                     $CurrentYaMarketProductCardResult->getProductQuantity(),
                 ), [$YaMarketTokenUid]);
 
-                return;
+                continue;
             }
 
             /** Обновляем остатки товара если наличие изменилось */

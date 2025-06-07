@@ -97,7 +97,7 @@ final class GroupYaMarketProductParams implements YaMarketProductParamsInterface
         return [
             'parameterId' => $this::ID,
             'name' => $this->getName(),
-            'value' => $data['product_card'],
+            'value' => $data->getGroupCard(),
         ];
     }
 }

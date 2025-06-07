@@ -32,9 +32,9 @@ use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductDTO;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCardRequest;
-use BaksDev\Yandex\Market\Products\Api\Products\Price\YaMarketProductUpdatePriceRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Price\GetYaMarketProductPriceRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Price\UpdateYaMarketProductPriceRequest;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
@@ -53,10 +53,11 @@ final readonly class YaMarketProductsPriceUpdate
         #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
         private YandexMarketCalculatorRequest $marketCalculatorRequest,
         private YaMarketProductFindCardRequest $yandexMarketProductRequest,
-        private YaMarketProductUpdatePriceRequest $marketProductPriceRequest,
+        private UpdateYaMarketProductPriceRequest $marketProductPriceRequest,
         private CurrentYaMarketProductCardInterface $marketProductsCard,
         private MessageDispatchInterface $messageDispatch,
         private YaMarketTokensByProfileInterface $YaMarketTokensByProfile,
+        private GetYaMarketProductPriceRequest $GetYaMarketProductPriceRequest,
     ) {}
 
 
@@ -129,27 +130,19 @@ final readonly class YaMarketProductsPriceUpdate
                 return;
             }
 
-
             /**
              * Проверяем изменение цены в карточке если добавлена ранее
              */
 
-            $MarketProduct = $this->yandexMarketProductRequest
+            $MarketProductPrice = $this->GetYaMarketProductPriceRequest
                 ->forTokenIdentifier($YaMarketTokenUid)
                 ->article($CurrentYaMarketProductCardResult->getArticle())
                 ->find();
 
-
-            if($MarketProduct->valid())
+            /** Не обновляем, если стоимость в карточке не изменилась */
+            if($Price->getRoundValue() === $MarketProductPrice)
             {
-                /** @var YaMarketProductDTO $YandexMarketProductDTO */
-                $YandexMarketProductDTO = $MarketProduct->current();
-
-                /** Не обновляем, если стоимость не изменилась */
-                if(true === $YandexMarketProductDTO->getPrice()->equals($Price))
-                {
-                    return;
-                }
+                continue;
             }
 
             $update = $this->marketProductPriceRequest

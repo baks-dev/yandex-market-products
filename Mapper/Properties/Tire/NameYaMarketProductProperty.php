@@ -127,36 +127,36 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
         $name = mb_strtoupper($firstChar, 'UTF-8').$then.' ';
 
 
-        $name .= $data['product_name'].' ';
+        $name .= $data->getProductName().' ';
 
-        if($data['product_variation_value'])
+        if($data->getProductVariationValue())
         {
-            $name .= $data['product_variation_value'];
+            $name .= $data->getProductVariationValue();
         }
 
-        if($data['product_modification_value'])
+        if($data->getProductModificationValue())
         {
-            $name .= '/'.$data['product_modification_value'].' ';
+            $name .= '/'.$data->getProductModificationValue().' ';
         }
 
-        if($data['product_offer_value'])
+        if($data->getProductOfferValue())
         {
-            $name .= 'R'.$data['product_offer_value'].' ';
+            $name .= 'R'.$data->getProductOfferValue().' ';
         }
 
-        if($data['product_offer_postfix'])
+        if($data->getProductOfferPostfix())
         {
-            $name .= $data['product_offer_postfix'].' ';
+            $name .= $data->getProductOfferPostfix().' ';
         }
 
-        if($data['product_variation_postfix'])
+        if($data->getProductVariationPostfix())
         {
-            $name .= $data['product_variation_postfix'].' ';
+            $name .= $data->getProductVariationPostfix().' ';
         }
 
-        if($data['product_modification_postfix'])
+        if($data->getProductModificationPostfix())
         {
-            $name .= $data['product_modification_postfix'].' ';
+            $name .= $data->getProductModificationPostfix().' ';
         }
 
 

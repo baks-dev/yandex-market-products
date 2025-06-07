@@ -101,7 +101,7 @@ final class ParameterValuesYaMarketProductProperty implements YaMarketProductPro
         }
 
         /** Получаем параметры категории */
-        $cases = $this->paramsCollection->cases($data['market_category']);
+        $cases = $this->paramsCollection->cases($data->getMarketCategory());
 
         /** @var YaMarketProductParamsInterface $param */
         foreach($cases as $param)

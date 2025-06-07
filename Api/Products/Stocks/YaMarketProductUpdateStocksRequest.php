@@ -29,7 +29,8 @@ use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
 use InvalidArgumentException;
 
-final class YaMarketProductUpdateStocksRequest extends YandexMarket
+final class
+YaMarketProductUpdateStocksRequest extends YandexMarket
 {
     private const bool STOP_SALES = false;
 
@@ -63,6 +64,14 @@ final class YaMarketProductUpdateStocksRequest extends YandexMarket
         {
             $this->logger->critical('Запрос может быть выполнен только в PROD окружении', [self::class.':'.__LINE__]);
             return true;
+        }
+
+        /**
+         * Если продажи отключены - обнуляем остаток
+         */
+        if($this->isStocks() === false)
+        {
+            $this->total = 0;
         }
 
         if(empty($this->article))

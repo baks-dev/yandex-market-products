@@ -43,7 +43,7 @@ final class CurrentYaMarketProductCardResult
 
     private array|false|null $params = null;
 
-    private array|false|null $images;
+    private array|false|null $images = null;
 
     public function __construct(
         private readonly string $product_uid, // " => "01878a9e-26ff-7f71-bb70-6cb19c044cd6"
@@ -67,10 +67,10 @@ final class CurrentYaMarketProductCardResult
 
         private readonly string $category_name, // " => "Triangle"
 
-        private readonly ?string $length, // " => null
-        private readonly ?string $width, // " => null
-        private readonly ?string $height, // " => null
-        private readonly ?string $weight, // " => null
+        private readonly ?int $length, // " => null
+        private readonly ?int $width, // " => null
+        private readonly ?int $height, // " => null
+        private readonly ?int $weight, // " => null
 
         private readonly ?int $market_category, // " => null
         private readonly ?string $product_properties, // " => "[{"type": null, "value": null}]"
@@ -148,14 +148,14 @@ final class CurrentYaMarketProductCardResult
         return $this->offer_const ? new ProductOfferConst($this->offer_const) : false;
     }
 
-    public function getProductOfferValue(): ?string
+    public function getProductOfferValue(): string|false
     {
-        return $this->product_offer_value;
+        return $this->product_offer_value ?: false;
     }
 
-    public function getProductOfferPostfix(): ?string
+    public function getProductOfferPostfix(): string|false
     {
-        return $this->product_offer_postfix;
+        return $this->product_offer_postfix ?: false;
     }
 
     /**
@@ -167,14 +167,14 @@ final class CurrentYaMarketProductCardResult
         return $this->variation_const ? new ProductVariationConst($this->variation_const) : false;
     }
 
-    public function getProductVariationValue(): ?string
+    public function getProductVariationValue(): string|false
     {
-        return $this->product_variation_value;
+        return $this->product_variation_value ?: false;
     }
 
-    public function getProductVariationPostfix(): ?string
+    public function getProductVariationPostfix(): string|false
     {
-        return $this->product_variation_postfix;
+        return $this->product_variation_postfix ?: false;
     }
 
     /**
@@ -186,14 +186,14 @@ final class CurrentYaMarketProductCardResult
         return $this->modification_const ? new ProductModificationConst($this->modification_const) : false;
     }
 
-    public function getProductModificationValue(): ?string
+    public function getProductModificationValue(): string|false
     {
-        return $this->product_modification_value;
+        return $this->product_modification_value ?: false;
     }
 
-    public function getProductModificationPostfix(): ?string
+    public function getProductModificationPostfix(): string|false
     {
-        return $this->product_modification_postfix;
+        return $this->product_modification_postfix ?: false;
     }
 
 

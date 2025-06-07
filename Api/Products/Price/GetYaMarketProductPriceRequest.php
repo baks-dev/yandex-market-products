@@ -29,15 +29,13 @@ use BaksDev\Reference\Currency\Type\Currencies\RUR;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use DateInterval;
 use InvalidArgumentException;
+use Symfony\Contracts\Cache\ItemInterface;
 
-final class YaMarketProductUpdatePriceRequest extends YandexMarket
+final class GetYaMarketProductPriceRequest extends YandexMarket
 {
     private ?string $article = null;
-
-    private ?Money $price = null;
-
-    private ?Currency $currency = null;
 
     public function article(string $article): self
     {
@@ -45,65 +43,39 @@ final class YaMarketProductUpdatePriceRequest extends YandexMarket
         return $this;
     }
 
-    public function price(Money $price): self
-    {
-        $this->price = $price;
-        return $this;
-    }
-
-    public function currency(Currency $currency): self
-    {
-        $this->currency = $currency;
-        return $this;
-    }
-
-
     /**
-     * Установка цен на товары в конкретном магазине
+     * Просмотр цен на указанные товары в магазине
      *
-     * Лимит: 5000 товаров в минуту, не более 500 товаров в одном запросе
+     * Лимит: 150 000 товаров в минуту
      *
-     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/assortment/updatePrices
+     * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/assortment/getPricesByOfferIds
      *
      */
-    public function update(): bool
+    public function find(): int|false
     {
-        if($this->isExecuteEnvironment() === false)
-        {
-            $this->logger->critical('Запрос может быть выполнен только в PROD окружении', [self::class.':'.__LINE__]);
-            return true;
-        }
-
         if(empty($this->article))
         {
-            throw new InvalidArgumentException('Invalid Argument article: call method article(string $article);');
+            throw new InvalidArgumentException('Invalid Argument Article');
         }
 
-        if($this->price === null)
-        {
-            throw new InvalidArgumentException('Invalid Argument price: call method price(Money $price);');
-        }
+        $cache = $this->getCacheInit('yandex-market-products');
+        $key = $this->getCompany().$this->article;
+        $cache->deleteItem($key);
 
-        if(empty($this->currency))
-        {
-            $this->currency = new Currency(RUR::class);
-        }
+        $response = $cache->get($this->getCompany().$this->article, function(ItemInterface $item) {
 
-        $offers = [
-            'offerId' => $this->article,
-            'price' => [
-                'value' => $this->price->getRoundValue(),
-                'currencyId' => str_replace('RUB', 'RUR', $this->currency->getCurrencyValueUpper()),
-            ],
-        ];
+            $item->expiresAfter(DateInterval::createFromDateString('1 minute'));
 
-        $response = $this->TokenHttpClient()
-            ->request(
-                'POST',
-                //sprintf('/businesses/%s/offer-prices/updates', $this->getBusiness()),
-                sprintf('/campaigns/%s/offer-prices/updates', $this->getCompany()),
-                ['json' => ['offers' => [$offers]]],
-            );
+            return $this->TokenHttpClient()
+                ->request(
+                    'POST',
+                    sprintf('/campaigns/%s/offer-prices', $this->getCompany()),
+                    ['json' =>
+                        ['offerIds' => [$this->article]],
+                    ],
+                );
+        });
+
 
         $content = $response->toArray(false);
 
@@ -112,13 +84,14 @@ final class YaMarketProductUpdatePriceRequest extends YandexMarket
 
             $this->logger->critical(
                 sprintf(
-                    'yandex-market-products: Ошибка %s обновления стоимости продукта',
+                    'yandex-market-products: Ошибка %s получении стоимости продукта',
                     $response->getStatusCode(),
                 ),
                 [
                     self::class.':'.__LINE__,
                     $this->getProfile(),
-                    $offers,
+                    $this->getCompany(),
+                    $this->article,
                     $content,
                 ],
             );
@@ -126,8 +99,24 @@ final class YaMarketProductUpdatePriceRequest extends YandexMarket
             return false;
         }
 
-        return true;
+
+        if(empty($content['result']['offers']))
+        {
+            return false;
+        }
+
+        $prices = array_filter($content['result']['offers'], function($offer) {
+            return $offer['offerId'] === $this->article;
+        });
+
+        if(empty($prices))
+        {
+            return false;
+        }
+
+        $price = $prices[array_key_first($prices)];
+
+        return $price['price']['value'];
 
     }
-
 }

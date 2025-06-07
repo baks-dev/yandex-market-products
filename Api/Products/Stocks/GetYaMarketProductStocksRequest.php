@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 /**
  * Информация об остатках и оборачиваемости
  */
-final class YaMarketProductGetStocksRequest extends YandexMarket
+final class GetYaMarketProductStocksRequest extends YandexMarket
 {
     private ?string $article = null;
 
@@ -60,6 +60,14 @@ final class YaMarketProductGetStocksRequest extends YandexMarket
             throw new InvalidArgumentException('Invalid Argument article');
         }
 
+        /**
+         * Если продажи отключены - всегда обнуляем остаток возвращая TRUE
+         */
+        if($this->isStocks() === false)
+        {
+            return true;
+        }
+
         $cache = $this->getCacheInit('yandex-market-products');
 
         $response = $cache->get($this->getCompany().$this->article, function(ItemInterface $item) {
@@ -71,7 +79,7 @@ final class YaMarketProductGetStocksRequest extends YandexMarket
                     'POST',
                     sprintf('/campaigns/%s/offers/stocks', $this->getCompany()),
                     ['json' =>
-                        ['offerIds' => [$this->article]]
+                        ['offerIds' => [$this->article]],
                     ],
                 );
         });

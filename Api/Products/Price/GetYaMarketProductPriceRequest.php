@@ -100,7 +100,8 @@ final class GetYaMarketProductPriceRequest extends YandexMarket
         }
 
 
-        if(empty($content['result']['offers']))
+        /** Если торговых предложений не найдено - возвращает FALSE */
+        if(true === empty($content['result']['offers']))
         {
             return false;
         }
@@ -109,14 +110,21 @@ final class GetYaMarketProductPriceRequest extends YandexMarket
             return $offer['offerId'] === $this->article;
         });
 
-        if(empty($prices))
+        /** Если артикула не найдено - возвращает FALSE */
+        if(true === empty($prices))
         {
             return false;
         }
 
         $price = $prices[array_key_first($prices)];
 
-        return $price['price']['value'];
+        /** Если найденному артикулу не присвоена цена - возвращает FALSE */
+        if(true === empty($price['price']))
+        {
+            return false;
+        }
+
+        return $price['price']['value'] ?: false;
 
     }
 }

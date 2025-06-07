@@ -30,7 +30,7 @@ use DomainException;
 use InvalidArgumentException;
 
 final class
-YaMarketProductUpdateStocksRequest extends YandexMarket
+UpdateYaMarketProductStocksRequest extends YandexMarket
 {
     private const bool STOP_SALES = false;
 
@@ -66,17 +66,20 @@ YaMarketProductUpdateStocksRequest extends YandexMarket
             return true;
         }
 
+        if(empty($this->article))
+        {
+            throw new InvalidArgumentException('Invalid Argument article');
+        }
+
         /**
-         * Если продажи отключены - обнуляем остаток
+         * Если продажи отключены - всегда обнуляем остаток
+         *
+         * @see YaMarketProductsStocksUpdate:110
+         *
          */
         if($this->isStocks() === false)
         {
             $this->total = 0;
-        }
-
-        if(empty($this->article))
-        {
-            throw new InvalidArgumentException('Invalid Argument article');
         }
 
         $response = $this->TokenHttpClient()
@@ -89,11 +92,11 @@ YaMarketProductUpdateStocksRequest extends YandexMarket
                             [
                                 'sku' => $this->article,
                                 "items" => [
-                                    ["count" => self::STOP_SALES === true ? 0 : max($this->total, 0)]
-                                ]
-                            ]
-                        ]
-                    ]
+                                    ["count" => max($this->total, 0)],
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             );
 
@@ -108,7 +111,7 @@ YaMarketProductUpdateStocksRequest extends YandexMarket
 
             throw new DomainException(
                 message: 'Ошибка '.self::class,
-                code: $response->getStatusCode()
+                code: $response->getStatusCode(),
             );
         }
 

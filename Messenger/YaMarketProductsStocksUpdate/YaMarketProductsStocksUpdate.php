@@ -27,8 +27,8 @@ namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductGetStocksRequest;
-use BaksDev\Yandex\Market\Products\Api\Products\Stocks\YaMarketProductUpdateStocksRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Stocks\GetYaMarketProductStocksRequest;
+use BaksDev\Yandex\Market\Products\Api\Products\Stocks\UpdateYaMarketProductStocksRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use BaksDev\Yandex\Market\Repository\YaMarketTokensByProfile\YaMarketTokensByProfileInterface;
@@ -41,8 +41,8 @@ final readonly class YaMarketProductsStocksUpdate
 {
     public function __construct(
         #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
-        private YaMarketProductGetStocksRequest $marketProductStocksGetRequest,
-        private YaMarketProductUpdateStocksRequest $marketProductStocksUpdateRequest,
+        private GetYaMarketProductStocksRequest $marketProductStocksGetRequest,
+        private UpdateYaMarketProductStocksRequest $marketProductStocksUpdateRequest,
         private CurrentYaMarketProductCardInterface $marketProductsCard,
         private MessageDispatchInterface $messageDispatch,
         private YaMarketTokensByProfileInterface $YaMarketTokensByProfile,
@@ -83,7 +83,6 @@ final readonly class YaMarketProductsStocksUpdate
 
         foreach($tokensByProfile as $YaMarketTokenUid)
         {
-
             /** Возвращает данные об остатках товаров на маркетплейсе */
             $ProductStocks = $this->marketProductStocksGetRequest
                 ->forTokenIdentifier($YaMarketTokenUid)
@@ -106,7 +105,12 @@ final readonly class YaMarketProductsStocksUpdate
                 return;
             }
 
-            if($ProductStocks === $CurrentYaMarketProductCardResult->getProductQuantity())
+            /**
+             * TRUE - возвращается в случае если продажи остановлены, следовательно, не сверяем остатки, а всегда обнуляем
+             *
+             * @see UpdateYaMarketProductStocksRequest:79
+             */
+            if($ProductStocks !== true && $ProductStocks === $CurrentYaMarketProductCardResult->getProductQuantity())
             {
                 $this->logger->info(sprintf(
                     'Наличие соответствует %s: %s == %s',

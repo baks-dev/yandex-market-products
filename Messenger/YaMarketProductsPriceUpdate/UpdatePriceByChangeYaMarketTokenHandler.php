@@ -36,7 +36,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
  * Обновляем цены при обновлении настроек токена и торговой наценки
  */
 #[AsMessageHandler(priority: 0)]
-final readonly class UpdatePriceByYaMarketTokenHandler
+final readonly class UpdatePriceByChangeYaMarketTokenHandler
 {
     public function __construct(
         private AllProductsIdentifierInterface $allProductsIdentifier,
@@ -80,11 +80,10 @@ final readonly class UpdatePriceByYaMarketTokenHandler
 
                 $YaMarketProductsPriceMessage = new YaMarketProductsPriceMessage($YaMarketProductsCardMessage);
 
-                $this->messageDispatch
-                    ->dispatch(
-                        message: $YaMarketProductsPriceMessage,
-                        transport: $UserProfileUid.'-low',
-                    );
+                $this->messageDispatch->dispatch(
+                    message: $YaMarketProductsPriceMessage,
+                    transport: $UserProfileUid.'-low',
+                );
             }
         }
     }

@@ -44,10 +44,12 @@ final class YandexMarketProductTest extends KernelTestCase
     public static function setUpBeforeClass(): void
     {
         self::$Authorization = new YaMarketAuthorizationToken(
-            new UserProfileUid(),
-            $_SERVER['TEST_YANDEX_MARKET_TOKEN'],
-            $_SERVER['TEST_YANDEX_MARKET_COMPANY'],
-            $_SERVER['TEST_YANDEX_MARKET_BUSINESS']
+            profile: UserProfileUid::TEST,
+            token: $_SERVER['TEST_YANDEX_MARKET_TOKEN'],
+            company: (int) $_SERVER['TEST_YANDEX_MARKET_COMPANY'],
+            business: (int) $_SERVER['TEST_YANDEX_MARKET_BUSINESS'],
+            card: false,
+            stocks: false,
         );
     }
 

@@ -55,9 +55,6 @@ final class YandexMarketProductTest extends KernelTestCase
 
     public function testUseCase(): void
     {
-
-        /**   */
-
         /** @var AllProductsIdentifierInterface $AllProductsIdentifier */
         $AllProductsIdentifier = self::getContainer()->get(AllProductsIdentifierInterface::class);
 
@@ -68,7 +65,7 @@ final class YandexMarketProductTest extends KernelTestCase
         $FindProductYandexMarketRequest = self::getContainer()->get(YaMarketProductFindCardRequest::class);
         $FindProductYandexMarketRequest->TokenHttpClient(self::$Authorization);
 
-        foreach($AllProductsIdentifier->findAllArray() as $i => $product)
+        foreach($AllProductsIdentifier->findAll() as $i => $ProductsIdentifierResult)
         {
             if($i >= 100)
             {
@@ -76,10 +73,10 @@ final class YandexMarketProductTest extends KernelTestCase
             }
 
             $YaMarketCard = $YaMarketProductsCard
-                ->forProduct($product['product_id'])
-                ->forOfferConst($product['offer_const'])
-                ->forVariationConst($product['variation_const'])
-                ->forModificationConst($product['modification_const'])
+                ->forProduct($ProductsIdentifierResult->getProductId())
+                ->forOfferConst($ProductsIdentifierResult->getProductOfferConst())
+                ->forVariationConst($ProductsIdentifierResult->getProductVariationConst())
+                ->forModificationConst($ProductsIdentifierResult->getProductModificationConst())
                 ->find();
 
             if($YaMarketCard === false || empty($YaMarketCard['product_price']))

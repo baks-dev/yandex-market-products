@@ -51,7 +51,7 @@ final class Role implements RoleInterface, MenuAdminInterface
     /** Метод возвращает PATH раздела */
     public function getPath(): string
     {
-        return 'yandex-market-products:admin.products.index';
+        return 'yandex-market-products:admin.custom.index';
     }
 
     /**

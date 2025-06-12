@@ -149,7 +149,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
         $content = $cache->get($key, function(ItemInterface $item): array|false {
 
-            $item->expiresAfter(DateInterval::createFromDateString('1 day'));
+            $item->expiresAfter(DateInterval::createFromDateString('50 seconds'));
 
             /** Присваиваем торговую наценку для расчета стоимости услуг */
             $trade = $this->getPercent();
@@ -183,8 +183,6 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
             if($response->getStatusCode() !== 200)
             {
-                $item->expiresAfter(DateInterval::createFromDateString('50 seconds'));
-
                 $this->logger->critical(
                     'yandex-market-products: Ошибка при получении стоимости услуг',
                     [$content, self::class.':'.__LINE__]
@@ -193,7 +191,13 @@ final class YandexMarketCalculatorRequest extends YandexMarket
                 return false;
             }
 
+            $item->expiresAfter(DateInterval::createFromDateString('1 day'));
+
+            /** Лимит: 100 запросов в минуту, добавляем лок */
+            sleep(1);
+
             return $content;
+
         });
 
         if(false === $content)

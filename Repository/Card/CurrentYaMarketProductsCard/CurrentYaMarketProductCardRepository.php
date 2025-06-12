@@ -567,58 +567,6 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
 			AS product_params",
         );
 
-
-        /**
-         * Фото продукции
-         */
-
-        /* Фото модификаций */
-
-        $dbal->leftJoin(
-            'product_modification',
-            ProductModificationImage::class,
-            'product_modification_image',
-            'product_modification_image.modification = product_modification.id',
-        );
-
-
-        /* Фото вариантов */
-
-        $dbal->leftJoin(
-            'product_offer',
-            ProductVariationImage::class,
-            'product_variation_image',
-            '
-			product_variation_image.variation = product_variation.id
-			',
-        );
-
-
-        /* Фот торговых предложений */
-
-        $dbal->leftJoin(
-            'product_offer',
-            ProductOfferImage::class,
-            'product_offer_images',
-            '
-			
-			product_offer_images.offer = product_offer.id
-			
-		',
-        );
-
-        /* Фото продукта */
-
-        $dbal->leftJoin(
-            'product',
-            ProductPhoto::class,
-            'product_photo',
-            '
-	
-			product_photo.event = product.event
-			',
-        );
-
         /**
          * Product Invariable
          */
@@ -644,7 +592,9 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                   )
            ');
 
-        /** Продукт Яндекс Маркет */
+
+        /** Кастомные настройки продукта Яндекс Маркет  */
+
         $dbal
             ->leftJoin(
                 'product_invariable',
@@ -653,60 +603,129 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                 'ya_market_product.invariable = product_invariable.id',
             );
 
+
+        /**
+         * Фото продукции
+         */
+
+        /* Кастомные фото Яндекс Маркет */
         $dbal->leftJoin(
             'ya_market_product',
             YandexMarketProductCustomImage::class,
             'ya_market_product_images',
             '
-                ya_market_product_images.invariable = ya_market_product.invariable AND
-                ya_market_product_images.root = true
+                ya_market_product_images.invariable = ya_market_product.invariable
             ',
         );
 
+        /* Фото модификаций */
+        $dbal->leftJoin(
+            'product_modification',
+            ProductModificationImage::class,
+            'product_modification_image',
+            'product_modification_image.modification = product_modification.id',
+        );
+
+
+        /* Фото вариантов */
+        $dbal->leftJoin(
+            'product_offer',
+            ProductVariationImage::class,
+            'product_variation_image',
+            '
+			product_variation_image.variation = product_variation.id
+			',
+        );
+
+
+        /* Фот торговых предложений */
+        $dbal->leftJoin(
+            'product_offer',
+            ProductOfferImage::class,
+            'product_offer_images',
+            '
+			
+			product_offer_images.offer = product_offer.id
+			
+		',
+        );
+
+        /* Фото продукта */
+        $dbal->leftJoin(
+            'product',
+            ProductPhoto::class,
+            'product_photo',
+            '
+	
+			product_photo.event = product.event
+			',
+        );
+
+
+
+
         $dbal->addSelect(
-            "JSON_AGG
-		( DISTINCT
-				CASE 
-				
-				WHEN ya_market_product_images.ext IS NOT NULL 
-				THEN JSONB_BUILD_OBJECT
-					(
-						'product_img_root', ya_market_product_images.root,
-						'product_img', CONCAT ( '/upload/".$dbal->table(YandexMarketProductCustomImage::class)."' , '/', ya_market_product_images.name),
-						'product_img_ext', ya_market_product_images.ext,
-						'product_img_cdn', ya_market_product_images.cdn
-					)
-				
-				WHEN product_offer_images.ext IS NOT NULL 
-				THEN JSONB_BUILD_OBJECT
-					(
-						'product_img_root', product_offer_images.root,
-						'product_img', CONCAT ( '/upload/".$dbal->table(ProductOfferImage::class)."' , '/', product_offer_images.name),
-						'product_img_ext', product_offer_images.ext,
-						'product_img_cdn', product_offer_images.cdn
-					) 
-					
-				WHEN product_variation_image.ext IS NOT NULL 
-				THEN JSONB_BUILD_OBJECT
-					(
-						'product_img_root', product_variation_image.root,
-						'product_img', CONCAT ( '/upload/".$dbal->table(ProductVariationImage::class)."' , '/', product_variation_image.name),
-						'product_img_ext', product_variation_image.ext,
-						'product_img_cdn', product_variation_image.cdn
-					)	
-					
-					
-				WHEN product_modification_image.ext IS NOT NULL 
-				THEN JSONB_BUILD_OBJECT
+            "JSON_AGG ( DISTINCT JSONB_BUILD_OBJECT
+                (
+                    'product_img_root', ya_market_product_images.root,
+                    'product_img', CONCAT ( '/upload/".$dbal->table(YandexMarketProductCustomImage::class)."' , '/', ya_market_product_images.name),
+                    'product_img_ext', ya_market_product_images.ext,
+                    'product_img_cdn', ya_market_product_images.cdn
+                )
+
+			) FILTER (WHERE ya_market_product_images.ext IS NOT NULL)
+			
+			AS product_images_custom
+	    ");
+
+
+        $dbal->addSelect(
+            "JSON_AGG ( DISTINCT JSONB_BUILD_OBJECT
 					(
 						'product_img_root', product_modification_image.root,
 						'product_img', CONCAT ( '/upload/".$dbal->table(ProductModificationImage::class)."' , '/', product_modification_image.name),
 						'product_img_ext', product_modification_image.ext,
 						'product_img_cdn', product_modification_image.cdn
 					)
-					
-				WHEN product_photo.ext IS NOT NULL 
-				THEN JSONB_BUILD_OBJECT
+
+			) FILTER (WHERE product_modification_image.ext IS NOT NULL)
+			
+			AS product_images_modification
+	    ");
+
+
+        $dbal->addSelect(
+            "JSON_AGG ( DISTINCT JSONB_BUILD_OBJECT
+					(
+						'product_img_root', product_variation_image.root,
+						'product_img', CONCAT ( '/upload/".$dbal->table(ProductVariationImage::class)."' , '/', product_variation_image.name),
+						'product_img_ext', product_variation_image.ext,
+						'product_img_cdn', product_variation_image.cdn
+					)
+
+			) FILTER (WHERE product_variation_image.ext IS NOT NULL)
+			
+			AS product_images_variation
+	    ");
+
+
+        $dbal->addSelect(
+            "JSON_AGG ( DISTINCT JSONB_BUILD_OBJECT
+					(
+						'product_img_root', product_offer_images.root,
+						'product_img', CONCAT ( '/upload/".$dbal->table(ProductOfferImage::class)."' , '/', product_offer_images.name),
+						'product_img_ext', product_offer_images.ext,
+						'product_img_cdn', product_offer_images.cdn
+					) 
+
+			) FILTER (WHERE product_offer_images.ext IS NOT NULL)
+			
+			AS product_images_offer
+	    ");
+
+
+        $dbal->addSelect(
+            "JSON_AGG ( DISTINCT JSONB_BUILD_OBJECT
 					(
 						'product_img_root', product_photo.root,
 						'product_img', CONCAT ( '/upload/".$dbal->table(ProductPhoto::class)."' , '/', product_photo.name),
@@ -714,11 +733,10 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
 						'product_img_cdn', product_photo.cdn
 					)
 
-				END
-	 
-			) AS product_images
-	    ",
-        );
+			) FILTER (WHERE product_photo.ext IS NOT NULL)
+			
+			AS product_images
+	    ");
 
 
         /* Базовая Цена товара */

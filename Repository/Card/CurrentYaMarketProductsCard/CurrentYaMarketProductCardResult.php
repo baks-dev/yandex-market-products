@@ -76,11 +76,19 @@ final class CurrentYaMarketProductCardResult
         private readonly ?string $product_properties, // " => "[{"type": null, "value": null}]"
         private readonly ?string $product_params, // " => "[{"name": null, "value": null}]"
 
-        private readonly ?string $product_images, // " => "[{
+
+        // " => "[{
         //"product_img": "/upload/product_photo/52a58f1569ad1d47162aee8ecca9578d",
         // "product_img_cdn": true,
         // "product_img_ext": "webp",
         // "product_img_root": true|false}]"
+
+        private readonly ?string $product_images_custom,
+        private readonly ?string $product_images_modification,
+        private readonly ?string $product_images_variation,
+        private readonly ?string $product_images_offer,
+        private readonly ?string $product_images,
+
 
         private readonly ?int $product_price, // " => 670000
         private readonly ?int $product_old_price, // " => 0
@@ -315,41 +323,64 @@ final class CurrentYaMarketProductCardResult
     /**
      * ProductImages
      */
+    /**
+     * ProductImages
+     */
     public function getProductImages(): array|false
     {
+        /** Возвращаем массив сформированный массив */
         if(false === is_null($this->images))
         {
             return $this->images;
         }
 
-        if(empty($this->product_images))
+        $collection = [
+            $this->product_images_custom,
+            $this->product_images_modification,
+            $this->product_images_variation,
+            $this->product_images_offer,
+            $this->product_images,
+        ];
+
+
+        foreach($collection as $images)
         {
-            $this->images = false;
-            return false;
+            if(empty($images))
+            {
+                continue;
+            }
+
+            if(false === json_validate($images))
+            {
+                continue;
+            }
+
+            $images = json_decode($images, false, 512, JSON_THROW_ON_ERROR);
+            $images = array_filter($images, static fn($img) => empty($img->product_img_ext) === false);
+
+            if(empty($images))
+            {
+                continue;
+            }
+
+            $this->images ? array_push($this->images, ...$images) : $this->images = $images;
+
         }
 
-        if(false === json_validate($this->product_images))
-        {
-            $this->images = false;
-            return false;
-        }
-
-        $images = json_decode($this->product_images, false, 512, JSON_THROW_ON_ERROR);
-        $images = array_filter($images, static fn($item) => empty($item->product_img) === false);
-
-        if(empty($images))
+        if(empty($this->images))
         {
             $this->images = false;
             return false;
         }
 
         /* Сортируем коллекцию изображений по root */
-        usort($images, static function($img) {
+        usort($this->images, static function($img) {
             return ($img->product_img_root === false) ? 1 : -1;
         });
 
-        return $this->images = $images;
+        return $this->images;
     }
+
 
     public function getProductPrice(): Money|false
     {

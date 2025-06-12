@@ -39,7 +39,6 @@ class YandexMarketMapperTest extends KernelTestCase
 {
     public function testUseCase(): void
     {
-
         /** @var AllProductsIdentifierInterface $AllProductsIdentifier */
         $AllProductsIdentifier = self::getContainer()->get(AllProductsIdentifierInterface::class);
 
@@ -50,61 +49,60 @@ class YandexMarketMapperTest extends KernelTestCase
         $YandexMarketMapper = self::getContainer()->get(YandexMarketMapper::class);
 
 
-        foreach($AllProductsIdentifier->findAllArray() as $key => $item)
+        foreach($AllProductsIdentifier->findAll() as $key => $ProductsIdentifierResult)
         {
             if($key >= 10)
             {
                 break;
             }
 
-            $YaMarketCard = $YaMarketProductsCard
-                ->forProduct($item['product_id'])
-                ->forOfferConst($item['offer_const'])
-                ->forVariationConst($item['variation_const'])
-                ->forModificationConst($item['modification_const'])
+            $CurrentYaMarketProductCardResult = $YaMarketProductsCard
+                ->forProduct($ProductsIdentifierResult->getProductId())
+                ->forOfferConst($ProductsIdentifierResult->getProductOfferConst())
+                ->forVariationConst($ProductsIdentifierResult->getProductVariationConst())
+                ->forModificationConst($ProductsIdentifierResult->getProductModificationConst())
                 ->find();
 
-            if($YaMarketCard === false)
+            if($CurrentYaMarketProductCardResult === false)
             {
                 continue;
             }
 
-            if(empty($YaMarketCard['length']))
+            if(empty($CurrentYaMarketProductCardResult->getLength()))
             {
                 continue;
             }
 
-            if(empty($YaMarketCard['width']))
+            if(empty($CurrentYaMarketProductCardResult->getWidth()))
             {
                 continue;
             }
 
-            if(empty($YaMarketCard['height']))
+            if(empty($CurrentYaMarketProductCardResult->getHeight()))
             {
                 continue;
             }
 
-            if(empty($YaMarketCard['weight']))
+            if(empty($CurrentYaMarketProductCardResult->getWeight()))
             {
                 continue;
             }
 
+            $request = $YandexMarketMapper->getData($CurrentYaMarketProductCardResult);
 
-            $request = $YandexMarketMapper->getData($YaMarketCard);
-
-            self::assertEquals($request['offerId'], $YaMarketCard['article']);
-            self::assertEquals(current($request['tags']), $YaMarketCard['product_card']);
-            self::assertNotFalse(stripos($request['name'], $YaMarketCard['product_name']));
-            self::assertEquals($request['marketCategoryId'], $YaMarketCard['market_category']);
-            self::assertEquals($request['description'], $YaMarketCard['product_preview']);
+            self::assertEquals($request['offerId'], $CurrentYaMarketProductCardResult->getArticle());
+            self::assertEquals(current($request['tags']), $CurrentYaMarketProductCardResult->getGroupCard());
+            self::assertNotFalse(stripos($request['name'], $CurrentYaMarketProductCardResult->getProductName()));
+            self::assertEquals($request['marketCategoryId'], $CurrentYaMarketProductCardResult->getMarketCategory());
+            self::assertEquals($request['description'], $CurrentYaMarketProductCardResult->getProductPreview());
 
 
-            self::assertEquals($request['weightDimensions']['length'], $YaMarketCard['length'] / 10);
-            self::assertEquals($request['weightDimensions']['width'], $YaMarketCard['width'] / 10);
-            self::assertEquals($request['weightDimensions']['height'], $YaMarketCard['height'] / 10);
-            self::assertEquals($request['weightDimensions']['weight'], $YaMarketCard['weight'] / 100);
+            self::assertEquals($request['weightDimensions']['length'], $CurrentYaMarketProductCardResult->getLength());
+            self::assertEquals($request['weightDimensions']['width'], $CurrentYaMarketProductCardResult->getWidth());
+            self::assertEquals($request['weightDimensions']['height'], $CurrentYaMarketProductCardResult->getHeight());
+            self::assertEquals($request['weightDimensions']['weight'], $CurrentYaMarketProductCardResult->getWeight());
 
-            //dd($YaMarketCard);
+            //dd($CurrentYaMarketProductCardResult);
 
 
             break;

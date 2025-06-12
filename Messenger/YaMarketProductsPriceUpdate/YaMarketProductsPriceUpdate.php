@@ -91,9 +91,6 @@ final readonly class YaMarketProductsPriceUpdate
             return;
         }
 
-        /** Лимит: 100 запросов в минуту, добавляем лок */
-        usleep(600000);
-
         foreach($tokensByProfile as $YaMarketTokenUid)
         {
             /**
@@ -173,8 +170,8 @@ final readonly class YaMarketProductsPriceUpdate
                     'Обновили стоимость товара %s (%s) : %s => %s',
                     $CurrentYaMarketProductCardResult->getArticle(),
                     $CurrentYaMarketProductCardResult->getProductPrice(), // стоимость в карточке
-                    $Price->getValue(), // новая стоимость на маркетплейс
-                    $CurrentYaMarketProductCardResult->getProductCurrency(),
+                    $MarketProductPrice, // предыдущая стоимость на маркетплейс
+                    $Price->getRoundValue(), // новая стоимость на маркетплейс
                 ), [self::class.':'.__LINE__, (string) $YaMarketTokenUid],
             );
         }

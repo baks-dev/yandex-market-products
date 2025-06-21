@@ -26,13 +26,10 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Reference\Parameters;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
-use BaksDev\Yandex\Market\Repository\YaMarketToken\YaMarketTokenByProfileInterface;
 use DateInterval;
 use DomainException;
 use Generator;
 use InvalidArgumentException;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
@@ -93,7 +90,7 @@ final class YandexMarketGetParametersRequest extends YandexMarket
 
                 throw new DomainException(
                     message: 'Ошибка YandexMarketCategoryRequest',
-                    code: $response->getStatusCode()
+                    code: $response->getStatusCode(),
                 );
             }
 

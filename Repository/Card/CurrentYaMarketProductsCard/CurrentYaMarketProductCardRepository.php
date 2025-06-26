@@ -820,10 +820,9 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
          * Применяем настройки стоимости магазина
          */
 
-        if($dbal->isNotProjectProfile())
+        if($dbal->bindProjectProfile())
         {
             $dbal
-                ->bindProjectProfile()
                 ->addSelect('project_profile_info.discount AS project_discount')
                 ->leftJoin(
                     'product',
@@ -904,7 +903,6 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
 		');
 
         $dbal->allGroupByExclude();
-
 
         return $dbal
             ->enableCache('products-product')

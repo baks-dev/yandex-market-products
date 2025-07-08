@@ -27,6 +27,7 @@ namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Orders\Order\Repository\ProductTotalInOrders\ProductTotalInOrdersInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\GetYaMarketProductStocksRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\UpdateYaMarketProductStocksRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
@@ -46,6 +47,7 @@ final readonly class YaMarketProductsStocksUpdate
         private CurrentYaMarketProductCardInterface $marketProductsCard,
         private MessageDispatchInterface $messageDispatch,
         private YaMarketTokensByProfileInterface $YaMarketTokensByProfile,
+        private ProductTotalInOrdersInterface $ProductTotalInOrders
     ) {}
 
     /**
@@ -75,11 +77,25 @@ final readonly class YaMarketProductsStocksUpdate
             return;
         }
 
-        /** Не обновляем базовую стоимость карточки без обязательных параметров */
+        /**
+         * Не обновляем базовую стоимость карточки без обязательных параметров
+         */
         if(false === $CurrentYaMarketProductCardResult->isCredentials())
         {
             return;
         }
+
+
+        /** Получаем остаток склада профиля пользователя с учетом заказов */
+
+        $productTotal = $this->ProductTotalInOrders
+            ->onProfile($message->getProfile())
+            ->onProduct($message->getProduct())
+            ->onOfferConst($message->getOfferConst())
+            ->onVariationConst($message->getVariationConst())
+            ->onModificationConst($message->getModificationConst())
+            ->findTotal();
+
 
         foreach($tokensByProfile as $YaMarketTokenUid)
         {
@@ -110,13 +126,13 @@ final readonly class YaMarketProductsStocksUpdate
              *
              * @see UpdateYaMarketProductStocksRequest:79
              */
-            if($ProductStocks !== true && $ProductStocks === $CurrentYaMarketProductCardResult->getProductQuantity())
+            if($ProductStocks !== true && $ProductStocks === $productTotal)
             {
                 $this->logger->info(sprintf(
                     'Наличие соответствует %s: %s == %s',
                     $CurrentYaMarketProductCardResult->getArticle(),
                     $ProductStocks,
-                    $CurrentYaMarketProductCardResult->getProductQuantity(),
+                    $productTotal,
                 ), [$YaMarketTokenUid]);
 
                 continue;
@@ -126,14 +142,14 @@ final readonly class YaMarketProductsStocksUpdate
             $this->marketProductStocksUpdateRequest
                 ->forTokenIdentifier($YaMarketTokenUid)
                 ->article($CurrentYaMarketProductCardResult->getArticle())
-                ->total($CurrentYaMarketProductCardResult->getProductQuantity())
+                ->total($productTotal)
                 ->update();
 
             $this->logger->info(sprintf(
                 'Обновили наличие %s: %s => %s',
                 $CurrentYaMarketProductCardResult->getArticle(),
                 $ProductStocks,
-                $CurrentYaMarketProductCardResult->getProductQuantity(),
+                $productTotal,
             ), [$YaMarketTokenUid]);
         }
     }

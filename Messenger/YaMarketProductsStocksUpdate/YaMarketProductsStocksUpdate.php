@@ -28,6 +28,8 @@ namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate;
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Repository\ProductTotalInOrders\ProductTotalInOrdersInterface;
+use BaksDev\Products\Stocks\BaksDevProductsStocksBundle;
+use BaksDev\Products\Stocks\Repository\ProductWarehouseTotal\ProductWarehouseTotalInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\GetYaMarketProductStocksRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Stocks\UpdateYaMarketProductStocksRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
@@ -47,7 +49,8 @@ final readonly class YaMarketProductsStocksUpdate
         private CurrentYaMarketProductCardInterface $marketProductsCard,
         private MessageDispatchInterface $messageDispatch,
         private YaMarketTokensByProfileInterface $YaMarketTokensByProfile,
-        private ProductTotalInOrdersInterface $ProductTotalInOrders
+        private ProductTotalInOrdersInterface $ProductTotalInOrders,
+        private ?ProductWarehouseTotalInterface $ProductWarehouseTotal = null,
     ) {}
 
     /**
@@ -85,17 +88,33 @@ final readonly class YaMarketProductsStocksUpdate
             return;
         }
 
+        /** Остаток товара в карточке */
+        $ProductQuantity = $CurrentYaMarketProductCardResult->getProductQuantity();
 
-        /** Получаем остаток склада профиля пользователя с учетом заказов */
+        /** Если подключен модуль складского учета - расчет согласно остаткам склада */
+        if(class_exists(BaksDevProductsStocksBundle::class))
+        {
+            /** Получаем остаток на складе с учетом резерва */
+            $stocksTotal = $this->ProductWarehouseTotal->getProductProfileTotal(
+                $message->getProfile(),
+                $message->getProduct(),
+                $message->getOfferConst(),
+                $message->getVariationConst(),
+                $message->getModificationConst(),
+            );
 
-        $productTotal = $this->ProductTotalInOrders
-            ->onProfile($message->getProfile())
-            ->onProduct($message->getProduct())
-            ->onOfferConst($message->getOfferConst())
-            ->onVariationConst($message->getVariationConst())
-            ->onModificationConst($message->getModificationConst())
-            ->findTotal();
+            /** Получаем количество необработанных заказов */
+            $unprocessed = $this->ProductTotalInOrders
+                ->onProfile($message->getProfile())
+                ->onProduct($message->getProduct())
+                ->onOfferConst($message->getOfferConst())
+                ->onVariationConst($message->getVariationConst())
+                ->onModificationConst($message->getModificationConst())
+                ->findTotal();
 
+
+            $ProductQuantity = ($stocksTotal - $unprocessed);
+        }
 
         foreach($tokensByProfile as $YaMarketTokenUid)
         {
@@ -126,13 +145,13 @@ final readonly class YaMarketProductsStocksUpdate
              *
              * @see UpdateYaMarketProductStocksRequest:79
              */
-            if($ProductStocks !== true && $ProductStocks === $productTotal)
+            if($ProductStocks !== true && $ProductStocks === $ProductQuantity)
             {
                 $this->logger->info(sprintf(
                     'Наличие соответствует %s: %s == %s',
                     $CurrentYaMarketProductCardResult->getArticle(),
                     $ProductStocks,
-                    $productTotal,
+                    $ProductQuantity,
                 ), [$YaMarketTokenUid]);
 
                 continue;
@@ -142,14 +161,14 @@ final readonly class YaMarketProductsStocksUpdate
             $this->marketProductStocksUpdateRequest
                 ->forTokenIdentifier($YaMarketTokenUid)
                 ->article($CurrentYaMarketProductCardResult->getArticle())
-                ->total($productTotal)
+                ->total($ProductQuantity)
                 ->update();
 
             $this->logger->info(sprintf(
                 'Обновили наличие %s: %s => %s',
                 $CurrentYaMarketProductCardResult->getArticle(),
                 $ProductStocks,
-                $productTotal,
+                $ProductQuantity,
             ), [$YaMarketTokenUid]);
         }
     }

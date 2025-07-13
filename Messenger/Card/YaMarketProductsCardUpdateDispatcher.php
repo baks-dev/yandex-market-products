@@ -81,11 +81,12 @@ final readonly class YaMarketProductsCardUpdateDispatcher
         {
             $this->logger->warning(
                 sprintf(
-                    'yandex-market-products: Не добавляем карточку  c артикулом %s без обязательных параметров',
+                    'yandex-market-products: Не добавляем карточку  c артикулом %s без обязательных параметров (цена, размер)',
                     $CurrentYaMarketProductCardResult->getArticle(),
                 ),
                 [self::class.':'.__LINE__, var_export($CurrentYaMarketProductCardResult, true)],
             );
+
             return;
         }
 

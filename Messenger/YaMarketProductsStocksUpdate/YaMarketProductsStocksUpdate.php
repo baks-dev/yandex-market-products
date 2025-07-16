@@ -50,7 +50,6 @@ final readonly class YaMarketProductsStocksUpdate
         private MessageDispatchInterface $messageDispatch,
         private YaMarketTokensByProfileInterface $YaMarketTokensByProfile,
         private ProductTotalInOrdersInterface $ProductTotalInOrders,
-        private ?ProductWarehouseTotalInterface $ProductWarehouseTotal = null,
     ) {}
 
     /**
@@ -73,6 +72,7 @@ final readonly class YaMarketProductsStocksUpdate
             ->forOfferConst($message->getOfferConst())
             ->forVariationConst($message->getVariationConst())
             ->forModificationConst($message->getModificationConst())
+            ->forProfile($message->getProfile())
             ->find();
 
         if(false === ($CurrentYaMarketProductCardResult instanceof CurrentYaMarketProductCardResult))
@@ -88,21 +88,12 @@ final readonly class YaMarketProductsStocksUpdate
             return;
         }
 
-        /** Остаток товара в карточке */
+        /**  Остаток товара в карточке либо если подключен модуль складского учета - остаток на складе */
         $ProductQuantity = $CurrentYaMarketProductCardResult->getProductQuantity();
 
-        /** Если подключен модуль складского учета - расчет согласно остаткам склада */
+        /** Если подключен модуль складского учета - расчет согласно необработанных заказов */
         if(class_exists(BaksDevProductsStocksBundle::class))
         {
-            /** Получаем остаток на складе с учетом резерва */
-            $stocksTotal = $this->ProductWarehouseTotal->getProductProfileTotal(
-                $message->getProfile(),
-                $message->getProduct(),
-                $message->getOfferConst(),
-                $message->getVariationConst(),
-                $message->getModificationConst(),
-            );
-
             /** Получаем количество необработанных заказов */
             $unprocessed = $this->ProductTotalInOrders
                 ->onProfile($message->getProfile())
@@ -112,8 +103,7 @@ final readonly class YaMarketProductsStocksUpdate
                 ->onModificationConst($message->getModificationConst())
                 ->findTotal();
 
-
-            $ProductQuantity = ($stocksTotal - $unprocessed);
+            $ProductQuantity -= $unprocessed;
         }
 
         foreach($tokensByProfile as $YaMarketTokenUid)
@@ -170,6 +160,7 @@ final readonly class YaMarketProductsStocksUpdate
                 $ProductStocks,
                 $ProductQuantity,
             ), [$YaMarketTokenUid]);
+
         }
     }
 }

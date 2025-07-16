@@ -28,6 +28,7 @@ use BaksDev\Products\Product\Type\Id\ProductUid;
 use BaksDev\Products\Product\Type\Offers\ConstId\ProductOfferConst;
 use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst;
 use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 
 interface CurrentYaMarketProductCardInterface
 {
@@ -38,6 +39,8 @@ interface CurrentYaMarketProductCardInterface
     public function forVariationConst(ProductVariationConst|string|null|false $variationConst): self;
 
     public function forModificationConst(ProductModificationConst|string|null|false $modificationConst): self;
+
+    public function forProfile(UserProfileUid $profile): self;
 
     /**
      * Метод получает активную карточку по идентификаторам

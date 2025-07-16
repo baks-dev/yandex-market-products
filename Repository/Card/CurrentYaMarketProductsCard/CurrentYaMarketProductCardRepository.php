@@ -54,7 +54,11 @@ use BaksDev\Products\Product\Type\Id\ProductUid;
 use BaksDev\Products\Product\Type\Offers\ConstId\ProductOfferConst;
 use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst;
 use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
-use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
+use BaksDev\Products\Stocks\BaksDevProductsStocksBundle;
+use BaksDev\Products\Stocks\Entity\Total\ProductStockTotal;
+use BaksDev\Users\Profile\UserProfile\Entity\Event\Info\UserProfileInfo;
+use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Entity\Custom\Images\YandexMarketProductCustomImage;
 use BaksDev\Yandex\Market\Products\Entity\Custom\YandexMarketProductCustom;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Event\YaMarketProductsSettingsEvent;
@@ -65,6 +69,9 @@ use InvalidArgumentException;
 
 final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProductCardInterface
 {
+
+    private UserProfileUid|false $profile = false;
+
     public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
 
     /**
@@ -158,6 +165,13 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
         }
 
         $this->modificationConst = $modificationConst;
+
+        return $this;
+    }
+
+    public function forProfile(UserProfileUid $profile): self
+    {
+        $this->profile = $profile;
 
         return $this;
     }
@@ -662,8 +676,6 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
         );
 
 
-
-
         $dbal->addSelect(
             "JSON_AGG ( DISTINCT JSONB_BUILD_OBJECT
                 (
@@ -833,50 +845,104 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
         }
 
 
-        /* Наличие и резерв торгового предложения */
-        $dbal->leftJoin(
-            'product_offer',
-            ProductOfferQuantity::class,
-            'product_offer_quantity',
-            'product_offer_quantity.offer = product_offer.id',
-        );
+        /**
+         * Наличие продукции на складе
+         * Если подключен модуль складского учета и передан идентификатор профиля
+         */
 
-        /* Наличие и резерв множественного варианта */
-        $dbal->leftJoin(
-            'product_variation',
-            ProductVariationQuantity::class,
-            'product_variation_quantity',
-            'product_variation_quantity.variation = product_variation.id',
-        );
+        if(true === ($this->profile instanceof UserProfileUid) && class_exists(BaksDevProductsStocksBundle::class))
+        {
 
-        /* Наличие и резерв модификации множественного варианта */
-        $dbal->leftJoin(
-            'product_modification',
-            ProductModificationQuantity::class,
-            'product_modification_quantity',
-            'product_modification_quantity.modification = product_modification.id',
-        );
+            $dbal
+                ->addSelect('(SUM(stock.total) - SUM(stock.reserve)) AS product_quantity')
+                ->leftJoin(
+                    'product',
+                    ProductStockTotal::class,
+                    'stock',
+                    '
+                    stock.profile = :profile AND
+                    stock.product = product.id 
+                    
+                    AND
+                        
+                        CASE 
+                            WHEN product_offer.const IS NOT NULL 
+                            THEN stock.offer = product_offer.const
+                            ELSE stock.offer IS NULL
+                        END
+                            
+                    AND 
+                    
+                        CASE
+                            WHEN product_variation.const IS NOT NULL 
+                            THEN stock.variation = product_variation.const
+                            ELSE stock.variation IS NULL
+                        END
+                        
+                    AND
+                    
+                        CASE
+                            WHEN product_modification.const IS NOT NULL 
+                            THEN stock.modification = product_modification.const
+                            ELSE stock.modification IS NULL
+                        END
+                    
+                    
+                ',
+                )
+                ->setParameter(
+                    'profile',
+                    $this->profile,
+                    UserProfileUid::TYPE,
+                );
 
+        }
 
-        /* Наличие продукта */
+        /**
+         * Наличие продукции в карточке
+         */
 
-        $dbal->addSelect('
-            COALESCE(
-                CASE WHEN product_modification_quantity.quantity > 0 AND product_modification_quantity.quantity > product_modification_quantity.reserve 
-                     THEN product_modification_quantity.quantity - ABS(product_modification_quantity.reserve) END,
-                CASE WHEN product_variation_quantity.quantity > 0 AND product_variation_quantity.quantity > product_variation_quantity.reserve 
-                     THEN product_variation_quantity.quantity - ABS(product_variation_quantity.reserve) END,
-                CASE WHEN product_offer_quantity.quantity > 0 AND product_offer_quantity.quantity > product_offer_quantity.reserve 
-                     THEN product_offer_quantity.quantity - ABS(product_offer_quantity.reserve) END,
-                CASE WHEN product_price.quantity > 0 AND product_price.quantity > product_price.reserve 
-                     THEN product_price.quantity - ABS(product_price.reserve) END
-            ) AS product_quantity
-		')
-            //->addGroupBy('product_modification_quantity.reserve')
-            //->addGroupBy('product_variation_quantity.reserve')
-            //->addGroupBy('product_offer_quantity.reserve')
-            //->addGroupBy('product_price.reserve')
-        ;
+        else
+        {
+
+            /* Наличие и резерв торгового предложения */
+            $dbal->leftJoin(
+                'product_offer',
+                ProductOfferQuantity::class,
+                'product_offer_quantity',
+                'product_offer_quantity.offer = product_offer.id',
+            );
+
+            /* Наличие и резерв множественного варианта */
+            $dbal->leftJoin(
+                'product_variation',
+                ProductVariationQuantity::class,
+                'product_variation_quantity',
+                'product_variation_quantity.variation = product_variation.id',
+            );
+
+            /* Наличие и резерв модификации множественного варианта */
+            $dbal->leftJoin(
+                'product_modification',
+                ProductModificationQuantity::class,
+                'product_modification_quantity',
+                'product_modification_quantity.modification = product_modification.id',
+            );
+
+            $dbal->addSelect('
+                COALESCE(
+                    CASE WHEN product_modification_quantity.quantity > 0 AND product_modification_quantity.quantity > product_modification_quantity.reserve 
+                         THEN product_modification_quantity.quantity - ABS(product_modification_quantity.reserve) END,
+                    CASE WHEN product_variation_quantity.quantity > 0 AND product_variation_quantity.quantity > product_variation_quantity.reserve 
+                         THEN product_variation_quantity.quantity - ABS(product_variation_quantity.reserve) END,
+                    CASE WHEN product_offer_quantity.quantity > 0 AND product_offer_quantity.quantity > product_offer_quantity.reserve 
+                         THEN product_offer_quantity.quantity - ABS(product_offer_quantity.reserve) END,
+                    CASE WHEN product_price.quantity > 0 AND product_price.quantity > product_price.reserve 
+                         THEN product_price.quantity - ABS(product_price.reserve) END
+                ) AS product_quantity
+		    ');
+
+        }
 
 
         /** Артикул продукта */

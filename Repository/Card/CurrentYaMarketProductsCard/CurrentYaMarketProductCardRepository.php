@@ -69,10 +69,10 @@ use InvalidArgumentException;
 
 final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProductCardInterface
 {
+    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
+
 
     private UserProfileUid|false $profile = false;
-
-    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
 
     /**
      * ID продукта

@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Tests;
 
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Mapper\YandexMarketMapper;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -61,6 +62,7 @@ class YandexMarketMapperTest extends KernelTestCase
                 ->forOfferConst($ProductsIdentifierResult->getProductOfferConst())
                 ->forVariationConst($ProductsIdentifierResult->getProductVariationConst())
                 ->forModificationConst($ProductsIdentifierResult->getProductModificationConst())
+                ->forProfile(new UserProfileUid())
                 ->find();
 
             if($CurrentYaMarketProductCardResult === false)

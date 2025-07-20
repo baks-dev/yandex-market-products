@@ -23,12 +23,13 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate;
+namespace BaksDev\Yandex\Market\Products\Messenger;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Yandex\Market\Messenger\YaMarketTokenMessage;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
+use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

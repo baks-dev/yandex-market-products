@@ -23,11 +23,12 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger\Card;
+namespace BaksDev\Yandex\Market\Products\Messenger;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Messenger\ProductMessage;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
+use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -38,7 +39,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class UpdateYaMarketCardByChangeProduct
 {
     public function __construct(
-        private AllProductsIdentifierInterface $AllProductsIdentifierReposirory,
+        private AllProductsIdentifierInterface $AllProductsIdentifierRepository,
         private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private MessageDispatchInterface $messageDispatch,
     ) {}
@@ -57,7 +58,7 @@ final readonly class UpdateYaMarketCardByChangeProduct
         }
 
         /** Получаем идентификаторы обновляемой продукции */
-        $products = $this->AllProductsIdentifierReposirory
+        $products = $this->AllProductsIdentifierRepository
             ->forProduct($message->getId())
             ->toArray();
 

@@ -31,6 +31,7 @@ use BaksDev\Products\Product\Type\Id\ProductUid;
 use BaksDev\Products\Product\Type\Offers\ConstId\ProductOfferConst;
 use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst;
 use BaksDev\Products\Product\Type\Offers\Variation\Modification\ConstId\ProductModificationConst;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -74,6 +75,7 @@ class YaMarketProductsCardRepositoryTest extends KernelTestCase
                 ->forOfferConst($ProductsIdentifierResult->getProductOfferConst())
                 ->forVariationConst($ProductsIdentifierResult->getProductVariationConst())
                 ->forModificationConst($ProductsIdentifierResult->getProductModificationConst())
+                ->forProfile(new UserProfileUid())
                 ->find();
 
             if(false === ($CurrentYaMarketProductCardResult instanceof CurrentYaMarketProductCardResult))

@@ -78,6 +78,7 @@ final readonly class YaMarketProductsPriceUpdate
             ->forOfferConst($message->getOfferConst())
             ->forVariationConst($message->getVariationConst())
             ->forModificationConst($message->getModificationConst())
+            ->forProfile($message->getProfile())
             ->find();
 
         if(false === ($CurrentYaMarketProductCardResult instanceof CurrentYaMarketProductCardResult))

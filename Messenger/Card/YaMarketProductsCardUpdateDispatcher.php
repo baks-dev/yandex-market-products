@@ -69,6 +69,7 @@ final readonly class YaMarketProductsCardUpdateDispatcher
             ->forOfferConst($message->getOfferConst())
             ->forVariationConst($message->getVariationConst())
             ->forModificationConst($message->getModificationConst())
+            ->forProfile($message->getProfile())
             ->find();
 
         if(false === ($CurrentYaMarketProductCardResult instanceof CurrentYaMarketProductCardResult))
@@ -104,7 +105,6 @@ final readonly class YaMarketProductsCardUpdateDispatcher
             {
                 /**
                  * Ошибка запишется в лог
-                 *
                  * @see YaMarketProductUpdateCardRequest
                  */
                 return;
@@ -122,7 +122,10 @@ final readonly class YaMarketProductsCardUpdateDispatcher
                 transport: (string) $message->getProfile(),
             );
 
-            $this->logger->info(sprintf('Обновили карточку товара %s', $request['offerId']));
+            $this->logger->info(sprintf(
+                'Обновили карточку товара %s',
+                $CurrentYaMarketProductCardResult->getArticle(),
+            ));
 
         }
     }

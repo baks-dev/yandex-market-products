@@ -177,6 +177,7 @@ class UpdateYaMarketProductsStocksCommand extends Command
                 ->forOfferConst($ProductsIdentifierResult->getProductOfferConst())
                 ->forVariationConst($ProductsIdentifierResult->getProductVariationConst())
                 ->forModificationConst($ProductsIdentifierResult->getProductModificationConst())
+                ->forProfile($UserProfileUid)
                 ->find();
 
             if(false === ($CurrentYaMarketProductCardResult instanceof CurrentYaMarketProductCardResult))

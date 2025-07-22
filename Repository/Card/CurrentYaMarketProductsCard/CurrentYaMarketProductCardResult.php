@@ -94,7 +94,7 @@ final class CurrentYaMarketProductCardResult
         private readonly ?int $product_old_price, // " => 0
 
         private readonly ?string $product_currency, // " => "rub"
-        private readonly ?int $product_quantity, //  => null
+        private readonly ?string $product_quantity, //  => null
 
         private readonly ?string $article, // " => "TR257-15-235-70-107H"
         private readonly ?string $barcode, // " => "2744610541511"
@@ -427,9 +427,6 @@ final class CurrentYaMarketProductCardResult
         return new Currency($this->product_currency);
     }
 
-    /**
-     * @depricate Переделать расчет наличия по необработанным заказам и остаткам склада
-     */
     public function getProductQuantity(): int
     {
         if(empty($this->product_quantity))
@@ -437,7 +434,22 @@ final class CurrentYaMarketProductCardResult
             return 0;
         }
 
-        return max($this->product_quantity, 0);
+        if(false === json_validate($this->product_quantity))
+        {
+            return 0;
+        }
+
+        $decode = json_decode($this->product_quantity, false, 512, JSON_THROW_ON_ERROR);
+
+        $quantity = 0;
+
+        foreach($decode as $item)
+        {
+            $quantity += $item->total;
+            $quantity -= $item->reserve;
+        }
+
+        return max($quantity, 0);
     }
 
     public function getArticle(): string|false

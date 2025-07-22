@@ -854,9 +854,17 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
         {
 
             $dbal
-                ->addSelect('(SUM(stock.total) - SUM(stock.reserve)) AS product_quantity')
+                ->addSelect("JSON_AGG ( 
+                        DISTINCT JSONB_BUILD_OBJECT (
+                            'total', stock.total, 
+                            'reserve', stock.reserve 
+                        )) FILTER (WHERE stock.total > stock.reserve)
+            
+                        AS product_quantity",
+                )
+
                 ->leftJoin(
-                    'product',
+                    'product_modification',
                     ProductStockTotal::class,
                     'stock',
                     '
@@ -929,18 +937,31 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                 'product_modification_quantity.modification = product_modification.id',
             );
 
-            $dbal->addSelect('
-                COALESCE(
-                    CASE WHEN product_modification_quantity.quantity > 0 AND product_modification_quantity.quantity > product_modification_quantity.reserve 
-                         THEN product_modification_quantity.quantity - ABS(product_modification_quantity.reserve) END,
-                    CASE WHEN product_variation_quantity.quantity > 0 AND product_variation_quantity.quantity > product_variation_quantity.reserve 
-                         THEN product_variation_quantity.quantity - ABS(product_variation_quantity.reserve) END,
-                    CASE WHEN product_offer_quantity.quantity > 0 AND product_offer_quantity.quantity > product_offer_quantity.reserve 
-                         THEN product_offer_quantity.quantity - ABS(product_offer_quantity.reserve) END,
-                    CASE WHEN product_price.quantity > 0 AND product_price.quantity > product_price.reserve 
-                         THEN product_price.quantity - ABS(product_price.reserve) END
-                ) AS product_quantity
-		    ');
+            $dbal
+                ->addSelect("JSON_AGG (
+                        DISTINCT JSONB_BUILD_OBJECT (
+                            
+                            
+                            'total', COALESCE(
+                                            product_modification_quantity.quantity, 
+                                            product_variation_quantity.quantity, 
+                                            product_offer_quantity.quantity, 
+                                            product_price.quantity,
+                                            0
+                                        ), 
+                            
+                            
+                            'reserve', COALESCE(
+                                            product_modification_quantity.reserve, 
+                                            product_variation_quantity.reserve, 
+                                            product_offer_quantity.reserve, 
+                                            product_price.reserve,
+                                            0
+                                        )
+                        ) )
+            
+                        AS product_quantity",
+                );
 
         }
 

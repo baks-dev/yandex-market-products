@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@ use BaksDev\Products\Category\Repository\CategoryChoice\CategoryChoiceInterface;
 use BaksDev\Products\Category\Type\Id\CategoryProductUid;
 use BaksDev\Yandex\Market\Products\Api\Reference\Category\YaMarketGetCategoriesTreeRequest;
 use BaksDev\Yandex\Market\Products\Api\Reference\Category\YandexMarketCategoryDTO;
+use BaksDev\Yandex\Market\Repository\YaMarketTokensByProfile\YaMarketTokensByProfileInterface;
+use InvalidArgumentException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -36,27 +38,19 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 final class PreformForm extends AbstractType
 {
-    private CategoryChoiceInterface $categoryChoice;
-    private TokenStorageInterface $tokenStorage;
-    private YaMarketGetCategoriesTreeRequest $yandexMarketCategoryRequest;
-
     public function __construct(
-        TokenStorageInterface $tokenStorage,
-        YaMarketGetCategoriesTreeRequest $yandexMarketCategoryRequest,
-        CategoryChoiceInterface $categoryChoice,
-    )
-    {
-        $this->categoryChoice = $categoryChoice;
-        $this->tokenStorage = $tokenStorage;
-        $this->yandexMarketCategoryRequest = $yandexMarketCategoryRequest;
-    }
+        private readonly TokenStorageInterface $TokenStorage,
+        private readonly YaMarketGetCategoriesTreeRequest $YandexMarketCategoryRequest,
+        private readonly CategoryChoiceInterface $CategoryChoiceRepository,
+        private readonly YaMarketTokensByProfileInterface $YaMarketTokensByProfileRepository
+    ) {}
 
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('category', ChoiceType::class, [
-                'choices' => $this->categoryChoice->findAll(),
+                'choices' => $this->CategoryChoiceRepository->findAll(),
                 'choice_value' => function(?CategoryProductUid $type) {
                     return $type?->getValue();
                 },
@@ -73,14 +67,24 @@ final class PreformForm extends AbstractType
 
         /** Получаем список параметров категории маркет по токену профиля */
 
-        $TokenInterface = $this->tokenStorage->getToken();
+        $TokenInterface = $this->TokenStorage->getToken();
         $UserProfileUid = $TokenInterface?->getUser()?->getProfile();
 
         if($UserProfileUid)
         {
+            /** Получаем все идентификаторы токенов профиля */
+            $profiles = $this->YaMarketTokensByProfileRepository
+                ->findAll($UserProfileUid);
 
-            $market = $this->yandexMarketCategoryRequest
-                ->profile($UserProfileUid)
+            if(false === $profiles || false === $profiles->valid())
+            {
+                throw new InvalidArgumentException('Идентификатор токена профиля не найден');
+            }
+
+            $YaMarketTokenUid = $profiles->current();
+
+            $market = $this->YandexMarketCategoryRequest
+                ->forTokenIdentifier($YaMarketTokenUid)
                 ->findAll();
 
             /** @var YandexMarketCategoryDTO $YandexMarketCategoryDTO */

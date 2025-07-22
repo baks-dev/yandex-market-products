@@ -34,6 +34,8 @@ use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductP
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductProperty;
 use BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit\Parameters\YaMarketProductsSettingsParametersDTO;
 use BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit\Property\YaMarketProductsSettingsPropertyDTO;
+use BaksDev\Yandex\Market\Repository\YaMarketTokensByProfile\YaMarketTokensByProfileInterface;
+use InvalidArgumentException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -52,7 +54,8 @@ final class YaMarketProductsSettingsForm extends AbstractType
         private readonly PropertyFieldsCategoryChoiceInterface $propertyFields,
         private readonly YaMarketProductPropertyCollection $marketProductPropertyCollection,
         private readonly YandexMarketGetParametersRequest $marketParametersRequest,
-        private readonly TokenStorageInterface $tokenStorage
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly YaMarketTokensByProfileInterface $YaMarketTokensByProfileRepository
     ) {}
 
 
@@ -119,8 +122,19 @@ final class YaMarketProductsSettingsForm extends AbstractType
             if($UserProfileUid)
             {
 
+                /** Получаем все идентификаторы токенов профиля */
+                $profiles = $this->YaMarketTokensByProfileRepository
+                    ->findAll($UserProfileUid);
+
+                if(false === $profiles || false === $profiles->valid())
+                {
+                    throw new InvalidArgumentException('Идентификатор токена профиля не найден');
+                }
+
+                $YaMarketTokenUid = $profiles->current();
+
                 $marketParameters = $this->marketParametersRequest
-                    ->profile($UserProfileUid)
+                    ->forTokenIdentifier($YaMarketTokenUid)
                     ->category($data->getMarket())
                     ->findAll();
 

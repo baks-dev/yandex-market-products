@@ -27,7 +27,6 @@ namespace BaksDev\Yandex\Market\Products\Security\Index;
 
 use BaksDev\Users\Profile\Group\Security\RoleInterface;
 use BaksDev\Users\Profile\Group\Security\VoterInterface;
-use BaksDev\Yandex\Market\Products\Security\Card\Role;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('baks.security.voter')]

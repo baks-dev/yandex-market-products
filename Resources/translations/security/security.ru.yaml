@@ -7,8 +7,8 @@ ROLE_YA_MARKET_PRODUCTS:
 
 # Правила
 ROLE_YA_MARKET_PRODUCTS_INDEX:
-  name: 'Настройки продукта Яндекс Маркет'
-  desc: 'Настройки продукта Яндекс Маркет'
+  name: 'Просмотр'
+  desc: ''
 
 ROLE_YA_MARKET_PRODUCTS_NEW:
   name: 'Добавить'

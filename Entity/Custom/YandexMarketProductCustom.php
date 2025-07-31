@@ -35,7 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'ya_market_product_custom')]
-final class YandexMarketProductCustom extends EntityState
+class YandexMarketProductCustom extends EntityState
 {
     #[Assert\NotBlank]
     #[Assert\Uuid]

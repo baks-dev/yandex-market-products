@@ -36,7 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity]
 #[ORM\Table(name: 'ya_market_product_custom_images')]
 #[ORM\Index(columns: ['root'])]
-final class YandexMarketProductCustomImage extends EntityState implements UploadEntityInterface
+class YandexMarketProductCustomImage extends EntityState implements UploadEntityInterface
 {
     /** ID */
     #[Assert\NotBlank]

@@ -28,7 +28,7 @@ namespace BaksDev\Yandex\Market\Products\UseCase\NewEdit;
 use BaksDev\Core\Entity\AbstractHandler;
 use BaksDev\Yandex\Market\Products\Entity\Custom\Images\YandexMarketProductCustomImage;
 use BaksDev\Yandex\Market\Products\Entity\Custom\YandexMarketProductCustom;
-use BaksDev\Yandex\Market\Products\Messenger\YandexMarketProductMessage;
+use BaksDev\Yandex\Market\Products\Messenger\Dispatcher\YandexMarketProductMessage;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductCustomImagesDTO;
 
 final class YandexMarketCustomProductHandler extends AbstractHandler

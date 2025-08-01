@@ -111,19 +111,22 @@ final readonly class YaMarketProductsPriceUpdate
 
             if(false === $Price)
             {
-                $this->messageDispatch->dispatch(
-                    message: $message,
-                    stamps: [new MessageDelay('1 minutes')],
-                    transport: $message->getProfile().'-low',
-                );
+                if($CurrentYaMarketProductCardResult->getProductQuantity() > 0)
+                {
+                    $this->messageDispatch->dispatch(
+                        message: $message,
+                        stamps: [new MessageDelay('1 minutes')],
+                        transport: $message->getProfile().'-low',
+                    );
 
-                $this->logger->critical(
-                    sprintf(
-                        'yandex-market-products: Пробуем обновит стоимость %s через 1 минуту',
-                        $CurrentYaMarketProductCardResult->getArticle(),
-                    ),
-                    [self::class.':'.__LINE__],
-                );
+                    $this->logger->critical(
+                        sprintf(
+                            'yandex-market-products: Пробуем обновит стоимость %s через 1 минуту',
+                            $CurrentYaMarketProductCardResult->getArticle(),
+                        ),
+                        [self::class.':'.__LINE__],
+                    );
+                }
 
                 continue;
             }

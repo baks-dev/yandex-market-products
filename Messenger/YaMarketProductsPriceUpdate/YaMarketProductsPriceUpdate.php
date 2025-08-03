@@ -124,7 +124,7 @@ final readonly class YaMarketProductsPriceUpdate
                             'yandex-market-products: Пробуем обновит стоимость %s через 1 минуту',
                             $CurrentYaMarketProductCardResult->getArticle(),
                         ),
-                        [self::class.':'.__LINE__],
+                        [self::class.':'.__LINE__, $YaMarketTokenUid],
                     );
                 }
 

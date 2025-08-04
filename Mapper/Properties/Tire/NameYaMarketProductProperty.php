@@ -173,7 +173,7 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
 
                     if(!empty($purpose_value['value']))
                     {
-                        $name .= $purpose_value['value'].' ';
+                        $name .= ', '.$purpose_value['value'].' ';
                     }
                 }
             }

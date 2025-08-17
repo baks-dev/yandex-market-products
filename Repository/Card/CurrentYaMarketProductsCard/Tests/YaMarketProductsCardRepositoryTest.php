@@ -52,10 +52,10 @@ class YaMarketProductsCardRepositoryTest extends KernelTestCase
         $YaMarketProductsCard = self::getContainer()->get(CurrentYaMarketProductCardInterface::class);
 
         // Предполагается, что эти UUID соответствуют данным, загруженным вашими тестовыми фикстурами.
-        $productUid = new ProductUid($_SERVER['TEST_OZON_PRODUCT']);
-        $offerConst = new ProductOfferConst($_SERVER['TEST_OZON_OFFER_CONST']);
-        $variationConst = new ProductVariationConst($_SERVER['TEST_OZON_VARIATION_CONST']);
-        $modificationConst = new ProductModificationConst($_SERVER['TEST_OZON_MODIFICATION_CONST']);
+        $productUid = new ProductUid($_SERVER['TEST_PRODUCT']);
+        $offerConst = new ProductOfferConst($_SERVER['TEST_OFFER_CONST']);
+        $variationConst = new ProductVariationConst($_SERVER['TEST_VARIATION_CONST']);
+        $modificationConst = new ProductModificationConst($_SERVER['TEST_MODIFICATION_CONST']);
 
 
         /** Если не указана настройка соотношений - карточки не найдет */

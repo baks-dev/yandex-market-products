@@ -106,15 +106,17 @@ final readonly class YaMarketProductsStocksUpdate
             $ProductQuantity -= $unprocessed;
         }
 
+        $ProductQuantity = max($ProductQuantity, 0);
+
         foreach($tokensByProfile as $YaMarketTokenUid)
         {
             /** Возвращает данные об остатках товаров на маркетплейсе */
-            $ProductStocks = $this->marketProductStocksGetRequest
+            $ProductStocksYandexMarket = $this->marketProductStocksGetRequest
                 ->forTokenIdentifier($YaMarketTokenUid)
                 ->article($CurrentYaMarketProductCardResult->getArticle())
                 ->find();
 
-            if(false === $ProductStocks)
+            if(false === $ProductStocksYandexMarket)
             {
                 $this->messageDispatch->dispatch(
                     message: $message,
@@ -135,12 +137,12 @@ final readonly class YaMarketProductsStocksUpdate
              *
              * @see UpdateYaMarketProductStocksRequest:79
              */
-            if($ProductStocks !== true && $ProductStocks === $ProductQuantity)
+            if($ProductStocksYandexMarket !== true && $ProductStocksYandexMarket === $ProductQuantity)
             {
                 $this->logger->info(sprintf(
                     'Наличие соответствует %s: %s == %s',
                     $CurrentYaMarketProductCardResult->getArticle(),
-                    $ProductStocks,
+                    $ProductStocksYandexMarket,
                     $ProductQuantity,
                 ), [$YaMarketTokenUid]);
 
@@ -157,7 +159,7 @@ final readonly class YaMarketProductsStocksUpdate
             $this->logger->info(sprintf(
                 'Обновили наличие %s: %s => %s',
                 $CurrentYaMarketProductCardResult->getArticle(),
-                $ProductStocks,
+                $ProductStocksYandexMarket,
                 $ProductQuantity,
             ), [$YaMarketTokenUid]);
 

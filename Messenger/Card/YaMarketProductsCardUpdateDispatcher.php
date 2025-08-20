@@ -25,7 +25,10 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger\Card;
 
+use BaksDev\Core\Deduplicator\Deduplicator;
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Lock\AppLockInterface;
+use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\YaMarketProductUpdateCardRequest;
 use BaksDev\Yandex\Market\Products\Mapper\YandexMarketMapper;
@@ -48,6 +51,7 @@ final readonly class YaMarketProductsCardUpdateDispatcher
         private YandexMarketMapper $yandexMarketMapper,
         private YaMarketTokensByProfileInterface $YaMarketTokensByProfile,
         private MessageDispatchInterface $messageDispatch,
+        private DeduplicatorInterface $deduplicator
     ) {}
 
     /**
@@ -97,14 +101,54 @@ final readonly class YaMarketProductsCardUpdateDispatcher
 
         foreach($tokensByProfile as $YaMarketTokenUid)
         {
+            /**
+             * Защита от параллельных запросов
+             */
+
+            $Deduplicator = $this->deduplicator
+                ->namespace('module-name')
+                ->expiresAfter('5 seconds')
+                ->deduplication([
+                    $message->getProduct(),
+                    $message->getOfferConst(),
+                    $message->getVariationConst(),
+                    $message->getModificationConst(),
+                    $YaMarketTokenUid,
+                    self::class,
+                ]);
+
+            if($Deduplicator->isExecuted())
+            {
+                return;
+            }
+
+            $Deduplicator->save();
+
+            /**
+             * Обновляем карточку товара
+             */
+
             $update = $this->marketProductUpdate
                 ->forTokenIdentifier($YaMarketTokenUid)
                 ->update($request);
+
+            if(is_null($update))
+            {
+                /** Пробуем обновить позже если попали в лимит */
+                $this->messageDispatch->dispatch(
+                    message: new YaMarketProductsPriceMessage($message),
+                    stamps: [new MessageDelay('1 minute')],
+                    transport: $message->getProfile().'-low',
+                );
+
+                continue;
+            }
 
             if(false === $update)
             {
                 /**
                  * Ошибка запишется в лог
+                 *
                  * @see YaMarketProductUpdateCardRequest
                  */
                 return;
@@ -127,6 +171,7 @@ final readonly class YaMarketProductsCardUpdateDispatcher
                 $CurrentYaMarketProductCardResult->getArticle(),
             ));
 
+            $Deduplicator->delete();
         }
     }
 }

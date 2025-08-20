@@ -43,7 +43,7 @@ final class YaMarketProductUpdateCardRequest extends YandexMarket
      * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/business-assortment/updateOfferMappings
      *
      */
-    public function update(array $card): bool
+    public function update(array $card): bool|null
     {
         if($this->isExecuteEnvironment() === false)
         {
@@ -62,6 +62,12 @@ final class YaMarketProductUpdateCardRequest extends YandexMarket
                 sprintf('/businesses/%s/offer-mappings/update', $this->getBusiness()),
                 ['json' => ['offerMappings' => [['offer' => $card]]]],
             );
+
+        /** Превышено ограничение на доступ к ресурсу. */
+        if($response->getStatusCode() === 420)
+        {
+            return null;
+        }
 
         $content = $response->toArray(false);
 

@@ -142,7 +142,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
             $this->width.
             $this->height.
             $this->weight.
-            self::class
+            self::class,
         );
 
         $cache = new FilesystemAdapter();
@@ -163,7 +163,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
                         [
                             "parameters" => [
                                 "campaignId" => $this->getCompany(),
-                                "frequency" => "DAILY"
+                                "frequency" => "DAILY",
                             ],
                             "offers" => [
                                 [
@@ -172,10 +172,10 @@ final class YandexMarketCalculatorRequest extends YandexMarket
                                     "length" => $this->length,
                                     "width" => $this->width,
                                     "height" => $this->height,
-                                    "weight" => $this->weight
-                                ]
-                            ]
-                        ]
+                                    "weight" => $this->weight,
+                                ],
+                            ],
+                        ],
                     ],
                 );
 
@@ -185,8 +185,13 @@ final class YandexMarketCalculatorRequest extends YandexMarket
             {
                 $this->logger->critical(
                     'yandex-market-products: Ошибка при получении стоимости услуг',
-                    [$content, self::class.':'.__LINE__]
+                    [$content, self::class.':'.__LINE__],
                 );
+
+                if($response->getStatusCode() === 420)
+                {
+                    sleep(1);
+                }
 
                 return false;
             }

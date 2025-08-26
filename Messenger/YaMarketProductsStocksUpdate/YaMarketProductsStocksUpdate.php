@@ -157,9 +157,8 @@ final readonly class YaMarketProductsStocksUpdate
                 ->update();
 
             $this->logger->info(sprintf(
-                'Обновили наличие %s: %s => %s',
+                'Обновили наличие %s: => %s',
                 $CurrentYaMarketProductCardResult->getArticle(),
-                $ProductStocksYandexMarket,
                 $ProductQuantity,
             ), [$YaMarketTokenUid]);
 

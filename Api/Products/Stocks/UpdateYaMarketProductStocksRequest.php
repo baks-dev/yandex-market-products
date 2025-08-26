@@ -80,6 +80,7 @@ UpdateYaMarketProductStocksRequest extends YandexMarket
         if($this->isStocks() === false)
         {
             $this->total = 0;
+            $this->logger->warning(sprintf(' %s: Останавливаем продажи артикула', $this->article));
         }
 
         $response = $this->TokenHttpClient()

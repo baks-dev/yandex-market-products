@@ -30,7 +30,6 @@ use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByInvariableI
 use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByInvariableResult;
 use BaksDev\Users\Profile\UserProfile\Repository\UserProfileTokenStorage\UserProfileTokenStorageInterface;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductImagesForm;
-use Exception;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -43,10 +42,6 @@ use Twig\Environment;
 
 final class YandexMarketCustomProductForm extends AbstractType
 {
-    public function __construct(
-        private readonly ProductDetailByInvariableInterface $productDetailByInvariable,
-    ) {}
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('images', CollectionType::class, [
@@ -60,24 +55,6 @@ final class YandexMarketCustomProductForm extends AbstractType
             'allow_add' => true,
             'prototype_name' => '__images__',
         ]);
-
-        /** Рендеринг шаблона, если описание NULL */
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function(FormEvent $event): void {
-                /** @var YandexMarketCustomProductDTO $dto */
-                $dto = $event->getData();
-
-                $product = $this->productDetailByInvariable
-                    ->invariable($dto->getInvariable())
-                    ->find();
-
-                if(false === ($product instanceof ProductDetailByInvariableResult))
-                {
-                    throw new Exception('Продукт не найден');
-                }
-            },
-        );
 
         /** Сохранить */
         $builder->add(

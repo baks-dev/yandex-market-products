@@ -37,14 +37,12 @@ use BaksDev\Products\Product\Type\Offers\Variation\Modification\Id\ProductModifi
 use BaksDev\Yandex\Market\Products\Forms\YandexMarketFilter\YandexMarketProductsFilterDTO;
 use BaksDev\Yandex\Market\Products\Repository\AllProductsWithYandexMarketImage\AllProductsWithYandexMarketImagesInterface;
 use BaksDev\Yandex\Market\Products\Repository\AllProductsWithYandexMarketImage\AllProductsWithYandexMarketImagesResult;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group yandex-market-products
- * @group yandex-market-products-repository
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 final class AllProductsWithYandexMarketImagesTest extends KernelTestCase
 {
     public function testFindAll(): void

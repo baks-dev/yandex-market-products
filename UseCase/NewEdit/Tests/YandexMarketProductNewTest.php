@@ -35,6 +35,7 @@ use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductCus
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductDTO;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductHandler;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -46,11 +47,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 
-/**
- * @group yandex-market-products
- * @group yandex-market-products-use-case
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 final class YandexMarketProductNewTest extends KernelTestCase
 {
     public static function setUpBeforeClass(): void

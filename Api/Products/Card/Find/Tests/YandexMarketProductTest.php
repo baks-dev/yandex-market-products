@@ -30,13 +30,12 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCardRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group yandex-market-products
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 final class YandexMarketProductTest extends KernelTestCase
 {
     private static YaMarketAuthorizationToken $Authorization;

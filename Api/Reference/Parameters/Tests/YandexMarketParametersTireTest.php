@@ -33,13 +33,12 @@ use BaksDev\Yandex\Market\Products\Mapper\Params\Tire\ColorYaMarketProductParams
 use BaksDev\Yandex\Market\Products\Mapper\Params\YaMarketProductParamsCollection;
 use BaksDev\Yandex\Market\Products\Mapper\Params\YaMarketProductParamsInterface;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group yandex-market-products
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 final class YandexMarketParametersTireTest extends KernelTestCase
 {
     private static YaMarketAuthorizationToken $Authorization;

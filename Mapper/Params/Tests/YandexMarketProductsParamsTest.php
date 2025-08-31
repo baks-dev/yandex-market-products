@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +26,12 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Mapper\Params\Tests;
 
 use BaksDev\Yandex\Market\Products\Mapper\Properties\ParameterValuesYaMarketProductProperty;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group yandex-market-products
- * @group yandex-market-products-params-tire
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 class YandexMarketProductsParamsTest extends KernelTestCase
 {
     public function testUseCase(): void

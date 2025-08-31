@@ -26,15 +26,12 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Controller\Admin\Custom\Tests;
 
 use BaksDev\Users\User\Tests\TestUserAccount;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group yandex-market-products
- * @group yandex-market-products-controller
- * @group yandex-market-products-controller-index
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 final class YandexMarketProductsIndexControllerTest extends WebTestCase
 {
     private const string URL = '/admin/ya/market/custom';

@@ -30,11 +30,8 @@ use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group yandex-market-products
- */
-#[Group('yandex-market-products')]
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 class YandexProductImageIdentifierByNameTest extends KernelTestCase
 {
     public function testUseCase(): void

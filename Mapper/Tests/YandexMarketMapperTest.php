@@ -29,13 +29,12 @@ use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentif
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Mapper\YandexMarketMapper;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group yandex-market-products
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 class YandexMarketMapperTest extends KernelTestCase
 {
     public function testUseCase(): void

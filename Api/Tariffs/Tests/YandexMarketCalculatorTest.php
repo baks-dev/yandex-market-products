@@ -29,13 +29,12 @@ use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group yandex-market-calculator-test
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 class YandexMarketCalculatorTest extends KernelTestCase
 {
     private static YaMarketAuthorizationToken $Authorization;

@@ -36,12 +36,8 @@ use ReflectionMethod;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
-/**
- * @group yandex-market-products
- */
-#[Group('yandex-market-products')]
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 class YandexMarketProductImageLocalRepositoryTest extends KernelTestCase
 {
     public function testUseCase(): void

@@ -27,15 +27,12 @@ namespace BaksDev\Yandex\Market\Products\Controller\Admin\Custom\Tests;
 
 use BaksDev\Products\Product\Type\Invariable\ProductInvariableUid;
 use BaksDev\Users\User\Tests\TestUserAccount;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group yandex-market-products
- * @group yandex-market-products-controller
- * @group yandex-market-products-controller-edit
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 final class YandexMarketProductsNewEditControllerTest extends WebTestCase
 {
     private const string URL = '/admin/ya/market/custom/edit/'.ProductInvariableUid::TEST;

@@ -33,21 +33,19 @@ use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductCus
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductDTO;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductHandler;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DependsOnClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 
-/**
- * @group yandex-market-products
- * @group yandex-market-products-use-case
- *
- * @depends BaksDev\Yandex\Market\Products\UseCase\NewEdit\Tests\YandexMarketProductNewTest::class
- */
 #[When(env: 'test')]
+#[Group('yandex-market-products')]
 final class YandexMarketProductEditTest extends KernelTestCase
 {
+    #[DependsOnClass(YandexMarketProductNewTest::class)]
     public function testEdit(): void
     {
         /** @var ContainerBagInterface $containerBag */

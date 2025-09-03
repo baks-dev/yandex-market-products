@@ -106,7 +106,7 @@ final readonly class YaMarketProductsCardUpdateDispatcher
              */
 
             $Deduplicator = $this->deduplicator
-                ->namespace('module-name')
+                ->namespace('yandex-market-products')
                 ->expiresAfter('5 seconds')
                 ->deduplication([
                     $message->getProduct(),

@@ -131,7 +131,7 @@ class YandexProductImageRepackWebpCommand extends Command
 
             $CDNUploadImageMessage = new CDNUploadImageMessage(
                 $YandexMarketProductImage,
-                OzonProductCustomImage::class,
+                YandexMarketProductCustomImage::class,
                 $dirName,
             );
 

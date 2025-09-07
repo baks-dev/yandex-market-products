@@ -109,6 +109,11 @@ class YandexProductImageRepackWebpCommand extends Command
         $upload[] = $TABLE;
         $uploadDir = implode(DIRECTORY_SEPARATOR, $upload);
 
+        if(false === is_dir($uploadDir))
+        {
+            return Command::SUCCESS;
+        }
+
         $iterator = new RecursiveDirectoryIterator($uploadDir, FilesystemIterator::SKIP_DOTS);
 
         /** @var SplFileInfo $info */

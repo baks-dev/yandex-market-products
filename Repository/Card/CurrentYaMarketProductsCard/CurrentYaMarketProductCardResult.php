@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard;
 
 use BaksDev\Products\Product\Entity\Property\ProductProperty;
+use BaksDev\Products\Product\Repository\ProductPriceResultInterface;
 use BaksDev\Products\Product\Type\Id\ProductUid;
 use BaksDev\Products\Product\Type\Offers\ConstId\ProductOfferConst;
 use BaksDev\Products\Product\Type\Offers\Variation\ConstId\ProductVariationConst;
@@ -36,7 +37,7 @@ use BaksDev\Reference\Money\Type\Money;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see CurrentYaMarketProductCardResult */
-final class CurrentYaMarketProductCardResult
+final class CurrentYaMarketProductCardResult implements ProductPriceResultInterface
 {
 
     private array|false|null $properties = null;
@@ -100,6 +101,9 @@ final class CurrentYaMarketProductCardResult
         private readonly ?string $barcode, // " => "2744610541511"
 
         private ?string $project_discount = null, // " => 0
+
+        private ?bool $promotion_active = null,
+        private string|int|null $promotion_price = null,
 
     ) {}
 
@@ -391,13 +395,18 @@ final class CurrentYaMarketProductCardResult
 
         $price = new Money($this->product_price, true);
 
-        /**
-         * Применяем настройки цены профиля проекта к стоимости товара
-         */
+        /** Акция/наценка магазина (promotion) */
+        if(false === empty($this->promotion_price) && true === $this->promotion_active)
+        {
+            $price->applyString($this->promotion_price);
+        }
+
+        /** Торговая наценка/скидка профиля магазина */
         if(false === empty($this->project_discount))
         {
             $price->applyString($this->project_discount);
         }
+
 
         return $price;
     }

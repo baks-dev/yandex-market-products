@@ -30,6 +30,7 @@ use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentif
 use BaksDev\Yandex\Market\Messenger\YaMarketTokenMessage;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
+use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -79,10 +80,25 @@ final readonly class UpdatePriceByChangeYaMarketTokenHandler
                     $ProductsIdentifierResult->getProductModificationConst(),
                 );
 
+                /**
+                 * Обновляем стоимость
+                 */
+
                 $YaMarketProductsPriceMessage = new YaMarketProductsPriceMessage($YaMarketProductsCardMessage);
 
                 $this->messageDispatch->dispatch(
                     message: $YaMarketProductsPriceMessage,
+                    transport: $UserProfileUid.'-low',
+                );
+
+                /**
+                 * Обновляем остатки на случай остановки продаж
+                 */
+
+                $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
+
+                $this->messageDispatch->dispatch(
+                    message: $YaMarketProductsStocksMessage,
                     transport: $UserProfileUid.'-low',
                 );
             }

@@ -82,7 +82,7 @@ final readonly class UpdateYaMarketCardByChangeProduct
                 /** Транспорт LOW чтобы не мешать общей очереди */
                 $this->messageDispatch->dispatch(
                     message: $YaMarketProductsCardMessage,
-                    transport: (string) $UserProfileUid.'-low',
+                    transport: $UserProfileUid.'-low',
                 );
             }
         }

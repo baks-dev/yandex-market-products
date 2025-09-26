@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Messenger;
 
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
@@ -49,6 +50,7 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
         private CurrentProductIdentifierInterface $currentProductIdentifier,
         private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private MessageDispatchInterface $messageDispatch,
+        private DeduplicatorInterface $deduplicator
     ) {}
 
 
@@ -75,6 +77,29 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
         {
             return;
         }
+
+
+        /** Дедубликатор изменения статусов (обновляем только один раз в сутки на статус) */
+
+        $Deduplicator = $this->deduplicator
+            ->namespace('ozon-products')
+            ->expiresAfter('1 day')
+            ->deduplication([
+                (string) $message->getId(),
+                $OrderEvent->getStatus()->getOrderStatusValue(),
+                self::class,
+            ]);
+
+        if($Deduplicator->isExecuted())
+        {
+            return;
+        }
+
+        $Deduplicator->save();
+
+        /**
+         * Обновляем остатки
+         */
 
         $EditOrderDTO = new EditOrderDTO();
         $OrderEvent->getDto($EditOrderDTO);
@@ -109,7 +134,7 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
 
                 $this->messageDispatch->dispatch(
                     message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
-                    stamps: [new MessageDelay('3 seconds')],
+                    stamps: [new MessageDelay('5 seconds')],
                     transport: (string) $UserProfileUid,
                 );
             }

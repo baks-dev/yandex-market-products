@@ -125,7 +125,7 @@ final readonly class YaMarketProductsStocksUpdate
                 );
 
                 $this->logger->critical(sprintf(
-                    'Пробуем обновить остатки артикула %s через 10 секунд',
+                    'Пробуем обновить остатки артикула %s через 30 секунд',
                     $CurrentYaMarketProductCardResult->getArticle(),
                 ));
 

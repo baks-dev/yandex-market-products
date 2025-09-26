@@ -120,12 +120,12 @@ final readonly class YaMarketProductsStocksUpdate
             {
                 $this->messageDispatch->dispatch(
                     message: $message,
-                    stamps: [new MessageDelay('5 seconds')],
+                    stamps: [new MessageDelay('30 seconds')],
                     transport: $message->getProfile().'-low',
                 );
 
                 $this->logger->critical(sprintf(
-                    'Пробуем обновить остатки артикула %s через 5 секунд',
+                    'Пробуем обновить остатки артикула %s через 10 секунд',
                     $CurrentYaMarketProductCardResult->getArticle(),
                 ));
 

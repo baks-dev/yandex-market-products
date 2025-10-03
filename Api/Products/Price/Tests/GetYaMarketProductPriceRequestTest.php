@@ -41,6 +41,7 @@ final class GetYaMarketProductPriceRequestTest extends KernelTestCase
 
     public static function setUpBeforeClass(): void
     {
+        /** @see .env.test */
         self::$Authorization = new YaMarketAuthorizationToken(
             profile: UserProfileUid::TEST,
             token: $_SERVER['TEST_YANDEX_MARKET_TOKEN'],
@@ -59,10 +60,12 @@ final class GetYaMarketProductPriceRequestTest extends KernelTestCase
         $GetYaMarketProductPriceRequest
             ->TokenHttpClient(self::$Authorization);
 
+        /** @see .env.test */
         $result = $GetYaMarketProductPriceRequest
-            ->article('WL-SPORTRS-16-205-45-87W')
+            ->article($_SERVER['TEST_ARTICLE'] ?? 'article')
             ->find();
 
+        // dd($result);
 
         self::assertFalse(false);
 

@@ -35,14 +35,32 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 final class GetYaMarketProductStocksRequest extends YandexMarket
 {
+    private int $total = 0;
+
+    private int $reserve = 0;
+
     private ?string $article = null;
 
     public function article(string $article): self
     {
+        /** Обнуляем остатки и зарезервированные */
+        $this->total = 0;
+        $this->reserve = 0;
+
+        /** Присваиваем артикул */
         $this->article = $article;
         return $this;
     }
 
+    public function getTotal(): int
+    {
+        return $this->total;
+    }
+
+    public function getReserve(): int
+    {
+        return $this->reserve;
+    }
 
     /**
      *
@@ -53,7 +71,7 @@ final class GetYaMarketProductStocksRequest extends YandexMarket
      * @see https://yandex.ru/dev/market/partner-api/doc/ru/reference/stocks/getStocks
      *
      */
-    public function find(): int|bool
+    public function find(): self|bool
     {
         if(empty($this->article))
         {
@@ -65,7 +83,7 @@ final class GetYaMarketProductStocksRequest extends YandexMarket
          */
         if($this->isStocks() === false)
         {
-            return true;
+            //return true;
         }
 
         $cache = $this->getCacheInit('yandex-market-products');
@@ -101,29 +119,42 @@ final class GetYaMarketProductStocksRequest extends YandexMarket
 
         if(empty($warehouses))
         {
-            return 0;
+            $this->total = 0;
+            $this->reserve = 0;
+
+            return $this;
         }
 
         $stocks = current($warehouses['offers'])['stocks'];
 
         if(empty($stocks))
         {
-            return 0;
+            $this->total = 0;
+            $this->reserve = 0;
+
+            return $this;
         }
 
-        /** Получаем остаток «Доступный к заказу» */
+        /**
+         * Получаем остаток «Доступный к заказу»
+         */
         $available = array_filter($stocks, static function($v) {
             return $v['type'] === 'AVAILABLE';
         });
 
-        if(empty($available))
-        {
-            return 0;
-        }
+        $this->total = empty($available) ? 0 : (int) current($available)['count'];
 
-        $available = current($available);
 
-        return $available['count'];
+        /**
+         * Получаем зарезервированный остаток
+         */
+        $freeze = array_filter($stocks, static function($v) {
+            return $v['type'] === 'FREEZE';
+        });
 
+        $this->reserve = empty($freeze) ? 0 : (int) current($freeze)['count'];
+
+
+        return $this;
     }
 }

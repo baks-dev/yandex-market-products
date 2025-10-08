@@ -100,7 +100,7 @@ final class CurrentYaMarketProductCardResult implements ProductPriceResultInterf
         private readonly ?string $article, // " => "TR257-15-235-70-107H"
         private readonly ?string $barcode, // " => "2744610541511"
 
-        private ?string $project_discount = null, // " => 0
+        private string|null $project_discount = null, // " => 0
 
         private ?bool $promotion_active = null,
         private string|int|null $promotion_price = null,

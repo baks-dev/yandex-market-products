@@ -32,7 +32,6 @@ use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
-use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCardRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Price\GetYaMarketProductPriceRequest;
 use BaksDev\Yandex\Market\Products\Api\Products\Price\UpdateYaMarketProductPriceRequest;
 use BaksDev\Yandex\Market\Products\Api\Tariffs\YandexMarketCalculatorRequest;
@@ -52,7 +51,6 @@ final readonly class YaMarketProductsPriceUpdate
     public function __construct(
         #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
         private YandexMarketCalculatorRequest $marketCalculatorRequest,
-        private YaMarketProductFindCardRequest $yandexMarketProductRequest,
         private UpdateYaMarketProductPriceRequest $marketProductPriceRequest,
         private CurrentYaMarketProductCardInterface $marketProductsCard,
         private MessageDispatchInterface $messageDispatch,

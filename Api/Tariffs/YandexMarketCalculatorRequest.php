@@ -184,7 +184,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
             if($response->getStatusCode() !== 200)
             {
                 $this->logger->critical(
-                    'yandex-market-products: Ошибка при получении стоимости услуг',
+                    sprintf('yandex-market-products: Ошибка %s при получении стоимости услуг', $response->getStatusCode()),
                     [$content, self::class.':'.__LINE__],
                 );
 

@@ -28,22 +28,21 @@ namespace BaksDev\Yandex\Market\Products\Schedule;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
-use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
-use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksUpdate;
+use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 /**
- * Обновляем цены
- * #midnight - каждый день между 00:00 и 2:59
+ * Обновляем остатки
+ * #hourly - в какую-то минуту каждый час
  *
- * @see YaMarketProductsStocksUpdate
+ * @see YaMarketProductsPriceUpdate
  * @see https://symfony.com/doc/current/scheduler.html#cron-expression-triggers
  */
-#[AsCronTask('#midnight', jitter: 60)]
-final readonly class UpdateYandexProductPriceCron
+#[AsCronTask('#hourly', jitter: 60)] // каждый час
+final readonly class UpdateYandexProductStocksCron
 {
     public function __construct(
         #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
@@ -98,7 +97,7 @@ final readonly class UpdateYandexProductPriceCron
                     $ProductsIdentifierResult->getProductModificationConst(),
                 );
 
-                $YaMarketProductsStocksMessage = new YaMarketProductsPriceMessage($YaMarketProductsCardMessage);
+                $YaMarketProductsStocksMessage = new YaMarketProductsStocksMessage($YaMarketProductsCardMessage);
 
                 $this->messageDispatch->dispatch(
                     message: $YaMarketProductsStocksMessage,

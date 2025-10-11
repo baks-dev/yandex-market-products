@@ -37,10 +37,11 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 /**
  * Обновляем цены
+ *
  * #midnight - каждый день между 00:00 и 2:59
  *
- * @see YaMarketProductsStocksUpdate
  * @see https://symfony.com/doc/current/scheduler.html#cron-expression-triggers
+ * @see YaMarketProductsStocksUpdate
  */
 #[AsCronTask('#midnight', jitter: 60)]
 final readonly class UpdateYandexProductPriceCron

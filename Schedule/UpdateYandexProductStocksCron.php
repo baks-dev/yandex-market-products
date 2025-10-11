@@ -36,9 +36,10 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 /**
  * Обновляем остатки
+ *
  * #hourly - в какую-то минуту каждый час
  *
- * @see YaMarketProductsPriceUpdate
+ * @see YaMarketProductsStocksMessage
  * @see https://symfony.com/doc/current/scheduler.html#cron-expression-triggers
  */
 #[AsCronTask('#hourly', jitter: 60)] // каждый час

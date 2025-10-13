@@ -190,7 +190,7 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
                 if($response->getStatusCode() === 420)
                 {
-                    sleep(1);
+                    sleep(30);
                 }
 
                 return false;

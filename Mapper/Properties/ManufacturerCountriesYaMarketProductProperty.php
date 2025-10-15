@@ -111,7 +111,7 @@ final class ManufacturerCountriesYaMarketProductProperty implements YaMarketProd
         {
             if($filter->value === 'kr')
             {
-                return 'Южная Корея';
+                return ['Южная Корея', 'Республика Корея'];
             }
 
             return [$this->translator->trans($filter->value, domain: 'field-country')];

@@ -85,10 +85,10 @@ final class CurrentYaMarketProductCardResult implements ProductPriceResultInterf
         // "product_img_root": true|false}]"
 
         private readonly ?string $product_images_custom,
-        private readonly ?string $product_images_modification,
-        private readonly ?string $product_images_variation,
-        private readonly ?string $product_images_offer,
-        private readonly ?string $product_images,
+        private ?string $product_images_modification,
+        private ?string $product_images_variation,
+        private ?string $product_images_offer,
+        private ?string $product_images,
 
 
         private readonly ?int $product_price, // " => 670000
@@ -338,6 +338,31 @@ final class CurrentYaMarketProductCardResult implements ProductPriceResultInterf
             return $this->images;
         }
 
+        /** Если имеется коллекция кастомных изображений - снимаем ROOT с изображений карточки */
+
+        if(false === empty($this->product_images_custom))
+        {
+            if(false === empty($this->product_images_modification))
+            {
+                $this->product_images_modification = str_replace('"product_img_root": true', '"product_img_root": false', $this->product_images_modification);
+            }
+
+            if(false === empty($this->product_images_variation))
+            {
+                $this->product_images_variation = str_replace('"product_img_root": true', '"product_img_root": false', $this->product_images_variation);
+            }
+
+            if(false === empty($this->product_images_offer))
+            {
+                $this->product_images_offer = str_replace('"product_img_root": true', '"product_img_root": false', $this->product_images_offer);
+            }
+
+            if(false === empty($this->product_images))
+            {
+                $this->product_images = str_replace('"product_img_root": true', '"product_img_root": false', $this->product_images);
+            }
+        }
+
         $collection = [
             $this->product_images_custom,
             $this->product_images_modification,
@@ -345,7 +370,6 @@ final class CurrentYaMarketProductCardResult implements ProductPriceResultInterf
             $this->product_images_offer,
             $this->product_images,
         ];
-
 
         foreach($collection as $images)
         {

@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Schedule;
 
+use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
@@ -33,6 +34,7 @@ use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMark
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 /**
@@ -87,7 +89,7 @@ final readonly class UpdateYandexProductPriceCron
 
         $profiles = iterator_to_array($profiles);
 
-        foreach($products as $ProductsIdentifierResult)
+        foreach($products as $stamps => $ProductsIdentifierResult)
         {
             foreach($profiles as $UserProfileUid)
             {
@@ -103,6 +105,7 @@ final readonly class UpdateYandexProductPriceCron
 
                 $this->messageDispatch->dispatch(
                     message: $YaMarketProductsStocksMessage,
+                    stamps: [new MessageDelay(sprintf('%s minutes', $stamps))],
                     transport: $UserProfileUid.'-low',
                 );
             }

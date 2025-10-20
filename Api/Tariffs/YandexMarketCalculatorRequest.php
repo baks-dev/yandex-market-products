@@ -134,6 +134,10 @@ final class YandexMarketCalculatorRequest extends YandexMarket
             }
         }
 
+        /** Присваиваем торговую наценку для расчета стоимости услуг */
+        $trade = $this->getPercent();
+        $this->price->applyString($trade);
+
         $key = md5(
             $this->getCompany().
             $this->category.
@@ -151,9 +155,6 @@ final class YandexMarketCalculatorRequest extends YandexMarket
 
             $item->expiresAfter(DateInterval::createFromDateString('50 seconds'));
 
-            /** Присваиваем торговую наценку для расчета стоимости услуг */
-            $trade = $this->getPercent();
-            $this->price->applyString($trade);
 
             $response = $this->TokenHttpClient()
                 ->request(

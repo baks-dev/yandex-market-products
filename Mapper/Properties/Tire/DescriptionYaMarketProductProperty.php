@@ -180,22 +180,22 @@ final class DescriptionYaMarketProductProperty implements YaMarketProductPropert
         }
 
 
-        $name .= '<br>';
+        $name .= PHP_EOL.PHP_EOL;
         $name .= $data->getProductPreview();
 
         if($data->getProductVariationValue())
         {
-            $name .= '<br>';
+            $name .= PHP_EOL.PHP_EOL;
             $name .= sprintf('Ширина профиля %s обеспечивает надежное сцепление с дорогой и стабильность на поворотах.', $data->getProductVariationValue());
         }
 
         if($data->getProductModificationValue())
         {
-            $name .= '<br>';
+            $name .= PHP_EOL.PHP_EOL;
             $name .= sprintf('Высота профиля %s обеспечивает оптимальное сочетание комфорта и управляемости.', $data->getProductModificationValue());
         }
 
-        return empty($name) ? null : trim($name);
+        return empty($name) ? null : trim(strip_tags($name));
 
     }
 }

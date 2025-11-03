@@ -140,7 +140,6 @@ class ClearYaMarketProductsCardsCommand extends Command
             /** Получаем все карточки YandexMarket по тегу */
             $findProductYandexMarketRequest = $this
                 ->findProductYandexMarketRequest
-                ->profile($profile)
                 ->forTag($article['article']);
 
             while(true)
@@ -160,7 +159,6 @@ class ClearYaMarketProductsCardsCommand extends Command
                     {
                         /** Удаляем на YandexMarket отсутствующую карточку */
                         $this->yandexMarketProductDeleteRequest
-                            ->profile($profile)
                             ->delete($card->getArticle());
 
                         $this->io->text(sprintf('Удаляем артикул %s', $card->getArticle()));

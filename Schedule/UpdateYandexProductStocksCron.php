@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Yandex\Market\Products\Schedule;
 
+use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
@@ -102,6 +103,7 @@ final readonly class UpdateYandexProductStocksCron
 
                 $this->messageDispatch->dispatch(
                     message: $YaMarketProductsStocksMessage,
+                    stamps: [new MessageDelay('1 hour')],
                     transport: $UserProfileUid.'-low',
                 );
             }

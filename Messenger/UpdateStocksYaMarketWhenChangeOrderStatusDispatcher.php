@@ -32,7 +32,7 @@ use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\UseCase\Admin\Edit\EditOrderDTO;
 use BaksDev\Orders\Order\UseCase\Admin\Edit\Products\OrderProductDTO;
-use BaksDev\Products\Product\Repository\CurrentProductIdentifier\CurrentProductIdentifierInterface;
+use BaksDev\Products\Product\Repository\CurrentProductIdentifier\CurrentProductIdentifierByEventInterface;
 use BaksDev\Products\Product\Repository\CurrentProductIdentifier\CurrentProductIdentifierResult;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
@@ -47,7 +47,7 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
 {
     public function __construct(
         private CurrentOrderEventInterface $CurrentOrderEvent,
-        private CurrentProductIdentifierInterface $currentProductIdentifier,
+        private CurrentProductIdentifierByEventInterface $currentProductIdentifier,
         private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private MessageDispatchInterface $messageDispatch,
         private DeduplicatorInterface $deduplicator

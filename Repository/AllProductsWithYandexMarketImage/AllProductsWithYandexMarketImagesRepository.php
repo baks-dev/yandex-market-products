@@ -28,7 +28,6 @@ namespace BaksDev\Yandex\Market\Products\Repository\AllProductsWithYandexMarketI
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Paginator\PaginatorInterface;
-use BaksDev\Elastic\Api\Index\ElasticGetIndex;
 use BaksDev\Products\Category\Entity\CategoryProduct;
 use BaksDev\Products\Category\Entity\Info\CategoryProductInfo;
 use BaksDev\Products\Category\Entity\Offers\CategoryProductOffers;
@@ -510,47 +509,6 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
 
         if($this->search?->getQuery())
         {
-            /** Поиск по модификации */
-            //            $result = $this->elasticGetIndex ? $this->elasticGetIndex->handle(
-            //                ProductModification::class,
-            //                $this->search->getQuery(),
-            //                1,
-            //            ) : false;
-            //
-            //            if($result)
-            //            {
-            //                $counter = $result['hits']['total']['value'];
-            //
-            //                if($counter)
-            //                {
-            //                    /** Идентификаторы */
-            //                    $data = array_column($result['hits']['hits'], "_source");
-            //
-            //                    $dbal
-            //                        ->createSearchQueryBuilder($this->search)
-            //                        ->addSearchInArray('product_modification.id', array_column($data, "id"));
-            //
-            //                    return $this->paginator->fetchAllAssociative($dbal);
-            //                }
-            //
-            //                /** Поиск по продукции */
-            //                $result = $this->elasticGetIndex->handle(Product::class, $this->search->getQuery(), 1);
-            //
-            //                $counter = $result['hits']['total']['value'];
-            //
-            //                if($counter)
-            //                {
-            //                    /** Идентификаторы */
-            //                    $data = array_column($result['hits']['hits'], "_source");
-            //
-            //                    $dbal
-            //                        ->createSearchQueryBuilder($this->search)
-            //                        ->addSearchInArray('product.id', array_column($data, "id"));
-            //
-            //                    return $this->paginator->fetchAllAssociative($dbal);
-            //                }
-            //            }
-
             $dbal
                 ->createSearchQueryBuilder($this->search)
                 ->addSearchEqualUid('account.id')

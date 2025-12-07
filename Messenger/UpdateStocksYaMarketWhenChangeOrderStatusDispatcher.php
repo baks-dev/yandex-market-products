@@ -28,6 +28,7 @@ namespace BaksDev\Yandex\Market\Products\Messenger;
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\UseCase\Admin\Edit\EditOrderDTO;
@@ -73,11 +74,10 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
             ->forOrder($message->getId())
             ->find();
 
-        if($OrderEvent === false)
+        if(false === ($OrderEvent instanceof OrderEvent))
         {
             return;
         }
-
 
         /** Дедубликатор изменения статусов (обновляем только один раз в сутки на статус) */
 

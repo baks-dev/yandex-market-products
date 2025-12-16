@@ -137,6 +137,16 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
                     stamps: [new MessageDelay('5 seconds')],
                     transport: (string) $UserProfileUid,
                 );
+
+
+                /** Дополнительно пробуем обновить (на случай если остатки еще не успели пересчитаться) */
+
+                $this->messageDispatch->dispatch(
+                    message: new YaMarketProductsStocksMessage($YaMarketProductsCardMessage),
+                    stamps: [new MessageDelay('15 seconds')],
+                    transport: (string) $UserProfileUid,
+                );
+
             }
         }
     }

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -34,13 +34,13 @@ use Symfony\Component\DependencyInjection\Attribute\When;
 #[Group('yandex-market-products')]
 class YandexMarketProductsParamsTest extends KernelTestCase
 {
+    /** @todo */
     public function testUseCase(): void
     {
         /** @var ParameterValuesYaMarketProductProperty $ParameterValuesYaMarketProductProperty */
         //$ParameterValuesYaMarketProductProperty = self::getContainer()->get(ParameterValuesYaMarketProductProperty::class);
         //$params = $ParameterValuesYaMarketProductProperty->getData(new YaMarketProductsCardUid('018f3ff4-ceda-71dc-b0d6-b47b4c929c38'));
 
-        // dd($params);
         //self::assertNotNull($params);
 
         self::assertTrue(true);

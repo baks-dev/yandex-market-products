@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Repository\YandexProductImageIdentifierByName\Tests;
 
 use BaksDev\Yandex\Market\Products\Repository\YandexProductImageIdentifierByName\YandexMarketProductImageIdentifierByNameInterface;
+use BaksDev\Yandex\Market\Products\Type\Image\YandexMarketProductImageUid;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
@@ -39,9 +40,8 @@ class YandexProductImageIdentifierByNameTest extends KernelTestCase
         /** @var YandexMarketProductImageIdentifierByNameInterface $YandexMarketProductImageIdentifierByNameRepository */
         $YandexMarketProductImageIdentifierByNameRepository = self::getContainer()->get(YandexMarketProductImageIdentifierByNameInterface::class);
 
-        $YandexMarketProductImageUid = $YandexMarketProductImageIdentifierByNameRepository->find('d6ab4d1e531612148b4708dc1baf50cd');
-
-        // dd($YandexMarketProductImageUid);
+        $YandexMarketProductImageUid = $YandexMarketProductImageIdentifierByNameRepository
+            ->find(YandexMarketProductImageUid::TEST);
 
         self::assertTrue(true);
 

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,11 @@ use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentif
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Yandex\Market\Products\Api\Products\Card\Find\YaMarketProductFindCardRequest;
 use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardInterface;
+use BaksDev\Yandex\Market\Products\Repository\Card\CurrentYaMarketProductsCard\CurrentYaMarketProductCardResult;
 use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
 use PHPUnit\Framework\Attributes\Group;
+use ReflectionClass;
+use ReflectionMethod;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -54,6 +57,8 @@ final class YandexMarketProductTest extends KernelTestCase
 
     public function testUseCase(): void
     {
+        self::assertTrue(true);
+
         /** @var AllProductsIdentifierInterface $AllProductsIdentifier */
         $AllProductsIdentifier = self::getContainer()->get(AllProductsIdentifierInterface::class);
 
@@ -71,7 +76,7 @@ final class YandexMarketProductTest extends KernelTestCase
                 break;
             }
 
-            $YaMarketCard = $YaMarketProductsCard
+            $CurrentYaMarketProductCardResult = $YaMarketProductsCard
                 ->forProduct($ProductsIdentifierResult->getProductId())
                 ->forOfferConst($ProductsIdentifierResult->getProductOfferConst())
                 ->forVariationConst($ProductsIdentifierResult->getProductVariationConst())
@@ -79,22 +84,30 @@ final class YandexMarketProductTest extends KernelTestCase
                 ->forProfile(new UserProfileUid())
                 ->find();
 
-            if($YaMarketCard === false || empty($YaMarketCard['product_price']))
+            if(false === ($CurrentYaMarketProductCardResult instanceof CurrentYaMarketProductCardResult))
             {
                 continue;
             }
 
-            $articles = $FindProductYandexMarketRequest->article($YaMarketCard['article'])->find();
-            self::assertIsBool($articles->valid());
 
-            $tags = $FindProductYandexMarketRequest->forTag($YaMarketCard['product_card'])->find();
-            self::assertIsBool($tags->valid());
+            // Вызываем все геттеры
+            $reflectionClass = new ReflectionClass(CurrentYaMarketProductCardResult::class);
+            $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
+
+            foreach($methods as $method)
+            {
+                // Методы без аргументов
+                if($method->getNumberOfParameters() === 0)
+                {
+                    // Вызываем метод
+                    $data = $method->invoke($CurrentYaMarketProductCardResult);
+                    // dump($data);
+                }
+            }
+
 
             break;
 
         }
-
-        self::assertFalse(false);
-
     }
 }

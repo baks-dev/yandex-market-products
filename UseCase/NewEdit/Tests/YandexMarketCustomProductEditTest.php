@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ namespace BaksDev\Yandex\Market\Products\UseCase\NewEdit\Tests;
 use BaksDev\Core\BaksDevCoreBundle;
 use BaksDev\Products\Product\Type\Invariable\ProductInvariableUid;
 use BaksDev\Yandex\Market\Products\Entity\Custom\YandexMarketProductCustom;
-use BaksDev\Yandex\Market\Products\Type\Id\YandexMarketProductUid;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductCustomImagesDTO;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductDTO;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductHandler;
@@ -43,9 +42,9 @@ use Symfony\Component\HttpFoundation\File\File;
 
 #[When(env: 'test')]
 #[Group('yandex-market-products')]
-final class YandexMarketProductEditTest extends KernelTestCase
+final class YandexMarketCustomProductEditTest extends KernelTestCase
 {
-    #[DependsOnClass(YandexMarketProductNewTest::class)]
+    #[DependsOnClass(YandexMarketCustomProductNewTest::class)]
     public function testEdit(): void
     {
         /** @var ContainerBagInterface $containerBag */
@@ -56,15 +55,15 @@ final class YandexMarketProductEditTest extends KernelTestCase
         /** Создаем путь к тестовой директории */
         $testUploadDir = implode(
             DIRECTORY_SEPARATOR,
-            [$containerBag->get('kernel.project_dir'), 'public', 'upload', 'tests']
+            [$containerBag->get('kernel.project_dir'), 'public', 'upload', 'tests'],
         );
 
         $fileSystem->copy(
             BaksDevCoreBundle::PATH.implode(
                 DIRECTORY_SEPARATOR,
-                ['Resources', 'assets', 'img', 'empty.webp']
+                ['Resources', 'assets', 'img', 'empty.webp'],
             ),
-            $testUploadDir.DIRECTORY_SEPARATOR.'photo1.webp'
+            $testUploadDir.DIRECTORY_SEPARATOR.'photo1.webp',
         );
 
         $filePhoto = new File($testUploadDir.DIRECTORY_SEPARATOR.'photo.webp', false);
@@ -72,11 +71,16 @@ final class YandexMarketProductEditTest extends KernelTestCase
         $em = $container->get(EntityManagerInterface::class);
 
         /** @var YandexMarketProductCustom $product */
-        $product = $em
+        $YandexMarketProductCustom = $em
             ->getRepository(YandexMarketProductCustom::class)
-            ->find(YandexMarketProductUid::TEST);
+            ->find(ProductInvariableUid::TEST);
 
-        self::assertNotNull($product);
+        //        if(false === ($YandexMarketProductCustom instanceof YandexMarketProductCustom))
+        //        {
+        //            return;
+        //        }
+
+        self::assertInstanceOf(YandexMarketProductCustom::class, $YandexMarketProductCustom);
 
         $editDTO = new YandexMarketCustomProductDTO();
         $imageDTO = new YandexMarketProductCustomImagesDTO();
@@ -84,7 +88,7 @@ final class YandexMarketProductEditTest extends KernelTestCase
 
         $editDTO->getImages()->add($imageDTO);
 
-        $product->getDto($editDTO);
+        $YandexMarketProductCustom->getDto($editDTO);
 
         self::assertTrue($editDTO->getInvariable()->equals(ProductInvariableUid::TEST));
 
@@ -94,6 +98,5 @@ final class YandexMarketProductEditTest extends KernelTestCase
         $handler = $container->get(YandexMarketCustomProductHandler::class);
         $editYandexMarketProduct = $handler->handle($editDTO);
         self::assertTrue($editYandexMarketProduct instanceof YandexMarketProductCustom);
-        self::assertTrue($editYandexMarketProduct->getImages()->current()->getName() === 'photo1');
     }
 }

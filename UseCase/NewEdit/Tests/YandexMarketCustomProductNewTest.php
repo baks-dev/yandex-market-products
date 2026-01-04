@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ use BaksDev\Core\BaksDevCoreBundle;
 use BaksDev\Products\Product\Type\Invariable\ProductInvariableUid;
 use BaksDev\Yandex\Market\Products\Entity\Custom\Images\YandexMarketProductCustomImage;
 use BaksDev\Yandex\Market\Products\Entity\Custom\YandexMarketProductCustom;
-use BaksDev\Yandex\Market\Products\Type\Id\YandexMarketProductUid;
 use BaksDev\Yandex\Market\Products\Type\Image\YandexMarketProductImageUid;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\Images\YandexMarketProductCustomImagesDTO;
 use BaksDev\Yandex\Market\Products\UseCase\NewEdit\YandexMarketCustomProductDTO;
@@ -49,7 +48,7 @@ use Symfony\Component\HttpFoundation\File\File;
 
 #[When(env: 'test')]
 #[Group('yandex-market-products')]
-final class YandexMarketProductNewTest extends KernelTestCase
+final class YandexMarketCustomProductNewTest extends KernelTestCase
 {
     public static function setUpBeforeClass(): void
     {
@@ -63,7 +62,7 @@ final class YandexMarketProductNewTest extends KernelTestCase
 
         $yandexMarketProduct = $em
             ->getRepository(YandexMarketProductCustom::class)
-            ->findOneBy(['id' => YandexMarketProductUid::TEST]);
+            ->findOneBy(['invariable' => ProductInvariableUid::TEST]);
 
         if($yandexMarketProduct)
         {
@@ -72,7 +71,7 @@ final class YandexMarketProductNewTest extends KernelTestCase
 
         $yandexMarketProductImages = $em
             ->getRepository(YandexMarketProductCustomImage::class)
-            ->findBy(['market' => YandexMarketProductImageUid::TEST]);
+            ->findBy(['invariable' => ProductInvariableUid::TEST]);
 
         foreach($yandexMarketProductImages as $image)
         {
@@ -95,7 +94,7 @@ final class YandexMarketProductNewTest extends KernelTestCase
         /** Создаем путь к тестовой директории */
         $testUploadDir = implode(
             DIRECTORY_SEPARATOR,
-            [$containerBag->get('kernel.project_dir'), 'public', 'upload', 'tests']
+            [$containerBag->get('kernel.project_dir'), 'public', 'upload', 'tests'],
         );
 
         /** Проверяем существование директории для тестовых картинок */
@@ -112,9 +111,9 @@ final class YandexMarketProductNewTest extends KernelTestCase
         $fileSystem->copy(
             BaksDevCoreBundle::PATH.implode(
                 DIRECTORY_SEPARATOR,
-                ['Resources', 'assets', 'img', 'empty.webp']
+                ['Resources', 'assets', 'img', 'empty.webp'],
             ),
-            $testUploadDir.DIRECTORY_SEPARATOR.'photo.webp'
+            $testUploadDir.DIRECTORY_SEPARATOR.'photo.webp',
         );
 
         $filePhoto = new File($testUploadDir.DIRECTORY_SEPARATOR.'photo.webp', false);
@@ -147,7 +146,7 @@ final class YandexMarketProductNewTest extends KernelTestCase
          */
         $yandexMarketProductDTO = new YandexMarketCustomProductDTO();
 
-        $yandexMarketProductDTO->setInvariable(ProductInvariableUid::TEST);
+        $yandexMarketProductDTO->setInvariable(new ProductInvariableUid(ProductInvariableUid::TEST));
         self::assertTrue($yandexMarketProductDTO->getInvariable()->equals(ProductInvariableUid::TEST));
 
         $yandexMarketProductDTO->getImages()->add($image);

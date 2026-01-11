@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ use BaksDev\Products\Product\Repository\CurrentProductIdentifier\CurrentProductI
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
@@ -51,7 +52,8 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
         private CurrentProductIdentifierByEventInterface $currentProductIdentifier,
         private AllProfileYaMarketTokenInterface $allProfileYaMarketToken,
         private MessageDispatchInterface $messageDispatch,
-        private DeduplicatorInterface $deduplicator
+        private DeduplicatorInterface $deduplicator,
+        #[Autowire(env: 'PROJECT_PROFILE')] private ?string $PROJECT_PROFILE = null,
     ) {}
 
 
@@ -106,6 +108,12 @@ final readonly class UpdateStocksYaMarketWhenChangeOrderStatusDispatcher
 
         foreach($profiles as $UserProfileUid)
         {
+            /** Если указан профиль проекта - пропускаем остальные профили */
+            if(false === empty($this->PROJECT_PROFILE) && false === $UserProfileUid->equals($this->PROJECT_PROFILE))
+            {
+                continue;
+            }
+
             /** @var OrderProductDTO $product */
             foreach($EditOrderDTO->getProduct() as $product)
             {

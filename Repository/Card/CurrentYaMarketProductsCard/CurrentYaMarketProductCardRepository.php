@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,7 @@ use BaksDev\Products\Promotion\Entity\Event\Price\ProductPromotionPrice;
 use BaksDev\Products\Promotion\Entity\ProductPromotion;
 use BaksDev\Products\Stocks\BaksDevProductsStocksBundle;
 use BaksDev\Products\Stocks\Entity\Total\ProductStockTotal;
+use BaksDev\Users\Profile\UserProfile\Entity\Event\Discount\UserProfileDiscount;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\Info\UserProfileInfo;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
@@ -667,10 +668,6 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
         }
 
 
-
-
-
-
         /** Кастомные настройки продукта Яндекс Маркет  */
 
         $dbal
@@ -899,15 +896,24 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
         if($dbal->bindProjectProfile())
         {
             $dbal
-                ->addSelect('project_profile_info.discount AS project_discount')
-                ->leftJoin(
+                ->join(
                     'product',
-                    UserProfileInfo::class,
-                    'project_profile_info',
-                    'project_profile_info.profile = :project_profile',
+                    UserProfile::class,
+                    'project_profile',
+                    '
+                        project_profile.id = :'.$dbal::PROJECT_PROFILE_KEY,
+                );
+
+            $dbal
+                ->addSelect('project_profile_discount.value AS project_discount')
+                ->leftJoin(
+                    'project_profile',
+                    UserProfileDiscount::class,
+                    'project_profile_discount',
+                    '
+                        project_profile_discount.event = project_profile.event',
                 );
         }
-
 
         /**
          * Наличие продукции на складе
@@ -926,7 +932,6 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
             
                         AS product_quantity",
                 )
-
                 ->leftJoin(
                     'product_modification',
                     ProductStockTotal::class,

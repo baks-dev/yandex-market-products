@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -382,8 +382,6 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
         //        ;
 
 
-
-
         $dbal->leftJoin(
             'product_invariable',
             YandexMarketProductCustomImage::class,
@@ -456,8 +454,8 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'category_info',
                 '
                     category.event = category_info.event AND
-                    category_info.active IS TRUE',
-            );
+                    category_info.active IS TRUE
+                ');
 
         $dbal
             ->addSelect('category_trans.name AS category_name')

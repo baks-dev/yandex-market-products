@@ -452,10 +452,8 @@ final class AllProductsWithYandexMarketImagesRepository implements AllProductsWi
                 'product_category',
                 CategoryProductInfo::class,
                 'category_info',
-                '
-                    category.event = category_info.event AND
-                    category_info.active IS TRUE
-                ');
+                'category.event = category_info.event',
+            );
 
         $dbal
             ->addSelect('category_trans.name AS category_name')

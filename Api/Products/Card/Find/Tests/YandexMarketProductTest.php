@@ -69,7 +69,9 @@ final class YandexMarketProductTest extends KernelTestCase
         $FindProductYandexMarketRequest = self::getContainer()->get(YaMarketProductFindCardRequest::class);
         $FindProductYandexMarketRequest->TokenHttpClient(self::$Authorization);
 
-        foreach($AllProductsIdentifier->findAll() as $i => $ProductsIdentifierResult)
+        $products = $AllProductsIdentifier->findAll();
+
+        foreach($products as $i => $ProductsIdentifierResult)
         {
             if($i >= 100)
             {

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -93,7 +93,11 @@ final class IndexLoadYaMarketProductParams implements YaMarketProductParamsInter
             return null;
         }
 
-        $index = explode('/', $data->getProductModificationPostfix());
+        /** Разбиваем по пробелу постфикс и берем первое значение */
+        $postfix = explode(' ', $data->getProductModificationPostfix());
+        $postfix = current($postfix);
+
+        $index = explode('/', $postfix);
         $cleaned_int = filter_var(current($index), FILTER_SANITIZE_NUMBER_INT);
 
         if(false === empty($cleaned_int))

@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger;
+namespace BaksDev\Yandex\Market\Products;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDelay;

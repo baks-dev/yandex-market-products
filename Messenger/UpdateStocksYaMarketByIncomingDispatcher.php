@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Yandex\Market\Products\Messenger\ProductStocks;
+namespace BaksDev\Yandex\Market\Products\Messenger;
 
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;

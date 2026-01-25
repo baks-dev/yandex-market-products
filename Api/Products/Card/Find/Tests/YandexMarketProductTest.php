@@ -69,7 +69,9 @@ final class YandexMarketProductTest extends KernelTestCase
         $FindProductYandexMarketRequest = self::getContainer()->get(YaMarketProductFindCardRequest::class);
         $FindProductYandexMarketRequest->TokenHttpClient(self::$Authorization);
 
-        $products = $AllProductsIdentifier->findAll();
+        $products = $AllProductsIdentifier
+            ->forProfile(new UserProfileUid(UserProfileUid::TEST))
+            ->findAll();
 
         foreach($products as $i => $ProductsIdentifierResult)
         {

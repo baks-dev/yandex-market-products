@@ -48,7 +48,9 @@ class YandexMarketMapperTest extends KernelTestCase
         /** @var YandexMarketMapper $YandexMarketMapper */
         $YandexMarketMapper = self::getContainer()->get(YandexMarketMapper::class);
 
-        $products = $AllProductsIdentifier->findAll();
+        $products = $AllProductsIdentifier
+            ->forProfile(new UserProfileUid(UserProfileUid::TEST))
+            ->findAll();
 
         foreach($products as $key => $ProductsIdentifierResult)
         {

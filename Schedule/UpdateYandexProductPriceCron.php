@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -72,27 +72,28 @@ final readonly class UpdateYandexProductPriceCron
             return;
         }
 
-        /** Получаем список */
-
-        /* Получаем все имеющиеся карточки в системе */
-        $products = $this->AllProductsIdentifierRepository->findAll();
-
-        if(false === $products || false === $products->valid())
+        foreach($profiles as $UserProfileUid)
         {
-            $this->logger->warning(
-                'Карточек для обновления не найдено',
-                [__FILE__.':'.__LINE__],
-            );
+            /** Получаем список */
 
-            return;
-        }
+            /* Получаем все имеющиеся карточки в системе */
+            $products = $this->AllProductsIdentifierRepository
+                ->forProfile($UserProfileUid)
+                ->findAll();
 
-        $profiles = iterator_to_array($profiles);
-
-        foreach($products as $stamps => $ProductsIdentifierResult)
-        {
-            foreach($profiles as $UserProfileUid)
+            if(false === $products || false === $products->valid())
             {
+                $this->logger->warning(
+                    'Карточек для обновления цен не найдено',
+                    [__FILE__.':'.__LINE__],
+                );
+
+                continue;
+            }
+
+            foreach($products as $stamps => $ProductsIdentifierResult)
+            {
+
                 $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
                     $UserProfileUid,
                     $ProductsIdentifierResult->getProductId(),

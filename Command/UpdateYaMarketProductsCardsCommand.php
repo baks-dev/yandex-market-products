@@ -165,7 +165,9 @@ class UpdateYaMarketProductsCardsCommand extends Command
         $this->io->note(sprintf('Обновляем профиль %s', $UserProfileUid->getAttr()));
 
         /* Получаем все имеющиеся карточки в системе */
-        $products = $this->allProductsIdentifier->findAll();
+        $products = $this->allProductsIdentifier
+            ->forProfile($UserProfileUid)
+            ->findAll();
 
         if(false === $products || false === $products->valid())
         {

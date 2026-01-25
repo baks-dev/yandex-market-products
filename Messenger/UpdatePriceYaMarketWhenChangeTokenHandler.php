@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,8 @@ use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
@@ -41,6 +43,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class UpdatePriceYaMarketWhenChangeTokenHandler
 {
     public function __construct(
+        #[Target('yandexMarketProductsLogger')] private LoggerInterface $logger,
         private AllProductsIdentifierInterface $allProductsIdentifier,
         private AllProfileYaMarketTokenInterface $allProfileToken,
         private MessageDispatchInterface $messageDispatch,
@@ -48,14 +51,6 @@ final readonly class UpdatePriceYaMarketWhenChangeTokenHandler
 
     public function __invoke(YaMarketTokenMessage $message): void
     {
-        /* Получаем все имеющиеся карточки в системе */
-        $products = $this->allProductsIdentifier->findAll();
-
-        if($products === false)
-        {
-            return;
-        }
-
         /** Получаем активные токены авторизации профилей */
         $profiles = $this->allProfileToken
             ->onlyActiveToken()
@@ -66,11 +61,24 @@ final readonly class UpdatePriceYaMarketWhenChangeTokenHandler
             return;
         }
 
-        $profiles = iterator_to_array($profiles);
-
-        foreach($products as $ProductsIdentifierResult)
+        foreach($profiles as $UserProfileUid)
         {
-            foreach($profiles as $UserProfileUid)
+            /* Получаем все имеющиеся карточки в системе */
+            $products = $this->allProductsIdentifier
+                ->forProfile($UserProfileUid)
+                ->findAll();
+
+            if($products === false)
+            {
+                $this->logger->warning(
+                    'Карточек для обновления цен не найдено',
+                    [__FILE__.':'.__LINE__],
+                );
+
+                continue;
+            }
+
+            foreach($products as $ProductsIdentifierResult)
             {
                 $YaMarketProductsCardMessage = new YaMarketProductsCardMessage(
                     $UserProfileUid,

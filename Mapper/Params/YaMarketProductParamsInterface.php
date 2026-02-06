@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ interface YaMarketProductParamsInterface
     public function getData(CurrentYaMarketProductCardResult $data, ?TranslatorInterface $translator = null): mixed;
 
     /** Возвращает значение по умолчанию */
-    public function default(): ?string;
+    public function default(): int|string|null;
 
     /** Добавить в настройку */
     public function isSetting(): bool;

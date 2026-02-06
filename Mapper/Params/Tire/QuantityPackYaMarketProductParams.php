@@ -47,9 +47,9 @@ final class QuantityPackYaMarketProductParams implements YaMarketProductParamsIn
         return false;
     }
 
-    public function default(): ?string
+    public function default(): int
     {
-        return null;
+        return 1;
     }
 
     /** Массив допустимых значений */
@@ -101,7 +101,7 @@ final class QuantityPackYaMarketProductParams implements YaMarketProductParamsIn
                     return [
                         'parameterId' => $this::ID,
                         'name' => $this->getName(),
-                        'value' => ($product_param->value === 'true' || $product_param->value === true),
+                        'value' => empty($product_param->value) ? $this->default() : $product_param->value,
                     ];
                 }
             }
@@ -110,7 +110,7 @@ final class QuantityPackYaMarketProductParams implements YaMarketProductParamsIn
         return [
             'parameterId' => $this::ID,
             'name' => $this->getName(),
-            'value' => false,
+            'value' => $this->default(),
         ];
     }
 }

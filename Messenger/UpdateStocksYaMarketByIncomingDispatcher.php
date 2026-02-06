@@ -32,6 +32,8 @@ use BaksDev\Products\Stocks\Entity\Stock\Products\ProductStockProduct;
 use BaksDev\Products\Stocks\Messenger\ProductStockMessage;
 use BaksDev\Products\Stocks\Repository\ProductStocksEvent\ProductStocksEventInterface;
 use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusIncoming;
+use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusMoving;
+use BaksDev\Products\Stocks\Type\Status\ProductStockStatus\ProductStockStatusWarehouse;
 use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
@@ -76,9 +78,16 @@ final readonly class UpdateStocksYaMarketByIncomingDispatcher
         }
 
         /**
-         * Если Статус заявки не является Incoming «Приход на склад»
+         * Если Статус заявки не является:
+         * Incoming «Приход на склад» - когда принимается поступление на склад
+         * Moving «Перемещение» - когда создается заявка на перемещение
+         * Warehouse «Отправили на склад» - когда отправили, но могли указать другое количество
          */
-        if(false === $ProductStockEvent->equalsProductStockStatus(ProductStockStatusIncoming::class))
+        if(
+            false === $ProductStockEvent->equalsProductStockStatus(ProductStockStatusIncoming::class)
+            && false === $ProductStockEvent->equalsProductStockStatus(ProductStockStatusMoving::class)
+            && false === $ProductStockEvent->equalsProductStockStatus(ProductStockStatusWarehouse::class)
+        )
         {
             return;
         }

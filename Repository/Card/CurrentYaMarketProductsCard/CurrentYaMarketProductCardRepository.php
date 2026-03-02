@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -32,11 +33,14 @@ use BaksDev\Products\Category\Entity\Trans\CategoryProductTrans;
 use BaksDev\Products\Product\Entity\Category\ProductCategory;
 use BaksDev\Products\Product\Entity\Description\ProductDescription;
 use BaksDev\Products\Product\Entity\Info\ProductInfo;
+use BaksDev\Products\Product\Entity\Offers\Barcode\ProductOfferBarcode;
 use BaksDev\Products\Product\Entity\Offers\Image\ProductOfferImage;
 use BaksDev\Products\Product\Entity\Offers\Price\ProductOfferPrice;
 use BaksDev\Products\Product\Entity\Offers\ProductOffer;
 use BaksDev\Products\Product\Entity\Offers\Quantity\ProductOfferQuantity;
+use BaksDev\Products\Product\Entity\Offers\Variation\Barcode\ProductVariationBarcode;
 use BaksDev\Products\Product\Entity\Offers\Variation\Image\ProductVariationImage;
+use BaksDev\Products\Product\Entity\Offers\Variation\Modification\Barcode\ProductModificationBarcode;
 use BaksDev\Products\Product\Entity\Offers\Variation\Modification\Image\ProductModificationImage;
 use BaksDev\Products\Product\Entity\Offers\Variation\Modification\Price\ProductModificationPrice;
 use BaksDev\Products\Product\Entity\Offers\Variation\Modification\ProductModification;
@@ -252,6 +256,7 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                 'product_info.product = product.id',
             );
 
+        /* Торговое предложение */
 
         $dbal
             ->addSelect('product_offer.const AS offer_const')
@@ -286,6 +291,17 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
             );
         }
 
+        /** Offer Barcode */
+
+        $dbal
+            ->leftJoin(
+                'product_offer',
+                ProductOfferBarcode::class,
+                'product_offer_barcode',
+                'product_offer_barcode.offer = product_offer.id'
+            );
+
+        /* Множественные варианты торгового предложения */
 
         $dbal
             ->addSelect('product_variation.const AS variation_const')
@@ -324,6 +340,17 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                 );
         }
 
+        /** Variation Barcode */
+
+        $dbal
+            ->leftJoin(
+                'product_variation',
+                ProductVariationBarcode::class,
+                'product_variation_barcode',
+                'product_variation_barcode.variation = product_variation.id'
+            );
+
+        /* Модификация множественного варианта торгового предложения */
 
         $dbal
             ->addSelect('product_modification.const AS modification_const')
@@ -358,6 +385,17 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                         product_modification.const IS NULL',
                 );
         }
+
+
+        /** Modification Barcode */
+
+        $dbal
+            ->leftJoin(
+                'product_modification',
+                ProductModificationBarcode::class,
+                'product_modification_barcode',
+                'product_modification_barcode.modification = product_modification.id'
+            );
 
 
         $dbal
@@ -1046,15 +1084,36 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
             ) AS article
 		');
 
-        /** Штрихкод продукта */
+        /** Штрихкоды продукта */
 
+        $dbal->addSelect(
+            "
+            JSON_AGG
+                    (DISTINCT
+         			CASE
+         			    WHEN product_modification_barcode.value IS NOT NULL
+                        THEN product_modification_barcode.value
+                        
+                        WHEN product_variation_barcode.value IS NOT NULL
+                        THEN product_variation_barcode.value
+                        
+                        WHEN product_offer_barcode.value IS NOT NULL
+                        THEN product_offer_barcode.value
+                        
+                        WHEN product_info.barcode IS NOT NULL
+                        THEN product_info.barcode
+                        
+                        ELSE NULL
+                    END
+                    )
+                    AS barcodes"
+        );
         $dbal->addSelect('
             COALESCE(
-                product_modification.barcode, 
-                product_variation.barcode, 
-                product_offer.barcode, 
-                product_info.barcode,
-                NULL
+                product_modification.barcode_old, 
+                product_variation.barcode_old, 
+                product_offer.barcode_old,
+                product_info.barcode
             ) AS barcode
 		');
 

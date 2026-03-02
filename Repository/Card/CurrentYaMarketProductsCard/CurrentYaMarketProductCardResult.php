@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
- *  
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
+ *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *  
+ *
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *  
+ *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -98,7 +99,9 @@ final class CurrentYaMarketProductCardResult implements ProductPriceResultInterf
         private readonly ?string $product_quantity, //  => null
 
         private readonly ?string $article, // " => "TR257-15-235-70-107H"
+
         private readonly ?string $barcode, // " => "2744610541511"
+        private readonly ?string $barcodes, // " => "2744610541511"
 
         private string|null $project_discount = null, // " => 0
 
@@ -492,6 +495,31 @@ final class CurrentYaMarketProductCardResult implements ProductPriceResultInterf
 
     public function getBarcode(): string|false
     {
-        return $this->barcode ?: false;
+        return true === empty($this->barcode) ? false : $this->barcode;
+    }
+
+    /**
+     * @return array<int, string>|null
+     */
+    public function getBarcodes(): array|null
+    {
+        if(is_null($this->barcodes))
+        {
+            return null;
+        }
+
+        if(false === json_validate($this->barcodes))
+        {
+            return null;
+        }
+
+        $barcodes = json_decode($this->barcodes, true, 512, JSON_THROW_ON_ERROR);
+
+        if(true === empty(current($barcodes)))
+        {
+            return null;
+        }
+
+        return $barcodes;
     }
 }

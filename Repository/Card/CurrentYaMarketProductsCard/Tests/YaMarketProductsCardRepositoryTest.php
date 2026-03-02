@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
- *  
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
+ *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *  
+ *
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *  
+ *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -66,21 +67,24 @@ class YaMarketProductsCardRepositoryTest extends KernelTestCase
             //->forProfile(new UserProfileUid('019577a9-71a3-714b-a99c-0386833d802f'))
             ->find();
 
-
-        if($CurrentYaMarketProductCardResult instanceof CurrentYaMarketProductCardResult)
+        if(false === $CurrentYaMarketProductCardResult)
         {
-            // Вызываем все геттеры
-            $reflectionClass = new ReflectionClass(CurrentYaMarketProductCardResult::class);
-            $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
+            self::assertTrue(true);
+            echo sprintf('%s результат репозитория не протестирован  %s %s', PHP_EOL, self::class, PHP_EOL);
+            return;
+        }
 
-            foreach($methods as $method)
+        // Вызываем все геттеры
+        $reflectionClass = new ReflectionClass(CurrentYaMarketProductCardResult::class);
+        $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
+
+        foreach($methods as $method)
+        {
+            // Методы без аргументов
+            if($method->getNumberOfParameters() === 0)
             {
-                // Методы без аргументов
-                if($method->getNumberOfParameters() === 0)
-                {
-                    // Вызываем метод
-                    $method->invoke($CurrentYaMarketProductCardResult);
-                }
+                // Вызываем метод
+                $method->invoke($CurrentYaMarketProductCardResult);
             }
         }
 

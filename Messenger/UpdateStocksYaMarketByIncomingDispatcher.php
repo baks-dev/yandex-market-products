@@ -38,12 +38,14 @@ use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
 use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsStocksUpdate\YaMarketProductsStocksMessage;
 use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
  * Обновляет складские остатки YaMarket при поступлении продукции на склад
  */
+#[Autoconfigure(shared: false)]
 #[AsMessageHandler(priority: 10)]
 final readonly class UpdateStocksYaMarketByIncomingDispatcher
 {

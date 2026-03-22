@@ -30,6 +30,16 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 interface YaMarketProductPropertyInterface
 {
     /**
+     * Сортировка (чем выше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int;
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool;
+
+    /**
      * Возвращает ключ (индекс в массиве)
      */
     public function getIndex(): string;
@@ -63,14 +73,4 @@ interface YaMarketProductPropertyInterface
      * Массив допустимых значений
      */
     public function choices(): ?array;
-
-    /**
-     * Сортировка (чем выше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int;
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool;
 }

@@ -79,31 +79,25 @@ use InvalidArgumentException;
 
 final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProductCardInterface
 {
-    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
-
-
     private UserProfileUid|false $profile = false;
-
     /**
      * ID продукта
      */
     private ProductUid|null $product = null;
-
     /**
      * Постоянный уникальный идентификатор ТП
      */
     private ProductOfferConst|null|false $offerConst = null;
-
     /**
      * Постоянный уникальный идентификатор варианта
      */
     private ProductVariationConst|null|false $variationConst = null;
-
     /**
      * Постоянный уникальный идентификатор модификации
      */
     private ProductModificationConst|null|false $modificationConst = null;
 
+    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
 
     public function forProduct(Product|ProductUid|string $product): self
     {
@@ -298,7 +292,7 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                 'product_offer',
                 ProductOfferBarcode::class,
                 'product_offer_barcode',
-                'product_offer_barcode.offer = product_offer.id'
+                'product_offer_barcode.offer = product_offer.id',
             );
 
         /* Множественные варианты торгового предложения */
@@ -347,7 +341,7 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                 'product_variation',
                 ProductVariationBarcode::class,
                 'product_variation_barcode',
-                'product_variation_barcode.variation = product_variation.id'
+                'product_variation_barcode.variation = product_variation.id',
             );
 
         /* Модификация множественного варианта торгового предложения */
@@ -394,7 +388,7 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                 'product_modification',
                 ProductModificationBarcode::class,
                 'product_modification_barcode',
-                'product_modification_barcode.modification = product_modification.id'
+                'product_modification_barcode.modification = product_modification.id',
             );
 
 
@@ -1106,7 +1100,7 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                         ELSE NULL
                     END
                     )
-                    AS barcodes"
+                    AS barcodes",
         );
         $dbal->addSelect('
             COALESCE(

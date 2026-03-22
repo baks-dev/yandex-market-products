@@ -37,9 +37,12 @@ final class WidthProfileYaMarketProductParams implements YaMarketProductParamsIn
 
     public const int ID = 50299747;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Ширина профиля';
+        return 600;
     }
 
     public function required(): bool
@@ -56,24 +59,6 @@ final class WidthProfileYaMarketProductParams implements YaMarketProductParamsIn
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 600;
-    }
-
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
-    {
-        $param = mb_strtolower((string) $param);
-
-        return in_array($param, [(string) self::ID, 'ширина профиля', 'ширина'], true);
     }
 
     public function isSetting(): bool
@@ -111,5 +96,20 @@ final class WidthProfileYaMarketProductParams implements YaMarketProductParamsIn
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [(string) self::ID, 'ширина профиля', 'ширина'], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Ширина профиля';
     }
 }

@@ -52,12 +52,6 @@ class YaMarketProductsSettings
         return (string) $this->id;
     }
 
-    public function getId(): CategoryProductUid
-    {
-        return $this->id;
-    }
-
-
     public function getEvent(): YaMarketProductsSettingsEventUid
     {
         return $this->event;
@@ -67,6 +61,11 @@ class YaMarketProductsSettings
     {
         $this->event = $event->getId();
         $this->id = $event->getSettings();
+    }
+
+    public function getId(): CategoryProductUid
+    {
+        return $this->id;
     }
 
 }

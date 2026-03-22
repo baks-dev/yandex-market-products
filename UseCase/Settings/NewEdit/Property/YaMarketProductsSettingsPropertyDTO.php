@@ -21,7 +21,6 @@ namespace BaksDev\Yandex\Market\Products\UseCase\Settings\NewEdit\Property;
 use BaksDev\Products\Category\Type\Section\Field\Id\CategoryProductSectionFieldUid;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Property\YaMarketProductsSettingsPropertyInterface;
 use BaksDev\Yandex\Market\Products\Type\Settings\Property\YaMarketProductProperty;
-use ReflectionProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see YaMarketProductsSettingsProperty */

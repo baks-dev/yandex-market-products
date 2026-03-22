@@ -37,9 +37,12 @@ final class WearResistanceYaMarketProductParams implements YaMarketProductParams
 
     public const int ID = 38009810;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Износостойкость';
+        return 600;
     }
 
     public function required(): bool
@@ -56,27 +59,6 @@ final class WearResistanceYaMarketProductParams implements YaMarketProductParams
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 600;
-    }
-
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
-    {
-        $param = mb_strtolower((string) $param);
-
-        return in_array($param, [
-            (string) self::ID,
-            mb_strtolower($this->getName()),
-        ], true);
     }
 
     public function isSetting(): bool
@@ -114,5 +96,23 @@ final class WearResistanceYaMarketProductParams implements YaMarketProductParams
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [
+            (string) self::ID,
+            mb_strtolower($this->getName()),
+        ], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Износостойкость';
     }
 }

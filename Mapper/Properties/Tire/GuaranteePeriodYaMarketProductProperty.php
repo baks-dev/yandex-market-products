@@ -42,6 +42,21 @@ final class GuaranteePeriodYaMarketProductProperty implements YaMarketProductPro
      */
     public const string PARAM = 'guaranteePeriod';
 
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
+    {
+        return 400;
+    }
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool
+    {
+        return self::PARAM === $value;
+    }
 
     public function getIndex(): string
     {
@@ -62,23 +77,6 @@ final class GuaranteePeriodYaMarketProductProperty implements YaMarketProductPro
     {
         return null;
     }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 400;
-    }
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool
-    {
-        return self::PARAM === $value;
-    }
-
 
     public function isSetting(): bool
     {

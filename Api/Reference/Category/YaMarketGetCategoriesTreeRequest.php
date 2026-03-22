@@ -67,7 +67,7 @@ final class YaMarketGetCategoriesTreeRequest extends YandexMarket
 
                 throw new DomainException(
                     message: 'Ошибка YandexMarketCategoryRequest',
-                    code: $response->getStatusCode()
+                    code: $response->getStatusCode(),
                 );
             }
 
@@ -98,7 +98,7 @@ final class YaMarketGetCategoriesTreeRequest extends YandexMarket
 
                 $result[] = [
                     "id" => $item["id"],
-                    "name" => $name
+                    "name" => $name,
                 ];
 
             }

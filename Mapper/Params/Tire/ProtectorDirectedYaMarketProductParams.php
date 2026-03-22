@@ -37,9 +37,12 @@ final class ProtectorDirectedYaMarketProductParams implements YaMarketProductPar
 
     public const int ID = 38184990;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Направленный протектор';
+        return 610;
     }
 
     public function required(): bool
@@ -56,27 +59,6 @@ final class ProtectorDirectedYaMarketProductParams implements YaMarketProductPar
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 610;
-    }
-
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
-    {
-        $param = mb_strtolower((string) $param);
-
-        return in_array($param, [
-            mb_strtolower($this->getName()),
-            (string) self::ID,
-        ], true);
     }
 
     public function isSetting(): bool
@@ -109,5 +91,23 @@ final class ProtectorDirectedYaMarketProductParams implements YaMarketProductPar
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [
+            mb_strtolower($this->getName()),
+            (string) self::ID,
+        ], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Направленный протектор';
     }
 }

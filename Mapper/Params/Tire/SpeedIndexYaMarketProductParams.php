@@ -37,9 +37,12 @@ final class SpeedIndexYaMarketProductParams implements YaMarketProductParamsInte
 
     public const int ID = 50322776;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Индекс максимальной скорости';
+        return 610;
     }
 
     public function required(): bool
@@ -56,14 +59,6 @@ final class SpeedIndexYaMarketProductParams implements YaMarketProductParamsInte
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 610;
     }
 
     /**
@@ -100,7 +95,7 @@ final class SpeedIndexYaMarketProductParams implements YaMarketProductParamsInte
             $cleaned_str = str_replace(
                 ['Н', 'К', 'М', 'Р', 'Т'], // русские символы
                 ['H', 'K', 'M', 'P', 'T'], // латиница
-                $cleaned_str
+                $cleaned_str,
             );
 
             if(!empty($cleaned_str))
@@ -121,17 +116,22 @@ final class SpeedIndexYaMarketProductParams implements YaMarketProductParamsInte
                     'V' => 'V (до 240 км/ч)',
                     'W' => 'W (до 270 км/ч)',
                     'Y' => 'Y (до 300 км/ч)',
-                    'Z/ZR' => 'Z/ZR (свыше 240 км/ч)'
+                    'Z/ZR' => 'Z/ZR (свыше 240 км/ч)',
                 };
 
                 return [
                     'parameterId' => $this::ID,
                     'name' => $this->getName(),
-                    'value' => $return_index
+                    'value' => $return_index,
                 ];
             }
         }
 
         return null;
+    }
+
+    public function getName(): string
+    {
+        return 'Индекс максимальной скорости';
     }
 }

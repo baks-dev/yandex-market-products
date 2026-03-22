@@ -97,7 +97,7 @@ final class YaMarketProductFindCardRequest extends YandexMarket
                 sprintf('/businesses/%s/offer-mappings', $this->getBusiness()),
                 [
                     'query' => $query,
-                    'json' => $data
+                    'json' => $data,
                 ],
             );
 

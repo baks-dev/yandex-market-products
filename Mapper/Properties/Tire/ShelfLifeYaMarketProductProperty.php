@@ -45,6 +45,22 @@ final class ShelfLifeYaMarketProductProperty implements YaMarketProductPropertyI
      */
     public const string PARAM = 'shelfLife';
 
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
+    {
+        return 500;
+    }
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool
+    {
+        return self::PARAM === $value;
+    }
+
     public function getIndex(): string
     {
         return self::PARAM;
@@ -64,23 +80,6 @@ final class ShelfLifeYaMarketProductProperty implements YaMarketProductPropertyI
     {
         return null;
     }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 500;
-    }
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool
-    {
-        return self::PARAM === $value;
-    }
-
 
     public function isSetting(): bool
     {

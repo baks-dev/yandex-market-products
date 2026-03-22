@@ -42,7 +42,7 @@ final class YaMarketProductsCardForm extends AbstractType
         $builder->add(
             'ya_market_products_card',
             SubmitType::class,
-            ['label' => 'Save', 'label_html' => true, 'attr' => ['class' => 'btn-primary']]
+            ['label' => 'Save', 'label_html' => true, 'attr' => ['class' => 'btn-primary']],
         );
     }
 

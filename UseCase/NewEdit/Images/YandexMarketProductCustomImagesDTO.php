@@ -31,11 +31,9 @@ use Symfony\Component\HttpFoundation\File\File;
 /** @see YandexMarketProductCustomImage */
 final class YandexMarketProductCustomImagesDTO implements YandexMarketProductCustomInterface
 {
-    private ?YandexMarketProductImageUid $id = null;
-
     /** Обложка категории */
     public ?File $file = null;
-
+    private ?YandexMarketProductImageUid $id = null;
     /** Название файла */
     private ?string $name = null;
 

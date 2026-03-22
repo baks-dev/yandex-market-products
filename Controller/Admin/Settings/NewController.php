@@ -76,7 +76,7 @@ final class NewController extends AbstractController
         }
 
         return $this->render([
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
 
     }

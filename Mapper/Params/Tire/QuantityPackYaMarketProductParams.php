@@ -37,27 +37,6 @@ final class QuantityPackYaMarketProductParams implements YaMarketProductParamsIn
 
     public const int ID = 33663230;
 
-    public function getName(): string
-    {
-        return 'Количество упаковок в товаре';
-    }
-
-    public function required(): bool
-    {
-        return false;
-    }
-
-    public function default(): int
-    {
-        return 1;
-    }
-
-    /** Массив допустимых значений */
-    public function choices(): ?array
-    {
-        return null;
-    }
-
     /**
      * Сортировка (чем меньше число - тем первым в итерации будет значение)
      */
@@ -66,17 +45,15 @@ final class QuantityPackYaMarketProductParams implements YaMarketProductParamsIn
         return 610;
     }
 
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
+    public function required(): bool
     {
-        $param = mb_strtolower((string) $param);
+        return false;
+    }
 
-        return in_array($param, [
-            (string) self::ID,
-            mb_strtolower($this->getName()),
-        ], true);
+    /** Массив допустимых значений */
+    public function choices(): ?array
+    {
+        return null;
     }
 
     public function isSetting(): bool
@@ -112,5 +89,28 @@ final class QuantityPackYaMarketProductParams implements YaMarketProductParamsIn
             'name' => $this->getName(),
             'value' => $this->default(),
         ];
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [
+            (string) self::ID,
+            mb_strtolower($this->getName()),
+        ], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Количество упаковок в товаре';
+    }
+
+    public function default(): int
+    {
+        return 1;
     }
 }

@@ -29,11 +29,8 @@ use BaksDev\Yandex\Market\Products\Mapper\Properties\Collection\YaMarketProductP
 final class YaMarketProductProperty
 {
     public const string TYPE = 'ya_market_product_property';
-
-    private ?YaMarketProductPropertyInterface $property = null;
-
     public const int CATEGORY_TIRE = 90490;
-
+    private ?YaMarketProductPropertyInterface $property = null;
 
     public function __construct(YaMarketProductPropertyInterface|self|string $property)
     {
@@ -74,22 +71,32 @@ final class YaMarketProductProperty
 
     }
 
-
-    public function __toString(): string
-    {
-        return $this->property ? $this->property->getIndex() : '';
-    }
-
     public function getYaMarketProductProperty(): ?YaMarketProductPropertyInterface
     {
         return $this->property;
+    }
+
+    public static function getDeclared(): array
+    {
+        return array_filter(
+            get_declared_classes(),
+            static function($className) {
+                return in_array(YaMarketProductPropertyInterface::class, class_implements($className), true);
+            },
+        );
+    }
+
+    public function equals(mixed $property): bool
+    {
+        $property = new self($property);
+
+        return $this->getYaMarketProductPropertyValue() === $property->getYaMarketProductPropertyValue();
     }
 
     public function getYaMarketProductPropertyValue(): string
     {
         return $this->property->getIndex();
     }
-
 
     public static function cases(): array
     {
@@ -105,21 +112,9 @@ final class YaMarketProductProperty
         return $case;
     }
 
-    public static function getDeclared(): array
+    public function __toString(): string
     {
-        return array_filter(
-            get_declared_classes(),
-            static function($className) {
-                return in_array(YaMarketProductPropertyInterface::class, class_implements($className), true);
-            }
-        );
-    }
-
-    public function equals(mixed $property): bool
-    {
-        $property = new self($property);
-
-        return $this->getYaMarketProductPropertyValue() === $property->getYaMarketProductPropertyValue();
+        return $this->property ? $this->property->getIndex() : '';
     }
 
 

@@ -86,8 +86,8 @@ final class YaMarketProductsSettingsPropertyForm extends AbstractType
                         TextType::class,
                         [
                             'data' => $data->getDef() ?: $YaMarketProperty->default(),
-                            'required' => $YaMarketProperty->required()
-                        ]
+                            'required' => $YaMarketProperty->required(),
+                        ],
                     );
                 }
             }
@@ -100,7 +100,7 @@ final class YaMarketProductsSettingsPropertyForm extends AbstractType
             [
                 'data_class' => YaMarketProductsSettingsPropertyDTO::class,
                 'property_fields' => null,
-            ]
+            ],
         );
     }
 

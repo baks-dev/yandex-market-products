@@ -66,63 +66,63 @@ final class AllProductsWithYandexMarketImagesTest extends KernelTestCase
             self::assertIsString($item->getProductName());
             self::assertTrue(
                 $item->getProductOfferId() === null ||
-                $item->getProductOfferId() instanceof ProductOfferUid
+                $item->getProductOfferId() instanceof ProductOfferUid,
             );
             self::assertTrue(
                 $item->getProductOfferValue() === null ||
-                is_string($item->getProductOfferValue())
+                is_string($item->getProductOfferValue()),
             );
             self::assertTrue(
                 $item->getProductOfferConst() === null ||
-                $item->getProductOfferConst() instanceof ProductOfferConst
+                $item->getProductOfferConst() instanceof ProductOfferConst,
             );
             self::assertTrue(
                 $item->getProductOfferPostfix() === null ||
-                is_string($item->getProductOfferPostfix())
+                is_string($item->getProductOfferPostfix()),
             );
             self::assertTrue(
                 $item->getProductOfferReference() === null ||
-                is_string($item->getProductOfferReference())
+                is_string($item->getProductOfferReference()),
             );
             self::assertTrue(
                 $item->getProductVariationId() === null ||
-                $item->getProductVariationId() instanceof ProductVariationUid
+                $item->getProductVariationId() instanceof ProductVariationUid,
             );
             self::assertTrue(
                 $item->getProductVariationValue() === null ||
-                is_string($item->getProductVariationValue())
+                is_string($item->getProductVariationValue()),
             );
             self::assertTrue(
                 $item->getProductVariationConst() === null ||
-                $item->getProductVariationConst() instanceof ProductVariationConst
+                $item->getProductVariationConst() instanceof ProductVariationConst,
             );
             self::assertTrue(
                 $item->getProductVariationPostfix() === null ||
-                is_string($item->getProductVariationPostfix())
+                is_string($item->getProductVariationPostfix()),
             );
             self::assertTrue(
                 $item->getProductVariationReference() === null ||
-                is_string($item->getProductVariationReference())
+                is_string($item->getProductVariationReference()),
             );
             self::assertTrue(
                 $item->getProductModificationId() === null ||
-                $item->getProductModificationId() instanceof ProductModificationUid
+                $item->getProductModificationId() instanceof ProductModificationUid,
             );
             self::assertTrue(
                 $item->getProductModificationValue() === null ||
-                is_string($item->getProductModificationValue())
+                is_string($item->getProductModificationValue()),
             );
             self::assertTrue(
                 $item->getProductModificationConst() === null ||
-                $item->getProductModificationConst() instanceof ProductModificationConst
+                $item->getProductModificationConst() instanceof ProductModificationConst,
             );
             self::assertTrue(
                 $item->getProductModificationPostfix() === null ||
-                is_string($item->getProductModificationPostfix())
+                is_string($item->getProductModificationPostfix()),
             );
             self::assertTrue(
                 $item->getProductModificationReference() === null ||
-                is_string($item->getProductModificationReference())
+                is_string($item->getProductModificationReference()),
             );
 
             break;

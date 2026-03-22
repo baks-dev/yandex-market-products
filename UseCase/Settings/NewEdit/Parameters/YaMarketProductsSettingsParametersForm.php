@@ -107,7 +107,7 @@ final class YaMarketProductsSettingsParametersForm extends AbstractType
             [
                 'data_class' => YaMarketProductsSettingsParametersDTO::class,
                 'property_fields' => null,
-            ]
+            ],
         );
     }
 

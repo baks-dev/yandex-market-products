@@ -30,7 +30,7 @@ return static function(TwigConfig $twig) {
 
     $twig->path(
         BaksDevYandexMarketProductsBundle::PATH.implode(DIRECTORY_SEPARATOR, ['Resources', 'view', '']), // .'Resources/view',
-        'yandex-market-products'
+        'yandex-market-products',
     );
 
 };

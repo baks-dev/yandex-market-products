@@ -19,9 +19,9 @@
 namespace BaksDev\Yandex\Market\Products\UseCase\Settings\Delete\Modify;
 
 use BaksDev\Core\Type\Modify\Modify\ModifyActionDelete;
-use BaksDev\Core\Type\Modify\ModifyAction;
 use BaksDev\Core\Type\Modify\Modify\ModifyActionNew;
 use BaksDev\Core\Type\Modify\Modify\ModifyActionUpdate;
+use BaksDev\Core\Type\Modify\ModifyAction;
 use BaksDev\Yandex\Market\Products\Entity\Settings\Modify\YaMarketProductsSettingsModifyInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 

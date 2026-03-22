@@ -37,9 +37,12 @@ final class StuddedYaMarketProductParams implements YaMarketProductParamsInterfa
 
     public const int ID = 38185150;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Шипуемые';
+        return 610;
     }
 
     public function required(): bool
@@ -56,27 +59,6 @@ final class StuddedYaMarketProductParams implements YaMarketProductParamsInterfa
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 610;
-    }
-
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
-    {
-        $param = mb_strtolower((string) $param);
-
-        return in_array($param, [
-            (string) self::ID,
-            mb_strtolower($this->getName()),
-        ], true);
     }
 
     public function isSetting(): bool
@@ -112,5 +94,23 @@ final class StuddedYaMarketProductParams implements YaMarketProductParamsInterfa
             'value' => false,
         ];
 
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [
+            (string) self::ID,
+            mb_strtolower($this->getName()),
+        ], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Шипуемые';
     }
 }

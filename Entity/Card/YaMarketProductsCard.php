@@ -65,14 +65,6 @@ class YaMarketProductsCard
     }
 
     /**
-     * Идентификатор
-     */
-    public function getId(): YaMarketProductsCardUid
-    {
-        return $this->id;
-    }
-
-    /**
      * Идентификатор События
      */
     public function getEvent(): YaMarketProductsCardEventUid
@@ -83,5 +75,13 @@ class YaMarketProductsCard
     public function setEvent(YaMarketProductsCardEventUid|YaMarketProductsCardEvent $event): void
     {
         $this->event = $event instanceof YaMarketProductsCardEvent ? $event->getId() : $event;
+    }
+
+    /**
+     * Идентификатор
+     */
+    public function getId(): YaMarketProductsCardUid
+    {
+        return $this->id;
     }
 }

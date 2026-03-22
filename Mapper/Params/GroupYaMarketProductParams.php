@@ -39,9 +39,12 @@ final class GroupYaMarketProductParams implements YaMarketProductParamsInterface
 
     public const int ID = 200;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Название группы вариантов';
+        return 610;
     }
 
     public function required(): bool
@@ -58,14 +61,6 @@ final class GroupYaMarketProductParams implements YaMarketProductParamsInterface
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 610;
     }
 
     /**
@@ -99,5 +94,10 @@ final class GroupYaMarketProductParams implements YaMarketProductParamsInterface
             'name' => $this->getName(),
             'value' => $data->getGroupCard(),
         ];
+    }
+
+    public function getName(): string
+    {
+        return 'Название группы вариантов';
     }
 }

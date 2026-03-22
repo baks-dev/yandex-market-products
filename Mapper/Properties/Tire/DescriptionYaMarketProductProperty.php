@@ -40,6 +40,13 @@ final class DescriptionYaMarketProductProperty implements YaMarketProductPropert
      */
     public const string PARAM = 'description';
 
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
+    {
+        return 894;
+    }
 
     public function getIndex(): string
     {
@@ -60,23 +67,6 @@ final class DescriptionYaMarketProductProperty implements YaMarketProductPropert
     {
         return null;
     }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 894;
-    }
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool
-    {
-        return self::PARAM === $value;
-    }
-
 
     public function isSetting(): bool
     {
@@ -197,5 +187,13 @@ final class DescriptionYaMarketProductProperty implements YaMarketProductPropert
 
         return empty($name) ? null : trim(strip_tags($name));
 
+    }
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool
+    {
+        return self::PARAM === $value;
     }
 }

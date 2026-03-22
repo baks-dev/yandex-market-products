@@ -43,6 +43,14 @@ final class VendorCodeYaMarketProductProperty implements YaMarketProductProperty
     //        private readonly ?CurrentYaMarketProductCardInterface $yaMarketProductsCard = null
     //    ) {}
 
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
+    {
+        return 890;
+    }
+
     public function getIndex(): string
     {
         return self::PARAM;
@@ -62,23 +70,6 @@ final class VendorCodeYaMarketProductProperty implements YaMarketProductProperty
     {
         return null;
     }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 890;
-    }
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool
-    {
-        return self::PARAM === $value;
-    }
-
 
     public function isSetting(): bool
     {
@@ -109,5 +100,13 @@ final class VendorCodeYaMarketProductProperty implements YaMarketProductProperty
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool
+    {
+        return self::PARAM === $value;
     }
 }

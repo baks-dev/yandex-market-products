@@ -37,9 +37,12 @@ final class ChamberYaMarketProductParams implements YaMarketProductParamsInterfa
 
     public const int ID = 38185030;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Камерные';
+        return 610;
     }
 
     public function required(): bool
@@ -56,27 +59,6 @@ final class ChamberYaMarketProductParams implements YaMarketProductParamsInterfa
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 610;
-    }
-
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
-    {
-        $param = mb_strtolower((string) $param);
-
-        return in_array($param, [
-            (string) self::ID,
-            mb_strtolower($this->getName())
-        ], true);
     }
 
     public function isSetting(): bool
@@ -101,7 +83,7 @@ final class ChamberYaMarketProductParams implements YaMarketProductParamsInterfa
                     return [
                         'parameterId' => $this::ID,
                         'name' => $this->getName(),
-                        'value' => ($product_param->value === 'true' || $product_param->value === true)
+                        'value' => ($product_param->value === 'true' || $product_param->value === true),
                     ];
                 }
             }
@@ -110,7 +92,25 @@ final class ChamberYaMarketProductParams implements YaMarketProductParamsInterfa
         return [
             'parameterId' => $this::ID,
             'name' => $this->getName(),
-            'value' => false
+            'value' => false,
         ];
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [
+            (string) self::ID,
+            mb_strtolower($this->getName()),
+        ], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Камерные';
     }
 }

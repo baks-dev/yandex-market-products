@@ -67,7 +67,7 @@ final class YaMarketProductDeleteCardRequest extends YandexMarket
 
             throw new DomainException(
                 message: 'Ошибка '.self::class,
-                code: $response->getStatusCode()
+                code: $response->getStatusCode(),
             );
         }
 

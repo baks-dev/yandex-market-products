@@ -103,6 +103,7 @@ final class YaMarketProductsSettingsForm extends AbstractType
 
             /**
              * Свойства карточки YaMarket
+             *
              * @var YaMarketProductPropertyInterface $case
              */
             foreach($this->marketProductPropertyCollection->casesSettings() as $case)

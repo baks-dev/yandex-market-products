@@ -37,13 +37,12 @@ use BaksDev\Yandex\Market\Products\Entity\Settings\YaMarketProductsSettings;
 
 final class AllProductsSettingsYaMarketRepository implements AllProductsSettingsYaMarketInterface
 {
+    private ?SearchDTO $search = null;
+
     public function __construct(
         private readonly DBALQueryBuilder $DBALQueryBuilder,
         private readonly PaginatorInterface $paginator
     ) {}
-
-    private ?SearchDTO $search = null;
-
 
     public function search(SearchDTO $search): self
     {
@@ -108,7 +107,7 @@ final class AllProductsSettingsYaMarketRepository implements AllProductsSettings
 					CONCAT ( '/upload/".$dbal->table(CategoryProductCover::class)."' , '/', category_cover.name)
 			   ELSE NULL
 			END AS cover
-		"
+		",
         );
 
 

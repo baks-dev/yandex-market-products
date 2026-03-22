@@ -46,18 +46,17 @@ final class ManufacturerCountriesYaMarketProductProperty implements YaMarketProd
         private readonly ?TranslatorInterface $translator = null
     ) {}
 
-
-    public function getIndex(): string
-    {
-        return self::PARAM;
-    }
-
     /**
      * Сортировка (чем меньше число - тем первым в итерации будет значение)
      */
     public static function priority(): int
     {
         return 888;
+    }
+
+    public function getIndex(): string
+    {
+        return self::PARAM;
     }
 
     public function default(): ?string
@@ -74,15 +73,6 @@ final class ManufacturerCountriesYaMarketProductProperty implements YaMarketProd
     {
         return null;
     }
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool
-    {
-        return self::PARAM === $value;
-    }
-
 
     public function isSetting(): bool
     {
@@ -118,5 +108,13 @@ final class ManufacturerCountriesYaMarketProductProperty implements YaMarketProd
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool
+    {
+        return self::PARAM === $value;
     }
 }

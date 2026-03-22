@@ -37,9 +37,12 @@ final class GripYaMarketProductParams implements YaMarketProductParamsInterface
 
     public const int ID = 37808390;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Сцепление на мокрой дороге';
+        return 620;
     }
 
     public function required(): bool
@@ -56,24 +59,6 @@ final class GripYaMarketProductParams implements YaMarketProductParamsInterface
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 620;
-    }
-
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
-    {
-        $param = mb_strtolower((string) $param);
-
-        return in_array($param, [(string) self::ID, mb_strtolower($this->getName())], true);
     }
 
     public function isSetting(): bool
@@ -113,5 +98,20 @@ final class GripYaMarketProductParams implements YaMarketProductParamsInterface
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [(string) self::ID, mb_strtolower($this->getName())], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Сцепление на мокрой дороге';
     }
 }

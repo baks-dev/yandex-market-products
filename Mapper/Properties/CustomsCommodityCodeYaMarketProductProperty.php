@@ -42,6 +42,13 @@ final class CustomsCommodityCodeYaMarketProductProperty implements YaMarketProdu
      */
     public const string PARAM = 'commodityCodes';
 
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
+    {
+        return 400;
+    }
 
     public function getIndex(): string
     {
@@ -62,23 +69,6 @@ final class CustomsCommodityCodeYaMarketProductProperty implements YaMarketProdu
     {
         return null;
     }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 400;
-    }
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool
-    {
-        return self::PARAM === $value;
-    }
-
 
     public function isSetting(): bool
     {
@@ -115,5 +105,13 @@ final class CustomsCommodityCodeYaMarketProductProperty implements YaMarketProdu
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool
+    {
+        return self::PARAM === $value;
     }
 }

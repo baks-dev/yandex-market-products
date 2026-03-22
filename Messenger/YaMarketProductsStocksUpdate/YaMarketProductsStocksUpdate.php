@@ -134,23 +134,22 @@ final readonly class YaMarketProductsStocksUpdate
                 continue;
             }
 
-
-            /**
-             * TRUE - возвращается в случае если продажи остановлены, следовательно, не сверяем остатки, а всегда обнуляем
-             *
-             * @see UpdateYaMarketProductStocksRequest:79
-             */
-            if($ProductStocksYandexMarket !== true && $ProductStocksYandexMarket->getTotal() === $ProductQuantity)
-            {
-                $this->logger->info(sprintf(
-                    'Наличие соответствует %s: %s == %s',
-                    $CurrentYaMarketProductCardResult->getArticle(),
-                    $ProductStocksYandexMarket->getTotal(),
-                    $ProductQuantity,
-                ), [$YaMarketTokenUid]);
-
-                continue;
-            }
+            //            /**
+            //             * TRUE - возвращается в случае если продажи остановлены, следовательно, не сверяем остатки, а всегда обнуляем
+            //             *
+            //             * @see UpdateYaMarketProductStocksRequest:79
+            //             */
+            //            if($ProductStocksYandexMarket !== true && $ProductStocksYandexMarket->getTotal() === $ProductQuantity)
+            //            {
+            //                $this->logger->info(sprintf(
+            //                    'Наличие соответствует %s: %s == %s',
+            //                    $CurrentYaMarketProductCardResult->getArticle(),
+            //                    $ProductStocksYandexMarket->getTotal(),
+            //                    $ProductQuantity,
+            //                ), [$YaMarketTokenUid]);
+            //
+            //                continue;
+            //            }
 
             /** В случае наличия резерва на маркетплейсе - вычитаем его из остатка */
             if(false === empty($ProductStocksYandexMarket->getReserve()))

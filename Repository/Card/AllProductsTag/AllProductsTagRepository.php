@@ -47,7 +47,7 @@ final readonly class AllProductsTagRepository implements AllProductsTagInterface
             'info',
             Product::class,
             'product',
-            'product.id = info.product'
+            'product.id = info.product',
         );
 
 

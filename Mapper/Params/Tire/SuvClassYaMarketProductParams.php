@@ -37,9 +37,12 @@ final class SuvClassYaMarketProductParams implements YaMarketProductParamsInterf
 
     public const int ID = 37808670;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Класс шин для внедорожников';
+        return 600;
     }
 
     public function required(): bool
@@ -56,24 +59,6 @@ final class SuvClassYaMarketProductParams implements YaMarketProductParamsInterf
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 600;
-    }
-
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
-    {
-        $param = mb_strtolower((string) $param);
-
-        return in_array($param, [(string) self::ID, mb_strtolower($this->getName())], true);
     }
 
     public function isSetting(): bool
@@ -132,5 +117,20 @@ final class SuvClassYaMarketProductParams implements YaMarketProductParamsInterf
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [(string) self::ID, mb_strtolower($this->getName())], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Класс шин для внедорожников';
     }
 }

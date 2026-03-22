@@ -41,6 +41,14 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
      */
     public const string PARAM = 'name';
 
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
+    {
+        return 895;
+    }
+
     public function getIndex(): string
     {
         return self::PARAM;
@@ -60,23 +68,6 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
     {
         return null;
     }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 895;
-    }
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool
-    {
-        return self::PARAM === $value;
-    }
-
 
     public function isSetting(): bool
     {
@@ -181,5 +172,13 @@ final class NameYaMarketProductProperty implements YaMarketProductPropertyInterf
 
 
         return empty($name) ? null : trim($name);
+    }
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool
+    {
+        return self::PARAM === $value;
     }
 }

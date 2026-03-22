@@ -44,6 +44,21 @@ final class PicturesYaMarketProductProperty implements YaMarketProductPropertyIn
         #[Autowire(env: 'CDN_HOST')] private readonly ?string $CDN_HOST = null,
     ) {}
 
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
+    {
+        return 600;
+    }
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool
+    {
+        return self::PARAM === $value;
+    }
 
     public function getIndex(): string
     {
@@ -64,22 +79,6 @@ final class PicturesYaMarketProductProperty implements YaMarketProductPropertyIn
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 600;
-    }
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool
-    {
-        return self::PARAM === $value;
     }
 
     public function isSetting(): bool

@@ -38,9 +38,12 @@ final class DiameterYaMarketProductParams implements YaMarketProductParamsInterf
 
     public const int ID = 27142895;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Диаметр';
+        return 610;
     }
 
     public function required(): bool
@@ -57,24 +60,6 @@ final class DiameterYaMarketProductParams implements YaMarketProductParamsInterf
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 610;
-    }
-
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
-    {
-        $param = mb_strtolower((string) $param);
-
-        return in_array($param, [(string) self::ID, 'диаметр', 'радиус'], true);
     }
 
     public function isSetting(): bool
@@ -113,5 +98,20 @@ final class DiameterYaMarketProductParams implements YaMarketProductParamsInterf
 
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [(string) self::ID, 'диаметр', 'радиус'], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Диаметр';
     }
 }

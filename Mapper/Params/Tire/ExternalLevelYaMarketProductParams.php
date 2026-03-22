@@ -38,9 +38,12 @@ final class ExternalLevelYaMarketProductParams implements YaMarketProductParamsI
 
     public const int ID = 14805775;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Уровень внешнего шума';
+        return 620;
     }
 
     public function required(): bool
@@ -57,24 +60,6 @@ final class ExternalLevelYaMarketProductParams implements YaMarketProductParamsI
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 620;
-    }
-
-    /**
-     * Проверяет, относится ли значение к данному объекту
-     */
-    public function equals(int|string $param): bool
-    {
-        $param = mb_strtolower((string) $param);
-
-        return in_array($param, [(string) self::ID, 'уровень внешнего шума', "уровень шума"], true);
     }
 
     public function isSetting(): bool
@@ -115,5 +100,20 @@ final class ExternalLevelYaMarketProductParams implements YaMarketProductParamsI
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли значение к данному объекту
+     */
+    public function equals(int|string $param): bool
+    {
+        $param = mb_strtolower((string) $param);
+
+        return in_array($param, [(string) self::ID, 'уровень внешнего шума', "уровень шума"], true);
+    }
+
+    public function getName(): string
+    {
+        return 'Уровень внешнего шума';
     }
 }

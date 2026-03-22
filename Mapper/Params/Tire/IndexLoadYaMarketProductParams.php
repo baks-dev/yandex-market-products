@@ -37,9 +37,12 @@ final class IndexLoadYaMarketProductParams implements YaMarketProductParamsInter
 
     public const int ID = 38009670;
 
-    public function getName(): string
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
     {
-        return 'Индекс нагрузки';
+        return 610;
     }
 
     public function required(): bool
@@ -56,14 +59,6 @@ final class IndexLoadYaMarketProductParams implements YaMarketProductParamsInter
     public function choices(): ?array
     {
         return null;
-    }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 610;
     }
 
     /**
@@ -110,5 +105,10 @@ final class IndexLoadYaMarketProductParams implements YaMarketProductParamsInter
         }
 
         return null;
+    }
+
+    public function getName(): string
+    {
+        return 'Индекс нагрузки';
     }
 }

@@ -49,7 +49,7 @@ final class YaMarketProductsSettingsHandler extends AbstractHandler
         /* Отправляем сообщение в шину */
         $this->messageDispatch->dispatch(
             message: new YaMarketProductsSettingsMessage($this->main->getId(), $this->main->getEvent(), $command->getEvent()),
-            transport: 'yandex-market-products'
+            transport: 'yandex-market-products',
         );
 
         return $this->main;

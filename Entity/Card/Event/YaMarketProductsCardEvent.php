@@ -110,9 +110,9 @@ class YaMarketProductsCardEvent extends EntityEvent
         return (string) $this->id;
     }
 
-    public function getId(): YaMarketProductsCardEventUid
+    public function getMain(): ?YaMarketProductsCardUid
     {
-        return $this->id;
+        return $this->main;
     }
 
     /**
@@ -123,10 +123,9 @@ class YaMarketProductsCardEvent extends EntityEvent
         $this->main = $main instanceof YaMarketProductsCard ? $main->getId() : $main;
     }
 
-
-    public function getMain(): ?YaMarketProductsCardUid
+    public function getId(): YaMarketProductsCardEventUid
     {
-        return $this->main;
+        return $this->id;
     }
 
     public function getDto($dto): mixed

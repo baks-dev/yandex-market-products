@@ -39,6 +39,14 @@ final class DownloadableYaMarketProductProperty implements YaMarketProductProper
      */
     public const string PARAM = 'downloadable';
 
+    /**
+     * Сортировка (чем меньше число - тем первым в итерации будет значение)
+     */
+    public static function priority(): int
+    {
+        return 600;
+    }
+
     public function getIndex(): string
     {
         return self::PARAM;
@@ -58,23 +66,6 @@ final class DownloadableYaMarketProductProperty implements YaMarketProductProper
     {
         return ['true', 'false'];
     }
-
-    /**
-     * Сортировка (чем меньше число - тем первым в итерации будет значение)
-     */
-    public static function priority(): int
-    {
-        return 600;
-    }
-
-    /**
-     * Проверяет, относится ли статус к данному объекту
-     */
-    public static function equals(string $value): bool
-    {
-        return self::PARAM === $value;
-    }
-
 
     public function isSetting(): bool
     {
@@ -105,5 +96,13 @@ final class DownloadableYaMarketProductProperty implements YaMarketProductProper
         }
 
         return null;
+    }
+
+    /**
+     * Проверяет, относится ли статус к данному объекту
+     */
+    public static function equals(string $value): bool
+    {
+        return self::PARAM === $value;
     }
 }

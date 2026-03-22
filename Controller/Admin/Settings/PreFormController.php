@@ -56,7 +56,7 @@ final class PreFormController extends AbstractController
 
             return $this->redirectToRoute(
                 'yandex-market-products:admin.settings.newedit.new',
-                ['id' => $PreformDTO->category, 'market' => $PreformDTO->market->getId()]
+                ['id' => $PreformDTO->category, 'market' => $PreformDTO->market->getId()],
             );
         }
 

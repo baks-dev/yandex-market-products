@@ -86,7 +86,7 @@ final class YandexMarketProductsFilterForm extends AbstractType
 
                     $data->setExists($sessionArray['exists'] ?? null);
                 }
-            }
+            },
         );
 
         $builder->addEventListener(
@@ -117,7 +117,7 @@ final class YandexMarketProductsFilterForm extends AbstractType
                     $this->request->getSession()->remove($this->sessionKey);
 
                 }
-            }
+            },
         );
     }
 }

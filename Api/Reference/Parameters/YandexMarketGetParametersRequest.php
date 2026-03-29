@@ -30,11 +30,13 @@ use DateInterval;
 use DomainException;
 use Generator;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Списки характеристик товаров по категориям
  */
+#[Autoconfigure(shared: false)]
 final class YandexMarketGetParametersRequest extends YandexMarket
 {
     private ?int $category = null;

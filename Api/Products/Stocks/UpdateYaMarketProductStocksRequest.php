@@ -28,9 +28,10 @@ namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-final class
-UpdateYaMarketProductStocksRequest extends YandexMarket
+#[Autoconfigure(shared: false)]
+final class UpdateYaMarketProductStocksRequest extends YandexMarket
 {
     private const bool STOP_SALES = false;
 

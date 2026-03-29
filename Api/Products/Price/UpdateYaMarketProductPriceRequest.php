@@ -30,7 +30,9 @@ use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(shared: false)]
 final class UpdateYaMarketProductPriceRequest extends YandexMarket
 {
     private ?string $article = null;

@@ -31,8 +31,10 @@ use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DateInterval;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Contracts\Cache\ItemInterface;
 
+#[Autoconfigure(shared: false)]
 final class GetYaMarketProductPriceRequest extends YandexMarket
 {
     private ?string $article = null;

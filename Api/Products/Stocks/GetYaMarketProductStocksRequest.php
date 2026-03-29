@@ -28,11 +28,13 @@ namespace BaksDev\Yandex\Market\Products\Api\Products\Stocks;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DateInterval;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Информация об остатках и оборачиваемости
  */
+#[Autoconfigure(shared: false)]
 final class GetYaMarketProductStocksRequest extends YandexMarket
 {
     private int $total = 0;

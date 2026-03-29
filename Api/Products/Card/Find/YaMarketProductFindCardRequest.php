@@ -28,7 +28,9 @@ namespace BaksDev\Yandex\Market\Products\Api\Products\Card\Find;
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use Generator;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(shared: false)]
 final class YaMarketProductFindCardRequest extends YandexMarket
 {
     private string|array|false $article = false;

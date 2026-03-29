@@ -33,11 +33,13 @@ use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Калькулятор стоимости услуг
  */
+#[Autoconfigure(shared: false)]
 final class YandexMarketCalculatorRequest extends YandexMarket
 {
     /**

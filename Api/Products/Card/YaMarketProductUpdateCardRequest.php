@@ -26,7 +26,9 @@ declare(strict_types=1);
 namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(shared: false)]
 final class YaMarketProductUpdateCardRequest extends YandexMarket
 {
     /**

@@ -27,7 +27,9 @@ namespace BaksDev\Yandex\Market\Products\Api\Products\Card;
 
 use BaksDev\Yandex\Market\Api\YandexMarket;
 use DomainException;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(shared: false)]
 final class YaMarketProductDeleteCardRequest extends YandexMarket
 {
     /**

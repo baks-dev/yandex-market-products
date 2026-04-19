@@ -961,7 +961,7 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                             'total', stock.total, 
                             'reserve', stock.reserve,
                             'approve', product_stock_approve.value
-                        )) FILTER (WHERE stock.total > stock.reserve AND product_stock_approve.value IS TRUE)
+                        )) FILTER (WHERE stock.total > stock.reserve AND product_stock_approve.value IS NOT FALSE)
             
                         AS product_quantity",
                 )

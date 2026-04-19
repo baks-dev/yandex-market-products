@@ -64,6 +64,7 @@ use BaksDev\Products\Promotion\Entity\Event\Period\ProductPromotionPeriod;
 use BaksDev\Products\Promotion\Entity\Event\Price\ProductPromotionPrice;
 use BaksDev\Products\Promotion\Entity\ProductPromotion;
 use BaksDev\Products\Stocks\BaksDevProductsStocksBundle;
+use BaksDev\Products\Stocks\Entity\Total\Approve\ProductStockApprove;
 use BaksDev\Products\Stocks\Entity\Total\ProductStockTotal;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\Discount\UserProfileDiscount;
 use BaksDev\Users\Profile\UserProfile\Entity\Event\Info\UserProfileInfo;
@@ -954,13 +955,13 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
 
         if(true === ($this->profile instanceof UserProfileUid) && class_exists(BaksDevProductsStocksBundle::class))
         {
-
             $dbal
                 ->addSelect("JSON_AGG ( 
                         DISTINCT JSONB_BUILD_OBJECT (
                             'total', stock.total, 
-                            'reserve', stock.reserve 
-                        )) FILTER (WHERE stock.total > stock.reserve)
+                            'reserve', stock.reserve,
+                            'approve', product_stock_approve.value
+                        )) FILTER (WHERE stock.total > stock.reserve AND product_stock_approve.value IS TRUE)
             
                         AS product_quantity",
                 )
@@ -1004,6 +1005,16 @@ final class CurrentYaMarketProductCardRepository implements CurrentYaMarketProdu
                     $this->profile,
                     UserProfileUid::TYPE,
                 );
+
+
+            $dbal
+                ->leftJoin(
+                    'stock',
+                    ProductStockApprove::class,
+                    'product_stock_approve',
+                    'product_stock_approve.main = stock.id',
+                );
+
 
         }
 

@@ -1,0 +1,138 @@
+<?php
+/*
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
+ *  
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is furnished
+ *  to do so, subject to the following conditions:
+ *  
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *  
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+
+declare(strict_types=1);
+
+namespace BaksDev\Yandex\Market\Products\Controller\Admin\Barcode;
+
+use BaksDev\Barcode\Writer\BarcodeFormat;
+use BaksDev\Barcode\Writer\BarcodeType;
+use BaksDev\Barcode\Writer\BarcodeWrite;
+use BaksDev\Core\Controller\AbstractController;
+use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
+use BaksDev\Core\Type\UidType\ParamConverter;
+use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByEventInterface;
+use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByEventResult;
+use BaksDev\Products\Product\Type\Event\ProductEventUid;
+use BaksDev\Products\Product\Type\Id\ProductUid;
+use BaksDev\Products\Product\Type\Offers\Id\ProductOfferUid;
+use BaksDev\Products\Product\Type\Offers\Variation\Id\ProductVariationUid;
+use BaksDev\Products\Product\Type\Offers\Variation\Modification\Id\ProductModificationUid;
+use BaksDev\Yandex\Market\Products\Repository\Barcode\YaMarketBarcodeSettings\YaMarketBarcodeSettingsInterface;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[AsController]
+#[RoleSecurity('ROLE_YA_MARKET_BARCODE_PRINT')]
+final class PrintController extends AbstractController
+{
+    /**
+     * Штрихкод Yandex market карточки
+     */
+    #[Route('/admin/yandex/barcode/print/{product}/{offer}/{variation}/{modification}', name: 'admin.barcode.print', methods: ['GET'])]
+    public function index(
+        Request $request,
+        #[Target('yandexMarketProductsLogger')] LoggerInterface $logger,
+        YaMarketBarcodeSettingsInterface $YaMarketBarcodeSettings,
+        ProductDetailByEventInterface $ProductDetailByUid,
+        BarcodeWrite $BarcodeWrite,
+        #[ParamConverter(ProductEventUid::class, key: 'product')] ProductEventUid $event,
+        #[ParamConverter(ProductOfferUid::class, key: 'offer')] ?ProductOfferUid $offer = null,
+        #[ParamConverter(ProductVariationUid::class, key: 'variation')] ?ProductVariationUid $variation = null,
+        #[ParamConverter(ProductModificationUid::class, key: 'modification')] ?ProductModificationUid $modification = null,
+    ): Response
+    {
+
+        /**
+         * Получить информацию о продукте
+         */
+
+        /** @var ProductDetailByEventResult $ProductDetail */
+        $ProductDetail = $ProductDetailByUid
+            ->event($event)
+            ->offer($offer)
+            ->variation($variation)
+            ->modification($modification)
+            ->findResult();
+
+        if(false === ($ProductDetail instanceof ProductDetailByEventResult))
+        {
+            $logger->critical(
+                'yandex-market-products: Продукция в упаковке не найдена',
+                [
+                    'event' => $event,
+                    'offer' => $offer,
+                    'variation' => $variation,
+                    'modification' => $modification,
+                    self::class.':'.__LINE__],
+            );
+
+            return new Response('Продукция в упаковке не найдена', Response::HTTP_NOT_FOUND);
+        }
+
+        /**
+         * Сгенерировать штрихкод продукции (один на все заказы)
+         */
+        $barcode = $BarcodeWrite
+            ->text($ProductDetail->getProductBarcode())
+            ->type(BarcodeType::Code128)
+            ->format(BarcodeFormat::SVG)
+            ->generate();
+
+        if($barcode === false)
+        {
+            /**
+             * Проверить права на исполнение
+             * chmod +x /home/bundles.baks.dev/vendor/baks-dev/barcode/Writer/Generate
+             * chmod +x /home/bundles.baks.dev/vendor/baks-dev/barcode/Reader/Decode
+             * */
+            throw new RuntimeException('Barcode write error');
+        }
+
+        $render = $BarcodeWrite->render();
+        $BarcodeWrite->remove();
+        $render = strip_tags($render, ['path']);
+        $render = trim($render);
+
+        /**
+         * Получить настройки бокового стикера
+         */
+        $BarcodeSettings = ($ProductDetail->getProductMain()) instanceof ProductUid ?
+            $YaMarketBarcodeSettings->forProduct($ProductDetail->getProductMain())->find() : false;
+
+        return $this->render(
+            parameters: [
+                'barcode' => $render,
+                'settings' => $BarcodeSettings,
+                'total' => $request->get('total', 1),
+                'product' => $ProductDetail,
+            ],
+            file: 'print.html.twig',
+        );
+    }
+}

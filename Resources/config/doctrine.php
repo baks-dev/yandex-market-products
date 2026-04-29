@@ -24,6 +24,8 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BaksDev\Yandex\Market\Products\BaksDevYandexMarketProductsBundle;
+use BaksDev\Yandex\Market\Products\Type\Barcode\Event\YaMarketBarcodeEventUid;
+use BaksDev\Yandex\Market\Products\Type\Barcode\Event\YaMarketBarcodeEventUidType;
 use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventType;
 use BaksDev\Yandex\Market\Products\Type\Card\Event\YaMarketProductsCardEventUid;
 use BaksDev\Yandex\Market\Products\Type\Card\Id\YaMarketProductsCardType;
@@ -49,6 +51,7 @@ return static function(DoctrineConfig $doctrine): void {
     $doctrine->dbal()->type(YandexMarketProductUid::TYPE)->class(YandexMarketProductType::class);
     $doctrine->dbal()->type(YandexMarketProductImageUid::TYPE)->class(YandexMarketProductImageType::class);
 
+    $doctrine->dbal()->type(YaMarketBarcodeEventUid::TYPE)->class(YaMarketBarcodeEventUidType::class);
 
     $emDefault = $doctrine->orm()->entityManager('default')->autoMapping(true);
 

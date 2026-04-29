@@ -79,3 +79,30 @@ ROLE_YA_MARKET_PRODUCTS_CARD_GET:
 ROLE_YA_MARKET_PRODUCTS_CARD_POST:
   name: 'Обновить новые'
   desc: 'Обновить новые карточки на Market'
+
+
+# Yandex Barcode
+
+ROLE_YA_MARKET_BARCODE:
+  name: 'Штрихкоды Yandex'
+  desc: 'Настройки стикеров для штрихкода Yandex'
+
+ROLE_YA_MARKET_BARCODE_INDEX:
+  name: 'Просмотр'
+  desc: ''
+
+ROLE_YA_MARKET_BARCODE_PRINT:
+  name: 'Печать'
+  desc: ''
+
+ROLE_YA_MARKET_BARCODE_NEW:
+  name: 'Добавить'
+  desc: ''
+
+ROLE_YA_MARKET_BARCODE_EDIT:
+  name: 'Редактировать'
+  desc: ''
+
+ROLE_YA_MARKET_BARCODE_DELETE:
+  name: 'Удалить'
+  desc: ''

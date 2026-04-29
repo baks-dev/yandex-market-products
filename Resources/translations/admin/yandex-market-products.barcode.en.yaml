@@ -1,0 +1,24 @@
+admin:
+  page:
+    index: 'Setting up Yandex barcodes'
+    new: 'Add Yandex barcode setting'
+    edit: 'Edit Yandex barcode settings'
+    delete: 'Delete Yandex barcode setting'
+
+  breadcrumb:
+    index: 'Setting up Yandex product card barcodes'
+    new: 'Add barcode settings for Yandex product cards'
+    edit: 'Edit the barcode settings for the Yandex product card'
+    delete: 'Delete the Yandex product card barcode setting'
+
+  success:
+    new: 'Yandex barcode settings added'
+    edit: 'Yandex barcode settings have been successfully updated'
+    delete: 'Yandex barcode settings have been successfully deleted'
+    restore: 'Yandex barcode settings have been successfully restored'
+
+  danger:
+    new: '%s: Error when adding barcode settings for Yandex product cards'
+    edit: '%s: Error when updating the Yandex product card barcode settings'
+    delete: '%s: Error when updating the Yandex product card barcode settings'
+    restore: '%s: Error when restoring the Yandex product card barcode settings'

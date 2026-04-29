@@ -1,10 +1,10 @@
 {# @var settings \BaksDev\Yandex\Market\Products\Repository\Barcode\YaMarketBarcodeSettings\YaMarketBarcodeSettingsResult #}
-
+{# @var card \BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByEventResult #}
 {% if card %}
 
     <div>
 
-        {% if settings.name and card.productName %}
+        {% if settings.name is defined and card.productName %}
             <div style="white-space: nowrap;">
                 Название: {{ string_width(card.productName, 32) }}
             </div>
@@ -43,7 +43,7 @@
 
         {% endif %}
 
-        <div>Дата производства: {{ "now"|date("d.m.Y") }}</div>
+        <div>Дата: {{ "now"|date("d.m.Y") }}</div>
     </div>
 
     <div class="text-end" style="float: right;">

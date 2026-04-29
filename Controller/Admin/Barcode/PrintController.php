@@ -34,7 +34,6 @@ use BaksDev\Core\Type\UidType\ParamConverter;
 use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByEventInterface;
 use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByEventResult;
 use BaksDev\Products\Product\Type\Event\ProductEventUid;
-use BaksDev\Products\Product\Type\Id\ProductUid;
 use BaksDev\Products\Product\Type\Offers\Id\ProductOfferUid;
 use BaksDev\Products\Product\Type\Offers\Variation\Id\ProductVariationUid;
 use BaksDev\Products\Product\Type\Offers\Variation\Modification\Id\ProductModificationUid;
@@ -48,7 +47,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-#[RoleSecurity('ROLE_YA_MARKET_BARCODE_PRINT')]
+#[RoleSecurity(['ROLE_YA_MARKET_BARCODE_PRINT', 'ROLE_ORDERS'])]
 final class PrintController extends AbstractController
 {
     /**
@@ -95,6 +94,16 @@ final class PrintController extends AbstractController
             return new Response('Продукция в упаковке не найдена', Response::HTTP_NOT_FOUND);
         }
 
+        if(empty($ProductDetail->getProductBarcode()))
+        {
+            $logger->critical(
+                sprintf('%s: Не указан штрихкод продукта в карточке', $ProductDetail->getProductArticle()),
+                [self::class.':'.__LINE__],
+            );
+
+            return new Response('Не указан штрихкод продукта', Response::HTTP_NOT_FOUND);
+        }
+
         /**
          * Сгенерировать штрихкод продукции (один на все заказы)
          */
@@ -122,8 +131,9 @@ final class PrintController extends AbstractController
         /**
          * Получить настройки бокового стикера
          */
-        $BarcodeSettings = ($ProductDetail->getProductMain()) instanceof ProductUid ?
-            $YaMarketBarcodeSettings->forProduct($ProductDetail->getProductMain())->find() : false;
+        $BarcodeSettings = $YaMarketBarcodeSettings
+                ->forProduct($ProductDetail->getProductMain())
+                ->find();
 
         return $this->render(
             parameters: [

@@ -1,0 +1,50 @@
+{% trans_default_domain("yandex-market-products.barcode") %}
+
+<tr class="vertical-middle">
+
+    <td class="text-nowrap">
+        {# Пользовательское меню #}
+        {{ include(_self|replace({ "card.html.twig": "_usecase.html.twig" })) }}
+    </td>
+
+    <td class="ps-5">
+        <div class="d-flex align-items-center">
+
+            {# Обложка #}
+            {% set image_path = '/assets/'~version~'/img/blank.svg' %}
+
+            {% if item.categoryCoverExt is defined and item.categoryCoverExt is not null %}
+                {% set image_path = cdn_image_path(item.categoryCoverImg, item.categoryCoverExt, item.categoryCoverCdn) %}
+            {% endif %}
+
+
+            <a href="{{ path('yandex-market-products:admin.settings.newedit.edit', { id: item.event }) }}" class="pe-3">
+                <div class="rounded-circle bg-contain lazy p-1" style="width: 50px; height: 50px;"
+                     data-bg="{{ image_path }}"
+                >
+                </div>
+            </a>
+
+            <div>
+                {# Название #}
+                <a href="{{ path('yandex-market-products:admin.barcode.newedit.edit', { id: item.event }) }}"
+                   class="fw-bolder text-decoration-none mb-1 modal-link disabled"
+                   data-bs-toggle="modal"
+                   data-bs-target="#modal"
+                >
+                    {{ item.categoryName }}
+                </a>
+
+                {# Описание #}
+                {% if item.categoryDescription %}
+                    <div class="text-muted fw-bolder">
+                        {{ item.categoryDescription }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </td>
+
+</tr>

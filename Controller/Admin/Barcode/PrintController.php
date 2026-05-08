@@ -132,7 +132,7 @@ final class PrintController extends AbstractController
          * Получить настройки бокового стикера
          */
         $BarcodeSettings = $YaMarketBarcodeSettings
-                ->forProduct($ProductDetail->getProductMain())
+            ->forProduct($ProductDetail->getProductId())
                 ->find();
 
         return $this->render(

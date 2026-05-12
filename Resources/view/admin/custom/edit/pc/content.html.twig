@@ -1,10 +1,12 @@
 {% trans_default_domain 'yandex-market-products.admin' %}
 
+{# @var product \BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByInvariableResult #}
+
 <div class="modal-dialog modal-dialog-centered " style="max-width: 850px;">
 
     {% if product %}
 
-        {% set arr_property = product.getCategorySectionField()|json_decode %}
+        {% set arr_property = product.getCategorySectionField() %}
 
         {{ form_start(form) }}
 

@@ -117,4 +117,9 @@ class YandexMarketProductCustomImage extends EntityState implements UploadEntity
     {
         return $this->name;
     }
+
+    public function isCdn(): bool
+    {
+        return $this->cdn === true;
+    }
 }

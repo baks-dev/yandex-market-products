@@ -121,7 +121,7 @@ final readonly class UpdateStocksYaMarketByIncomingDispatcher
 
                 $this->messageDispatch->dispatch(
                     $YaMarketProductsStocksMessage,
-                    stamps: [new MessageDelay('5 seconds')], // задержка 5 сек для обновления карточки
+                    stamps: [new MessageDelay('1 minutes')], // задержка 5 сек для обновления карточки
                     transport: $UserProfileUid.'-low',
                 );
 

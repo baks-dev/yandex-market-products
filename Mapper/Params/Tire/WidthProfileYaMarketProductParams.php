@@ -90,7 +90,7 @@ final class WidthProfileYaMarketProductParams implements YaMarketProductParamsIn
                 return [
                     'parameterId' => $this::ID,
                     'name' => $this->getName(),
-                    'value' => $product_param->value,
+                    'value' => $product_param->value === 'null' ? null : $product_param->value,
                 ];
             }
         }

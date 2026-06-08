@@ -91,7 +91,7 @@ final class DiameterYaMarketProductParams implements YaMarketProductParamsInterf
                 return [
                     'parameterId' => $this::ID,
                     'name' => $this->getName(),
-                    'value' => $translator?->trans($product_param->value, domain: 'field.tire.radius'),
+                    'value' => $product_param->value === 'null' ? null : $translator?->trans($product_param->value, domain: 'field.tire.radius'),
                 ];
             }
         }

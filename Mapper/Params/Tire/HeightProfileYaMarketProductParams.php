@@ -90,7 +90,7 @@ final class HeightProfileYaMarketProductParams implements YaMarketProductParamsI
                 return [
                     'parameterId' => $this::ID,
                     'name' => $this->getName(),
-                    'value' => $product_param->value,
+                    'value' => $product_param->value === 'null' ? null : $product_param->value,
                 ];
             }
         }
